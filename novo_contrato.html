@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Novo Contrato/Transação | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            overflow-x: hidden;
+            display: flex; /* Para o layout com sidebar */
+            min-height: 100vh; /* Garante que o body ocupe toda a altura */
+        }
+
+        /* === Botão Hamburguer (NOVO) === */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        /* === Sidebar Lateral - PADRÃO EXATO DO SEU CÓDIGO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active { /* Para mobile */
+            transform: translateX(0);
+        }
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px; /* Espaço para a sidebar */
+            flex: 1; /* Ocupa o restante do espaço */
+            padding: 40px;
+            box-sizing: border-box;
+            max-width: calc(100% - 320px); /* Ajuste para não encostar na borda direita */
+            transition: margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Espaçamento entre as seções */
+        }
+
+        .main-content header {
+            margin-bottom: 0;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+
+        /* === Seções do Formulário === */
+        .form-section {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-section h3 {
+            color: #04b45f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field label {
+            font-weight: bold;
+            color: #ccc;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-field label::before {
+            content: attr(data-icon);
+            font-size: 1.1em;
+            color: #04b45f;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            background-color: #121212; /* Fundo mais escuro para inputs */
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-field input[type="file"] {
+            padding: 6px; /* Ajuste para o input de arquivo */
+        }
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            border-color: #03a252;
+        }
+
+        .form-field textarea {
+            resize: vertical; /* Permite redimensionar verticalmente */
+            min-height: 80px;
+        }
+
+        /* === Botoes === */
+        .botoes {
+            display: flex;
+            flex-wrap: wrap; /* Permite que os botões quebrem a linha */
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: flex-start; /* Alinha botões à esquerda */
+        }
+
+        .botoes button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .botoes button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+
+        .botoes button.cancelar {
+            background-color: #e74c3c; /* Cor vermelha para cancelar */
+        }
+        .botoes button.cancelar:hover {
+            background-color: #c0392b;
+        }
+        .botoes button.simular {
+             background-color: #3498db; /* Cor azul para simular */
+        }
+        .botoes button.simular:hover {
+            background-color: #2980b9;
+        }
+
+        /* === Simulador de Parcelas - Resultados === */
+        #simulacao-results {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-top: 30px; /* Espaço do formulário */
+            display: none; /* Inicia oculto */
+            flex-direction: column;
+            gap: 20px;
+        }
+        #simulacao-results h3 {
+            color: #04b45f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+            text-align: center;
+        }
+        .result-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .result-box {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            flex: 1; /* Para ocupar espaço igual */
+            min-width: 150px; /* Mínimo para não quebrar muito */
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+        }
+        .result-box p:first-child {
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .result-box p:last-child {
+            color: #04b45f;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 0;
+        }
+
+        .tabela-amortizacao-container {
+            overflow-x: auto; /* Para a tabela rolar em telas pequenas */
+        }
+        .tabela-amortizacao-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tabela-amortizacao-container th, .tabela-amortizacao-container td {
+            padding: 10px 15px;
+            border: 1px solid rgba(4, 180, 95, 0.3);
+            text-align: left;
+            font-size: 14px;
+        }
+        .tabela-amortizacao-container th {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .tabela-amortizacao-container td {
+            background-color: #121212;
+            color: #ccc;
+        }
+        .tabela-amortizacao-container tr:nth-child(even) td {
+            background-color: #1a1a1a; /* Cor mais escura para linhas pares */
+        }
+        
+        /* === Rodapé do Conteúdo Principal === */
+        .main-content-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding-top: 20px;
+            border-top: 1px solid rgba(4, 180, 95, 0.3);
+            margin-top: auto; /* Empurra o rodapé para baixo */
+        }
+
+        /* === Janela de Sugestão (do dashboard) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px; /* Para não ficar muito largo em desktop */
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* ========================================= */
+        /* === MEDIA QUERIES para Responsividade === */
+        /* ========================================= */
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                left: 0;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+                margin-right: 0;
+            }
+
+            body.sidebar-open .main-content {
+                margin-left: 240px;
+                max-width: calc(100% - 240px);
+                filter: brightness(0.5);
+                pointer-events: none;
+            }
+
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 20px;
+            }
+
+            .main-content header h1 {
+                font-size: 24px;
+            }
+
+            .main-content header .header-icon {
+                font-size: 24px;
+            }
+
+            .form-section {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .form-section h3 {
+                font-size: 18px;
+            }
+
+            .form-field label {
+                font-size: 14px;
+            }
+
+            .form-field input,
+            .form-field select,
+            .form-field textarea {
+                font-size: 13px;
+                padding: 8px;
+            }
+
+            .botoes {
+                flex-direction: column; /* Botões empilhados */
+                gap: 10px;
+                align-items: stretch; /* Estica os botões para a largura total */
+            }
+
+            .botoes button {
+                width: 100%; /* Botões ocupam largura total */
+                justify-content: center; /* Centraliza o texto */
+                padding: 10px 15px;
+                font-size: 15px;
+            }
+
+            .result-boxes {
+                flex-direction: column; /* Empilha os boxes de resultado */
+                align-items: stretch;
+            }
+
+            .result-box {
+                min-width: unset; /* Remove min-width */
+                flex: none; /* Não cresce mais */
+            }
+
+            .janela-sugestao {
+                bottom: 15px;
+                right: 15px;
+                max-width: calc(100% - 30px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-menu {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 20px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .main-content header h1 {
+                font-size: 22px;
+            }
+
+            .form-section h3 {
+                font-size: 16px;
+            }
+
+            .tabela-amortizacao-container th, .tabela-amortizacao-container td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Novo Contrato/Transação</h1>
+            <span class="header-icon">✨</span>
+        </header>
+
+        <form id="contractForm">
+            <div class="form-section">
+                <h3>Detalhes Principais do Contrato</h3>
+                <div class="form-field">
+                    <label for="clienteSelect" data-icon="👤">Selecione o Cliente:</label>
+                    <select id="clienteSelect" required>
+                        <option value="">-- Escolha um cliente cadastrado --</option>
+                        <option value="cliente1">João da Silva (ID: 123)</option>
+                        <option value="cliente2">Maria Oliveira (ID: 456)</option>
+                        <option value="cliente3">Carlos Pereira (ID: 789)</option>
+                        <option value="cliente4">Ana Costa (ID: 101)</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="valor-total" data-icon="💰">Valor Total do Contrato (R$):</label>
+                    <input type="number" id="valor-total" placeholder="Ex: 1500.00" step="0.01" min="0" required />
+                </div>
+
+                <div class="form-field">
+                    <label for="parcelas" data-icon="🗓️">Número de Parcelas:</label>
+                    <input type="number" id="parcelas" placeholder="Ex: 12" min="1" required />
+                </div>
+
+                <div class="form-field">
+                    <label for="taxa-juros" data-icon="📈">Taxa de Juros Mensal (%):</label>
+                    <input type="number" id="taxa-juros" placeholder="Ex: 2.5 (para 2.5%)" step="0.01" min="0" required />
+                </div>
+
+                <div class="form-field">
+                    <label for="data-inicio" data-icon="📆">Data de Início do Contrato:</label>
+                    <input type="date" id="data-inicio" required />
+                </div>
+
+                <div class="form-field">
+                    <label for="data-primeira-parcela" data-icon="🗓️">Data da Primeira Parcela:</label>
+                    <input type="date" id="data-primeira-parcela" required />
+                </div>
+
+                <div class="form-field">
+                    <label for="tipo-contrato" data-icon="📄">Tipo de Contrato:</label>
+                    <select id="tipo-contrato">
+                        <option value="emprestimo">Empréstimo</option>
+                        <option value="financiamento">Financiamento</option>
+                        <option value="servico">Serviço</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="observacoes" data-icon="💬">Observações Iniciais:</label>
+                    <textarea id="observacoes" placeholder="Adicione observações importantes sobre o contrato..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-section" id="section-emprestimo">
+                <h3>Detalhes do Empréstimo</h3>
+                <div class="form-field">
+                    <label for="valor-entrada" data-icon="💸">Valor de Entrada / Sinal (R$):</label>
+                    <input type="number" id="valor-entrada" placeholder="Ex: 500.00" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="periodo-carencia" data-icon="⏳">Período de Carência (dias):</label>
+                    <input type="number" id="periodo-carencia" placeholder="Ex: 30" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="juros-mora" data-icon="⚠️">Juros de Mora ao Mês (%):</label>
+                    <input type="number" id="juros-mora" placeholder="Ex: 0.03 (para 0.03%)" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="multa-atraso" data-icon="🚨">Multa por Atraso (%):</label>
+                    <input type="number" id="multa-atraso" placeholder="Ex: 2 (para 2%)" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="tipo-simulacao" data-icon="🧮">Tipo de Simulação:</label>
+                    <select id="tipo-simulacao">
+                        <option value="price">Tabela Price</option>
+                        <option value="sac">SAC</option>
+                        <option value="juros-simples">Juros Simples (Pagamento Único)</option>
+                        <option value="juros-compostos">Juros Compostos (Pagamento Único)</option>
+                    </select>
+                </div>
+                <div class="botoes">
+                    <button type="button" class="simular" onclick="simularEmprestimo()">📊 Simular Empréstimo</button>
+                </div>
+            </div>
+
+            <div class="form-section" id="section-aluguel">
+                <h3>Detalhes do Contrato de Aluguel</h3>
+                <div class="form-field">
+                    <label for="valor-aluguel" data-icon="🏠">Valor do Aluguel (R$):</label>
+                    <input type="number" id="valor-aluguel" placeholder="Ex: 1200.00" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="data-inicio-aluguel" data-icon="🗓️">Data de Início do Aluguel:</label>
+                    <input type="date" id="data-inicio-aluguel" />
+                </div>
+                <div class="form-field">
+                    <label for="data-fim-aluguel" data-icon="🗓️">Data de Fim do Aluguel:</label>
+                    <input type="date" id="data-fim-aluguel" />
+                </div>
+                <div class="form-field">
+                    <label for="dia-vencimento-aluguel" data-icon="📅">Dia de Vencimento:</label>
+                    <input type="number" id="dia-vencimento-aluguel" placeholder="Ex: 5" min="1" max="31" />
+                </div>
+                <div class="form-field">
+                    <label for="indice-reajuste" data-icon="📈">Índice de Reajuste:</label>
+                    <input type="text" id="indice-reajuste" placeholder="Ex: IGPM, IPCA" />
+                </div>
+                <div class="form-field">
+                    <label for="caucao-fianca" data-icon="🔒">Caução / Fiança:</label>
+                    <input type="text" id="caucao-fianca" placeholder="Ex: 3 meses de aluguel ou Fiador" />
+                </div>
+            </div>
+
+            <div class="form-section" id="section-venda">
+                <h3>Acordo de Venda (Produto/Serviço)</h3>
+                <div class="form-field">
+                    <label for="descricao-item" data-icon="📦">Descrição do Item/Serviço:</label>
+                    <textarea id="descricao-item" placeholder="Detalhes do produto ou serviço vendido..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="valor-venda" data-icon="💲">Valor da Venda (R$):</label>
+                    <input type="number" id="valor-venda" placeholder="Ex: 500.00" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="condicoes-pagamento-venda" data-icon="💳">Condições de Pagamento:</label>
+                    <textarea id="condicoes-pagamento-venda" placeholder="Ex: À vista, 3x no cartão, boleto..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="data-entrega-venda" data-icon="🚚">Data de Entrega/Conclusão:</label>
+                    <input type="date" id="data-entrega-venda" />
+                </div>
+            </div>
+
+            <div class="form-section" id="section-rolo">
+                <h3>Rolo / Troca / Permuta</h3>
+                <div class="form-field">
+                    <label for="descricao-rolo" data-icon="🔄">Descrição da Troca/Itens Envolvidos:</label>
+                    <textarea id="descricao-rolo" placeholder="Descreva os itens ou valores que serão trocados..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="valor-estimado-rolo" data-icon="💰">Valor Estimado Envolvido (R$):</label>
+                    <input type="number" id="valor-estimado-rolo" placeholder="Ex: 2000.00" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="condicoes-rolo" data-icon="🤝">Condições da Permuta:</label>
+                    <textarea id="condicoes-rolo" placeholder="Detalhes e condições do rolo/troca..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-section" id="section-servico">
+                <h3>Acordo de Serviço</h3>
+                <div class="form-field">
+                    <label for="descricao-servico" data-icon="🛠️">Descrição Detalhada do Serviço:</label>
+                    <textarea id="descricao-servico" placeholder="O que será executado, escopo, etc."></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="valor-servico" data-icon="💲">Valor do Serviço (R$):</label>
+                    <input type="number" id="valor-servico" placeholder="Ex: 800.00" step="0.01" min="0" />
+                </div>
+                <div class="form-field">
+                    <label for="forma-pagamento-servico" data-icon="💳">Forma de Pagamento:</label>
+                    <input type="text" id="forma-pagamento-servico" placeholder="Ex: Pix, Cartão, Boleto" />
+                </div>
+                <div class="form-field">
+                    <label for="prazo-servico" data-icon="🗓️">Prazo de Conclusão:</label>
+                    <input type="text" id="prazo-servico" placeholder="Ex: 15 dias úteis, 30/08/2025" />
+                </div>
+            </div>
+
+            <div class="form-section" id="section-outros">
+                <h3>Outros Acordos Financeiros</h3>
+                <div class="form-field">
+                    <label for="nome-acordo-outros" data-icon="📝">Nome/Título do Acordo:</label>
+                    <input type="text" id="nome-acordo-outros" placeholder="Ex: Acordo de Quitação, Parceria" />
+                </div>
+                <div class="form-field">
+                    <label for="descricao-outros" data-icon="💬">Descrição do Acordo:</label>
+                    <textarea id="descricao-outros" placeholder="Detalhe as condições e termos do acordo..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="valor-outros" data-icon="💰">Valor Envolvido (R$):</label>
+                    <input type="number" id="valor-outros" placeholder="Ex: 1000.00" step="0.01" min="0" />
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Termos e Observações Gerais</h3>
+                <div class="form-field">
+                    <label data-icon="📜">Termos e Condições Específicas:</label>
+                    <textarea id="termos-gerais" placeholder="Insira cláusulas, regras adicionais ou termos importantes que se aplicam a todos os contratos."></textarea>
+                </div>
+                <div class="form-field">
+                    <label data-icon="📎">Anexar Documentos Relacionados:</label>
+                    <input type="file" id="anexar-documentos" multiple />
+                    <small style="color: #ccc;">Para referência visual. O upload real exigiria um backend.</small>
+                </div>
+            </div>
+
+            <div class="form-section" id="simulacao-results">
+                <h3>Resultados da Simulação</h3>
+                <div class="result-boxes">
+                    <div class="result-box">
+                        <p>Valor da Parcela:</p>
+                        <p id="parcela-result">R$ 0,00</p>
+                    </div>
+                    <div class="result-box">
+                        <p>Total a Pagar:</p>
+                        <p id="total-pagar-result">R$ 0,00</p>
+                    </div>
+                    <div class="result-box">
+                        <p>Juros Totais:</p>
+                        <p id="juros-total-result">R$ 0,00</p>
+                    </div>
+                </div>
+                <div id="tabela-amortizacao-container" class="tabela-amortizacao-container">
+                    </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Observações Finais do Contrato</h3>
+                <div class="form-field">
+                    <label data-icon="🗒️">Observações Gerais:</label>
+                    <textarea placeholder="Quaisquer outras informações relevantes sobre este contrato."></textarea>
+                </div>
+            </div>
+
+            <div class="botoes">
+                <button type="submit" onclick="salvarContrato()">✅ Salvar Contrato</button>
+                <button type="button" class="cancelar" onclick="window.location.href='contratos.html'">❌ Cancelar</button>
+                <button type="button" onclick="gerarPDF()">📥 Gerar PDF do Contrato</button>
+            </div>
+        </form>
+
+        <footer class="main-content-footer">Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const mainContent = document.getElementById('main-content');
+
+            hamburgerMenu.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                document.body.classList.toggle('sidebar-open');
+            });
+
+            // Fechar sidebar ao clicar fora (apenas em mobile)
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                }
+            });
+
+            // Ativar link da sidebar
+            const currentPath = window.location.pathname.split('/').pop();
+            const navLinks = document.querySelectorAll('.sidebar nav ul li a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+
+            // --- Lógica de exibição de seções dinâmicas ---
+            const tipoContratoSelect = document.getElementById('tipo-contrato');
+            const sections = {
+                'emprestimo': document.getElementById('section-emprestimo'),
+                'financiamento': document.getElementById('section-emprestimo'), // Reutiliza a seção de empréstimo para financiamento
+                'aluguel': document.getElementById('section-aluguel'),
+                'venda': document.getElementById('section-venda'),
+                'rolo': document.getElementById('section-rolo'),
+                'servico': document.getElementById('section-servico'),
+                'outros': document.getElementById('section-outros')
+            };
+
+            function toggleSections() {
+                const selectedType = tipoContratoSelect.value;
+                for (const key in sections) {
+                    if (sections[key]) {
+                        sections[key].style.display = 'none';
+                    }
+                }
+                if (sections[selectedType]) {
+                    sections[selectedType].style.display = 'flex';
+                }
+            }
+
+            tipoContratoSelect.addEventListener('change', toggleSections);
+            toggleSections(); // Chama na carga da página para exibir a seção inicial
+
+            // --- Lógica do Simulador de Empréstimo ---
+            window.simularEmprestimo = function() {
+                const valorTotal = parseFloat(document.getElementById('valor-total').value);
+                const parcelas = parseInt(document.getElementById('parcelas').value);
+                const taxaJuros = parseFloat(document.getElementById('taxa-juros').value) / 100; // Converte para decimal
+                const valorEntrada = parseFloat(document.getElementById('valor-entrada').value) || 0;
+                const tipoSimulacao = document.getElementById('tipo-simulacao').value;
+
+                if (isNaN(valorTotal) || isNaN(parcelas) || isNaN(taxaJuros) || valorTotal <= 0 || parcelas <= 0 || taxaJuros < 0) {
+                    alert('Por favor, preencha todos os campos obrigatórios do empréstimo com valores válidos.');
+                    return;
+                }
+
+                const valorFinanciado = valorTotal - valorEntrada;
+                let valorParcela = 0;
+                let jurosTotais = 0;
+                let totalAPagar = 0;
+                let tabelaHTML = '';
+
+                if (tipoSimulacao === 'price') {
+                    if (taxaJuros === 0) {
+                        valorParcela = valorFinanciado / parcelas;
+                        jurosTotais = 0;
+                    } else {
+                        valorParcela = valorFinanciado * (taxaJuros / (1 - Math.pow(1 + taxaJuros, -parcelas)));
+                    }
+                    totalAPagar = valorParcela * parcelas + valorEntrada;
+                    jurosTotais = totalAPagar - valorTotal;
+
+                    tabelaHTML = '<h4>Tabela de Amortização (Price)</h4><table><thead><tr><th>Parcela</th><th>Amortização</th><th>Juros</th><th>Pagamento</th><th>Saldo Devedor</th></tr></thead><tbody>';
+                    let saldoDevedor = valorFinanciado;
+                    for (let i = 1; i <= parcelas; i++) {
+                        const juros = saldoDevedor * taxaJuros;
+                        const amortizacao = valorParcela - juros;
+                        saldoDevedor -= amortizacao;
+                        tabelaHTML += `<tr><td>${i}</td><td>R$ ${amortizacao.toFixed(2)}</td><td>R$ ${juros.toFixed(2)}</td><td>R$ ${valorParcela.toFixed(2)}</td><td>R$ ${saldoDevedor.toFixed(2)}</td></tr>`;
+                    }
+                    tabelaHTML += '</tbody></table>';
+
+                } else if (tipoSimulacao === 'sac') {
+                    const amortizacaoFixa = valorFinanciado / parcelas;
+                    tabelaHTML = '<h4>Tabela de Amortização (SAC)</h4><table><thead><tr><th>Parcela</th><th>Amortização</th><th>Juros</th><th>Pagamento</th><th>Saldo Devedor</th></tr></thead><tbody>';
+                    let saldoDevedor = valorFinanciado;
+                    totalAPagar = valorEntrada;
+                    jurosTotais = 0;
+
+                    for (let i = 1; i <= parcelas; i++) {
+                        const juros = saldoDevedor * taxaJuros;
+                        valorParcela = amortizacaoFixa + juros;
+                        saldoDevedor -= amortizacaoFixa;
+
+                        totalAPagar += valorParcela;
+                        jurosTotais += juros;
+
+                        tabelaHTML += `<tr><td>${i}</td><td>R$ ${amortizacaoFixa.toFixed(2)}</td><td>R$ ${juros.toFixed(2)}</td><td>R$ ${valorParcela.toFixed(2)}</td><td>R$ ${saldoDevedor.toFixed(2)}</td></tr>`;
+                    }
+                    tabelaHTML += '</tbody></table>';
+
+                } else if (tipoSimulacao === 'juros-simples') {
+                    jurosTotais = valorFinanciado * taxaJuros * parcelas; // parcelas aqui como meses
+                    totalAPagar = valorFinanciado + jurosTotais + valorEntrada;
+                    valorParcela = totalAPagar; // Pagamento único
+                    tabelaHTML = `<p><strong>Juros Simples (Pagamento Único):</strong></p>`;
+                    tabelaHTML += `<p>Valor Financiado: R$ ${valorFinanciado.toFixed(2)}</p>`;
+                    tabelaHTML += `<p>Juros Totais: R$ ${jurosTotais.toFixed(2)}</p>`;
+                    tabelaHTML += `<p>Total a Pagar (com juros): R$ ${totalAPagar.toFixed(2)}</p>`;
+
+                } else if (tipoSimulacao === 'juros-compostos') {
+                    totalAPagar = valorFinanciado * Math.pow((1 + taxaJuros), parcelas) + valorEntrada;
+                    jurosTotais = totalAPagar - valorFinanciado - valorEntrada;
+                    valorParcela = totalAPagar; // Pagamento único
+                    tabelaHTML = `<p><strong>Juros Compostos (Pagamento Único):</strong></p>`;
+                    tabelaHTML += `<p>Valor Financiado: R$ ${valorFinanciado.toFixed(2)}</p>`;
+                    tabelaHTML += `<p>Juros Totais: R$ ${jurosTotais.toFixed(2)}</p>`;
+                    tabelaHTML += `<p>Total a Pagar (com juros): R$ ${totalAPagar.toFixed(2)}</p>`;
+                }
+
+                document.getElementById('parcela-result').textContent = `R$ ${valorParcela.toFixed(2)}`;
+                document.getElementById('total-pagar-result').textContent = `R$ ${totalAPagar.toFixed(2)}`;
+                document.getElementById('juros-total-result').textContent = `R$ ${jurosTotais.toFixed(2)}`;
+                document.getElementById('tabela-amortizacao-container').innerHTML = tabelaHTML;
+                document.getElementById('simulacao-results').style.display = 'flex';
+            };
+
+            window.salvarContrato = function() {
+                // Aqui você coletaria todos os dados do formulário
+                const cliente = document.getElementById('clienteSelect').value;
+                const valorTotal = document.getElementById('valor-total').value;
+                const parcelas = document.getElementById('parcelas').value;
+                const taxaJuros = document.getElementById('taxa-juros').value;
+                const dataInicio = document.getElementById('data-inicio').value;
+                const dataPrimeiraParcela = document.getElementById('data-primeira-parcela').value;
+                const tipoContrato = document.getElementById('tipo-contrato').value;
+                const observacoesIniciais = document.getElementById('observacoes').value;
+                const termosGerais = document.getElementById('termos-gerais').value;
+                // ... coletar todos os outros campos dinâmicos conforme o tipo de contrato
+
+                if (!cliente || !valorTotal || !parcelas || !taxaJuros || !dataInicio || !dataPrimeiraParcela) {
+                    alert('Por favor, preencha todos os campos obrigatórios antes de salvar.');
+                    return;
+                }
+
+                alert('✅ Contrato salvo com sucesso! (Esta é uma simulação, um backend real seria necessário para salvar os dados)');
+                // Futuramente, aqui você enviaria os dados para um servidor
+            };
+
+            window.gerarPDF = function() {
+                const clientName = document.getElementById('clienteSelect').options[document.getElementById('clienteSelect').selectedIndex].text;
+                if (!clientName || clientName === "-- Escolha um cliente cadastrado --") {
+                    alert("Por favor, selecione um cliente antes de gerar o PDF.");
+                    return;
+                }
+
+                const formSections = document.querySelectorAll('.form-section:not(#janela-sugestao):not(#simulacao-results)');
+                const simulacaoResults = document.getElementById('simulacao-results');
+
+                // Cria um elemento temporário para construir o conteúdo do PDF
+                const tempDiv = document.createElement('div');
+                tempDiv.style.fontFamily = "'Segoe UI', sans-serif";
+                tempDiv.style.color = '#333';
+                tempDiv.style.backgroundColor = '#fff';
+                tempDiv.style.padding = '20px';
+
+                // Título principal do PDF
+                const pdfTitle = document.createElement('h1');
+                pdfTitle.textContent = `Contrato/Transação - ${clientName}`;
+                pdfTitle.style.textAlign = 'center';
+                pdfTitle.style.color = '#04b45f';
+                pdfTitle.style.marginBottom = '30px';
+                tempDiv.appendChild(pdfTitle);
+
+                // Adicionar informações do formulário
+                formSections.forEach(section => {
+                    if (section.style.display !== 'none') { // Inclui apenas seções visíveis
+                        const sectionTitle = section.querySelector('h3');
+                        if (sectionTitle) {
+                            const h3 = document.createElement('h3');
+                            h3.textContent = sectionTitle.textContent;
+                            h3.style.color = '#04b45f';
+                            h3.style.marginTop = '20px';
+                            h3.style.marginBottom = '10px';
+                            tempDiv.appendChild(h3);
+                        }
+
+                        section.querySelectorAll('.form-field').forEach(field => {
+                            const label = field.querySelector('label');
+                            const input = field.querySelector('input, select, textarea');
+
+                            if (label && input && input.value) { // Verifica se tem valor
+                                const p = document.createElement('p');
+                                let value = input.value;
+                                if (input.type === 'date') {
+                                    value = new Date(value).toLocaleDateString('pt-BR');
+                                } else if (input.type === 'number') {
+                                    value = parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                } else if (input.tagName === 'SELECT') {
+                                    value = input.options[input.selectedIndex].text;
+                                }
+
+                                p.innerHTML = `<strong>${label.textContent.replace(':', '')}:</strong> ${value}`;
+                                p.style.marginBottom = '5px';
+                                tempDiv.appendChild(p);
+                            }
+                        });
+                    }
+                });
+
+                // Adicione o elemento de resultados da simulação (se estiver visível)
+                if (simulacaoResults.style.display === 'flex') {
+                    const simulacaoHeader = document.createElement('h3');
+                    simulacaoHeader.textContent = 'Simulação de Parcelas';
+                    simulacaoHeader.style.textAlign = 'center';
+                    simulacaoHeader.style.color = '#04b45f';
+                    simulacaoHeader.style.marginTop = '30px';
+                    simulacaoHeader.style.marginBottom = '20px';
+                    tempDiv.appendChild(simulacaoHeader);
+
+                    const resultsContent = document.getElementById('simulacao-results').cloneNode(true);
+                    resultsContent.style.backgroundColor = 'transparent';
+                    resultsContent.style.border = 'none';
+                    resultsContent.style.boxShadow = 'none';
+                    resultsContent.style.padding = '0';
+
+                    const resultBoxes = resultsContent.querySelector('.result-boxes');
+                    if (resultBoxes) {
+                        resultBoxes.style.display = 'flex';
+                        resultBoxes.style.justifyContent = 'space-around';
+                        resultBoxes.style.gap = '15px';
+                        resultBoxes.style.marginBottom = '20px';
+                        resultBoxes.querySelectorAll('.result-box').forEach(box => {
+                            box.style.backgroundColor = '#f0f0f0';
+                            box.style.border = '1px solid #ddd';
+                            box.style.borderRadius = '8px';
+                            box.style.padding = '15px';
+                            box.style.textAlign = 'center';
+                            box.style.flex = '1';
+                            box.style.minWidth = '150px';
+                            box.style.boxShadow = 'none';
+                            box.querySelector('p:first-child').style.color = '#666';
+                            box.querySelector('p:last-child').style.color = '#04b45f';
+                        });
+                    }
+
+                    const tabelaAmortizacaoContainer = resultsContent.querySelector('#tabela-amortizacao-container');
+                    if (tabelaAmortizacaoContainer && tabelaAmortizacaoContainer.innerHTML.trim() !== '') {
+                        const table = tabelaAmortizacaoContainer.querySelector('table');
+                        if (table) {
+                            table.style.width = '100%';
+                            table.style.borderCollapse = 'collapse';
+                            table.querySelectorAll('th, td').forEach(cell => {
+                                cell.style.padding = '8px 12px';
+                                cell.style.border = '1px solid #eee';
+                                cell.style.textAlign = 'left';
+                                cell.style.fontSize = '12px';
+                            });
+                            table.querySelectorAll('th').forEach(th => {
+                                th.style.backgroundColor = '#04b45f';
+                                th.style.color = '#fff';
+                                th.style.fontWeight = 'bold';
+                                th.style.textTransform = 'uppercase';
+                            });
+                            table.querySelectorAll('tr:nth-child(even) td').forEach(td => {
+                                td.style.backgroundColor = '#f9f9f9';
+                            });
+                            table.querySelectorAll('td').forEach(td => {
+                                td.style.backgroundColor = '#fff';
+                                td.style.color = '#333';
+                            });
+                        }
+                    }
+
+                    tempDiv.appendChild(resultsContent);
+                }
+
+
+                const options = {
+                    margin: 10,
+                    filename: `contrato_${clientName.replace(/\s/g, '_')}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().from(tempDiv).set(options).save();
+            };
+
+            // --- Funções para janela de sugestão e WhatsApp ---
+            window.abrirSugestao = function() {
+                const janelaSugestao = document.getElementById('janela-sugestao');
+                janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+            };
+
+            window.enviarSugestao = function() {
+                const janela = document.getElementById("janela-sugestao");
+                const mensagem = janela.querySelector("textarea").value.trim();
+
+                if (mensagem === "") {
+                    alert("Digite uma sugestão antes de enviar.");
+                    return;
+                }
+
+                alert("✅ Sugestão enviada com sucesso!");
+                janela.style.display = "none";
+                janela.querySelector("textarea").value = ""; // Limpa o textarea
+
+                // Aqui futuramente você pode enviar pro WhatsApp ou salvar em banco
+            };
+        });
+    </script>
+</body>
+</html>

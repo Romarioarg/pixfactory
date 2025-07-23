@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Usuário | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden; /* Para evitar rolagem horizontal indesejada */
+            min-height: 100vh; /* Garante que o body ocupe a altura total da viewport */
+            flex-direction: column; /* Altera para coluna em telas pequenas */
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul           { color: #3498db; }
+        .verde          { color: #2ecc71; }
+        .amarelo        { color: #f1c40f; }
+        .vermelho       { color: #e74c3c; }
+        .roxo           { color: #9b59b6; }
+        .azul-claro     { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza          { color: #bdc3c7; }
+        .limao          { color: #a3e635; } /* Cor nova para o Perfil */
+        .roxo-claro     { color: #c084fc; }
+        .laranja        { color: #e67e22; }
+        .azul-escuro    { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px; /* Espaço para a sidebar */
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px); /* Ajuste para preencher a tela */
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        /* Ajuste para o ícone no header */
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px; /* Espaçamento entre as seções */
+        }
+        .section-container:last-child {
+            margin-bottom: 0; /* A última seção não precisa de margem inferior */
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon {
+            font-size: 24px;
+            color: #a3e635; /* Cor para ícones de seção do Perfil */
+        }
+
+        .section-container p {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* Seção de Informações do Perfil */
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .foto-usuario {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.4);
+        }
+
+        .user-details h1 {
+            color: #fff; /* Nome em branco */
+            font-size: 28px;
+            margin: 0 0 8px 0;
+        }
+
+        .user-details p {
+            font-size: 16px;
+            color: #a3e635; /* Cor de destaque para informações importantes */
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-details p .detail-icon {
+            font-size: 18px;
+            color: #04b45f;
+        }
+
+        .edit-button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex; /* Para alinhar ícone e texto */
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .edit-button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+
+        /* Histórico de Atividade (Timeline-like) */
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            padding-left: 20px; /* Espaço para a linha do tempo */
+        }
+
+        .activity-list:before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: rgba(4, 180, 95, 0.3); /* Linha do tempo sutil */
+        }
+
+        .activity-item {
+            background-color: #121212;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-item:before {
+            content: '';
+            position: absolute;
+            left: -18px; /* Alinhado com a linha do tempo */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: #04b45f; /* Ponto na linha do tempo */
+            border-radius: 50%;
+            border: 2px solid #1e1e1e; /* Borda para destaque */
+        }
+
+        .activity-item span.activity-icon {
+            font-size: 18px;
+            color: #a3e635; /* Ícone da atividade */
+        }
+
+        .activity-item .activity-details {
+            font-size: 14px;
+            color: #ccc;
+            flex-grow: 1;
+        }
+        .activity-item .activity-date {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap; /* Não quebrar a data */
+        }
+
+        /* Seção de Plano Atual */
+        .plan-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Para responsividade */
+            gap: 20px;
+        }
+
+        .plan-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .plan-info p {
+            font-size: 15px;
+            margin: 5px 0;
+            color: #ccc;
+        }
+        .plan-info p strong {
+            color: #a3e635; /* Destaque para valores do plano */
+        }
+
+        .upgrade-button {
+            background-color: #3498db; /* Cor azul para upgrade */
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upgrade-button:hover {
+            background-color: #2980b9;
+        }
+
+
+        /* === Janela de Sugestão (do dashboard) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            width: 300px; /* Largura padrão para desktop */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* === Menu Hamburguer e Adaptações para Celular === */
+        .hamburger-menu {
+            display: none; /* Esconde por padrão em desktop */
+            font-size: 28px;
+            color: #04b45f;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100; /* Acima da sidebar */
+            background-color: #1e1e1e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Media Queries para Telas Menores */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px; /* Largura da sidebar no mobile */
+                left: -260px; /* Esconde a sidebar por padrão */
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0; /* Mostra a sidebar */
+            }
+
+            .hamburger-menu {
+                display: block; /* Mostra o menu hambúrguer */
+            }
+
+            .main-content {
+                margin-left: 0; /* Remove a margem da sidebar */
+                padding: 20px;
+                max-width: 100%; /* Ocupa toda a largura */
+                margin-right: 0;
+                padding-top: 80px; /* Espaço para o menu hambúrguer fixo */
+            }
+
+            .main-content header {
+                flex-direction: column; /* Empilha título e ícone */
+                align-items: flex-start;
+            }
+
+            .profile-info {
+                flex-direction: column; /* Empilha foto e detalhes do usuário */
+                align-items: center;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .user-details h1, .user-details p {
+                text-align: center;
+                width: 100%; /* Ocupa a largura total para centralizar */
+            }
+            .user-details p {
+                 justify-content: center; /* Centraliza ícones e texto */
+            }
+
+            .edit-button {
+                width: 100%; /* Botão ocupa a largura total */
+                justify-content: center; /* Centraliza conteúdo do botão */
+            }
+
+            .activity-list {
+                padding-left: 0; /* Remove padding extra para a linha do tempo */
+            }
+            .activity-list:before {
+                left: 10px; /* Ajusta a posição da linha do tempo */
+            }
+            .activity-item {
+                flex-direction: column; /* Empilha ícone, detalhes e data */
+                align-items: flex-start;
+                padding: 10px 15px;
+                gap: 5px;
+            }
+            .activity-item:before {
+                left: -10px; /* Ajusta o ponto da linha do tempo */
+            }
+            .activity-item .activity-date {
+                align-self: flex-end; /* Alinha a data/hora à direita */
+            }
+
+            .plan-details {
+                flex-direction: column; /* Empilha info do plano e botão */
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .upgrade-button {
+                width: 100%; /* Botão ocupa a largura total */
+                justify-content: center; /* Centraliza conteúdo do botão */
+            }
+
+            .janela-sugestao {
+                width: calc(100% - 40px); /* Ocupa quase toda a largura */
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html" class="active"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5581999999999?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Perfil do Usuário</h1>
+            <span class="header-icon">🧑‍💼</span>
+        </header>
+
+        <section class="section-container">
+            <h2><span class="section-icon">🌟</span> Minhas Informações</h2>
+            <div class="profile-info">
+                <img src="https://via.placeholder.com/120/04b45f/121212?text=RM" alt="Foto do usuário" class="foto-usuario" />
+                <div class="user-details">
+                    <h1>Romario Dev</h1>
+                    <p><span class="detail-icon">📧</span> romariodev@pixfactory.com.br</p>
+                    <p><span class="detail-icon">📞</span> (81) 99999-9999</p>
+                    <button class="edit-button" onclick="alert('Redirecionar para página de edição de perfil')">
+                        <span class="detail-icon">🛠️</span> Editar Perfil
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon">💼</span> Meu Plano Atual</h2>
+            <div class="plan-details">
+                <div class="plan-info">
+                    <p>Plano: <strong>Profissional</strong></p>
+                    <p>Recursos Ativos: Clientes Ilimitados, Contratos, Agenda, Exportação, Suporte Prioritário.</p>
+                    <p>Vencimento: <strong>15/08/2025</strong></p>
+                </div>
+                <button class="upgrade-button" onclick="alert('Redirecionar para página de upgrade de plano')">
+                    <span class="detail-icon">🚀</span> Fazer Upgrade
+                </button>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon">📜</span> Histórico de Atividade</h2>
+            <ul class="activity-list">
+                <li class="activity-item">
+                    <span class="activity-icon">✅</span> 
+                    <span class="activity-details">Login realizado com sucesso.</span>
+                    <span class="activity-date">21/07/2025 às 08:42</span>
+                </li>
+                <li class="activity-item">
+                    <span class="activity-icon">📥</span> 
+                    <span class="activity-details">Exportou relatório de <strong>Contratos (CSV)</strong>.</span>
+                    <span class="activity-date">20/07/2025 às 17:15</span>
+                </li>
+                <li class="activity-item">
+                    <span class="activity-icon">✉️</span> 
+                    <span class="activity-details">Enviou cobrança para <strong>Cliente A.</strong></span>
+                    <span class="activity-date">19/07/2025 às 14:30</span>
+                </li>
+                <li class="activity-item">
+                    <span class="activity-icon">📝</span> 
+                    <span class="activity-details">Criou novo cliente: <strong>Maria Oliveira</strong>.</span>
+                    <span class="activity-date">18/07/2025 às 10:00</span>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Função para mostrar/esconder a sidebar em telas menores
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Funções da Janela de Sugestão
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        // Função para abrir WhatsApp (já existente nas outras páginas)
+        function abrirWhatsApp() {
+            const numeroWhatsApp = '5581999999999';
+            const mensagem = 'Olá! Preciso de ajuda com o PixFactory.';
+            const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+
+        // Fecha a sidebar ao clicar em um item do menu (opcional, para UX em mobile)
+        document.querySelectorAll('.sidebar nav ul li a').forEach(item => {
+            item.addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

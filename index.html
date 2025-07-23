@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>PixFactory • Carregando...</title>
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <style>
+        /* Mantendo seus estilos para garantir que a página ainda pareça familiar */
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@600&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center; /* Centralizar o texto de carregamento */
+            font-size: 1.5em;
+        }
+
+        .loading-message {
+            color: #04b45f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-message">
+        <p>Carregando PixFactory...</p>
+        <p>Aguarde um momento enquanto preparamos sua experiência.</p>
+    </div>
+
+    <script>
+        // Redireciona imediatamente para o Dashboard (que agora é seu index.html)
+        // Você pode adicionar um pequeno atraso (por exemplo, 1000ms = 1 segundo)
+        // se quiser que a mensagem de "Carregando" apareça por um instante.
+        // Se quiser atraso, use: setTimeout(function() { window.location.href = 'dashboard.html'; }, 1000);
+        window.location.href = 'dashboard.html'; // Redireciona imediatamente
+    </script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Cliente | PixFactory</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex; /* Mantém para desktop */
+            overflow-x: hidden; /* NOVO: Impede scroll horizontal indesejado */
+        }
+
+        /* === Botão do Menu para Celular (NOVO) === */
+        .menu-toggle {
+            display: none; /* Esconde por padrão, só mostra no celular */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 1100; /* Acima do sidebar */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            /* NOVO: Para animação do menu no celular */
+            transform: translateX(0); /* Começa visível no desktop */
+            transition: transform 0.3s ease-in-out;
+        }
+        /* NOVO: Quando o menu está escondido no celular */
+        .sidebar.active {
+            transform: translateX(0); /* Move para a tela quando ativado */
+        }
+        .sidebar.hidden { /* Adicionado para esconder o menu no celular */
+            transform: translateX(-100%);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral (do dashboard) */
+        .sidebar .icon {
+            font-size: 1em; /* Ajuste para o tamanho padrão dos ícones */
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul            { color: #3498db; }
+        .verde           { color: #2ecc71; }
+        .amarelo         { color: #f1c40f; }
+        .vermelho        { color: #e74c3c; }
+        .roxo            { color: #9b59b6; }
+        .azul-claro      { color: #5dade2; }
+        .vermelho-claro  { color: #f1948a; }
+        .cinza           { color: #bdc3c7; }
+        .limao           { color: #a3e635; }
+        .roxo-claro      { color: #c084fc; }
+        .laranja         { color: #e67e22; }
+        .azul-escuro     { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px; /* Mantém o padding do dashboard para consistência */
+            max-width: calc(100% - 320px); /* Ajustado para 320px como no dashboard */
+            margin-right: 40px; /* Mantém o margin do dashboard */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 0; /* Gerenciado por margin-bottom entre seções */
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px; /* Espaço maior como no dashboard */
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3); /* Linha como no dashboard */
+            padding-bottom: 15px; /* Padding como no dashboard */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px; /* Tamanho da fonte como no dashboard */
+            margin: 0;
+        }
+        
+        /* Ajuste para o ícone no header, se houver */
+        .main-content header .header-icon {
+            font-size: 28px; /* Mantém o tamanho do ícone do header */
+            color: #04b45f;
+        }
+
+
+        /* Seções como a de Busca, Detalhes, Timeline, Histórico */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f; /* Borda verde como no dashboard */
+            border-radius: 10px;
+            padding: 25px; /* Padding maior como nos cards do dashboard */
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15); /* Sombra mais destacada */
+            display: flex;
+            flex-direction: column;
+            gap: 0; /* Gerenciado por margin-bottom entre seções */
+        }
+
+        /* Espaçamento entre as seções individuais */
+        .search-section {
+            margin-bottom: 20px; /* Espaço entre seções */
+        }
+
+        .client-details-section {
+            margin-bottom: 20px;
+        }
+
+        .timeline-section {
+            margin-bottom: 20px; /* Espaço entre Linha do Tempo e Histórico */
+        }
+        .history-section {
+            margin-bottom: 0; /* Última seção não precisa de margem inferior */
+        }
+
+
+        /* === Seção de Busca === */
+        .search-section {
+            padding-top: 15px; /* Ajusta o padding */
+            padding-bottom: 15px;
+        }
+        .search-section input {
+            width: 100%;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-section input::placeholder {
+            color: #888;
+        }
+
+        .search-section input:focus {
+            border-color: #03a252;
+        }
+
+        /* === Seção de Detalhes do Cliente === */
+        .client-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .client-photo {
+            width: 80px; /* Aumentado um pouco */
+            height: 80px; /* Aumentado um pouco */
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #04b45f;
+            flex-shrink: 0;
+        }
+
+        .client-info-main {
+            flex-grow: 1;
+        }
+        .client-info-main h2 {
+            margin: 0 0 5px 0; /* Ajusta margem */
+            color: #04b45f;
+            font-size: 22px; /* Aumenta um pouco */
+        }
+
+        .client-info-main p {
+            margin: 4px 0; /* Ajusta margem */
+            font-size: 14px; /* Aumenta um pouco */
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .client-info-main p strong {
+            color: #04b45f;
+            margin-right: 5px;
+        }
+
+        .client-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Aumenta o espaçamento entre botões */
+            margin-top: 10px; /* Ajusta a margem */
+            justify-content: center; /* NOVO: Centraliza botões */
+        }
+
+        .client-actions button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px; /* Padding maior */
+            border-radius: 8px; /* Raio da borda maior */
+            font-size: 14px; /* Fonte maior */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            flex-grow: 1; /* NOVO: Faz os botões crescerem */
+            min-width: 120px; /* NOVO: Tamanho mínimo para botões */
+        }
+
+        .client-actions button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px); /* Efeito de hover mais pronunciado */
+        }
+
+        /* Cores dos botões específicas */
+        .client-actions .contract-btn { background-color: #04b45f; }
+        .client-actions .edit-btn { background-color: #f1c40f; color: #1e1e1e; }
+        .client-actions .remove-btn { background-color: #e74c3c; }
+
+
+        /* === Linha do Tempo de Parcelas e Histórico - Com ícones nos TÍTULOS e mais compactos === */
+        .timeline-section h2, .history-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Aumenta espaço do ícone no título */
+            color: #04b45f;
+            font-size: 20px; /* Aumenta um pouco */
+            margin-bottom: 10px; /* Aumenta a margem */
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2); /* Adiciona borda sutil como no dashboard */
+            padding-bottom: 5px; /* Adiciona padding para a borda */
+        }
+
+        .timeline-item, .history-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px; /* Aumenta espaçamento */
+            margin-bottom: 8px; /* Aumenta margem entre itens */
+            font-size: 14px; /* Aumenta um pouco */
+            color: #ccc;
+            line-height: 1.4;
+        }
+        .timeline-item:last-child, .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-icon, .history-icon, .title-icon {
+            font-size: 18px; /* Aumenta o ícone */
+            flex-shrink: 0;
+            margin-top: 2px; /* Ajusta alinhamento vertical */
+        }
+
+        /* Cores dos ícones nos itens da lista (ajustadas conforme o print) */
+        .timeline-item .status-pago { color: #2ecc71; }
+        .timeline-item .status-atrasado { color: #e74c3c; }
+        .timeline-item .status-proxima { color: #f1c40f; }
+
+        .history-item .icon-cadastro { color: #3498db; }
+        .history-item .icon-contrato { color: #9b59b6; }
+        .history-item .icon-pagamento { color: #e67e22; }
+        .history-item .icon-classificacao { color: #e74c8c; }
+
+
+        /* Estilos específicos para os ícones nos TÍTULOS das seções (ajustados conforme o print) */
+        .timeline-section .title-icon-timeline { color: #3498db; }
+        .history-section .title-icon-history { color: #9b59b6; }
+
+
+        /* === Janela de Sugestão (do dashboard) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* ============================================================= */
+        /* MÁGICAS PARA TELAS PEQUENAS (CELULAR/TABLET) */
+        /* ============================================================= */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column; /* Coloca sidebar e main um em cima do outro */
+                align-items: center; /* Centraliza o conteúdo principal */
+            }
+
+            .sidebar {
+                width: 280px; /* Largura para o menu quando aberto no celular */
+                transform: translateX(-100%); /* Esconde o menu por padrão */
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Sombra para destacar */
+                /* position: absolute;  Pode ser necessário dependendo do layout, mas fixed costuma funcionar */
+                left: 0; /* Garante que o menu deslize da esquerda */
+            }
+
+            .sidebar.active {
+                transform: translateX(0); /* Mostra o menu quando ativo */
+            }
+
+            .menu-toggle {
+                display: block; /* Mostra o botão do menu */
+            }
+
+            .main-content {
+                margin-left: 0; /* Conteúdo principal ocupa toda a largura */
+                margin-right: 0;
+                padding: 20px; /* Ajusta o padding para celular */
+                max-width: 100%; /* Ocupa a largura total disponível */
+                padding-top: 80px; /* Dá espaço para o botão do menu */
+            }
+
+            .main-content header {
+                flex-direction: column; /* Título e ícone um abaixo do outro */
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .main-content header h1 {
+                font-size: 24px;
+            }
+
+            .main-content header .header-icon {
+                font-size: 24px;
+            }
+
+            .section-container {
+                padding: 15px; /* Reduz o padding das seções */
+                margin-bottom: 15px; /* Reduz o espaço entre seções */
+            }
+
+            .client-header {
+                flex-direction: column; /* Foto e informações uma abaixo da outra */
+                text-align: center;
+                gap: 10px;
+            }
+
+            .client-photo {
+                width: 60px; /* Foto menor no celular */
+                height: 60px;
+            }
+
+            .client-info-main h2 {
+                font-size: 20px; /* Título do cliente menor */
+            }
+
+            .client-info-main p {
+                font-size: 13px; /* Informações do cliente menores */
+            }
+
+            .client-actions {
+                flex-direction: column; /* Botões um abaixo do outro */
+                align-items: stretch; /* Estica os botões para a largura total */
+                gap: 8px; /* Espaço menor entre botões */
+            }
+
+            .client-actions button {
+                padding: 12px; /* Aumenta o padding dos botões para serem mais fáceis de clicar */
+                font-size: 16px; /* Aumenta a fonte dos botões */
+                min-width: unset; /* Remove o min-width para celular */
+            }
+
+            .timeline-section h2, .history-section h2 {
+                font-size: 18px; /* Títulos de linha do tempo/histórico menores */
+                justify-content: center; /* Centraliza títulos no celular */
+                text-align: center; /* Garante alinhamento central */
+            }
+
+            .timeline-item, .history-item {
+                font-size: 13px; /* Texto dos itens menores */
+                align-items: center; /* Centraliza ícone e texto */
+                text-align: left; /* Alinha o texto à esquerda */
+            }
+            .sidebar footer {
+                display: none; /* Esconde o footer do sidebar no mobile, já que o main-content tem o seu */
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" aria-label="Abrir menu" onclick="toggleMenu()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html" class="active"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5581999999999?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Clientes</h1>
+            <span class="header-icon">👤</span>
+        </header>
+
+        <section class="section-container search-section">
+            <input type="text" id="clientSearch" placeholder="Buscar por nome, cidade, bairro, telefone ou e-mail..." />
+        </section>
+
+        <section class="section-container client-details-section">
+            <div class="client-header">
+                <img src="https://via.placeholder.com/80/04b45f/FFFFFF?text=Foto" alt="Foto do Cliente" class="client-photo" />
+                <div class="client-info-main">
+                    <h2>João da Silva</h2>
+                    <p>📍 São Paulo / SP · Bairro: Centro</p>
+                    <p>📞 (11) 90000-0000 · 📧 joao@email.com</p>
+                    <p><strong>⭐ Perfil:</strong> Bom pagador</p>
+                </div>
+            </div>
+            <div class="client-actions">
+                <button class="contract-btn">📄 Ver Contrato</button>
+                <button>📩 Enviar Cobrança</button>
+                <button class="edit-btn">✏️ Editar Cliente</button>
+                <button class="remove-btn">🗑️ Remover</button>
+            </div>
+        </section>
+
+        <section class="section-container timeline-section">
+            <h2><span class="title-icon title-icon-timeline">📅</span> Linha do Tempo de Parcelas</h2>
+            <div class="timeline-item">
+                <span class="timeline-icon status-pago">✅</span>
+                <p><strong>10/06/2025</strong> — Parcela paga R$ 250,00</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-icon status-atrasado">⚠️</span>
+                <p><strong>10/07/2025</strong> — Parcela atrasada R$ 250,00</p>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-icon status-proxima">⏳</span>
+                <p><strong>10/08/2025</strong> — Próxima parcela R$ 250,00</p>
+            </div>
+        </section>
+
+        <section class="section-container history-section">
+            <h2><span class="title-icon title-icon-history">📄</span> Histórico do Cliente</h2>
+            <div class="history-item">
+                <span class="history-icon icon-cadastro">🗓️</span>
+                <p>Cadastrado em: 01/05/2025</p>
+            </div>
+            <div class="history-item">
+                <span class="history-icon icon-contrato">📄</span>
+                <p>Contrato ativo: Empréstimo R$ 1.500,00 em 6x</p>
+            </div>
+            <div class="history-item">
+                <span class="history-icon icon-pagamento">💰</span>
+                <p>Pagou 1 de 6 parcelas - 1 em atraso</p>
+            </div>
+            <div class="history-item">
+                <span class="history-icon icon-classificacao">⭐</span>
+                <p>Classificação automática: Bom pagador</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Função para abrir/fechar o menu lateral (Igual à da página de cadastro)
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = ''; // Limpa o campo
+                abrirSugestao(); // Fecha a janela após enviar
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        function abrirWhatsApp() {
+            const numeroWhatsApp = '5581999999999';
+            const mensagem = 'Olá! Preciso de ajuda com o PixFactory.';
+            const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('clientSearch');
+            searchInput.addEventListener('input', (event) => {
+                console.log('Buscando por:', event.target.value);
+            });
+            // Opcional: Se quiser que o menu feche ao clicar fora dele no celular
+            document.addEventListener('click', (event) => {
+                const sidebar = document.querySelector('.sidebar');
+                const menuToggle = document.querySelector('.menu-toggle');
+                if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !menuToggle.contains(event.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

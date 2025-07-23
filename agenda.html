@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>Agenda de Cobranças | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">\
+    <style>
+        :root {
+            --cor-principal: #04b45f;
+            --cor-fundo: #121212;
+            --cor-fundo-sidebar: #1e1e1e;
+            --cor-texto: #fff;
+            --cor-texto-secundario: #ccc;
+            --cor-borda: rgba(4, 180, 95, 0.3);
+            --cor-sombra: rgba(4, 180, 95, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            display: flex;
+            overflow-x: hidden; /* Evita barra de rolagem horizontal indesejada */
+            min-height: 100vh; /* Garante que o body ocupe toda a altura */
+        }
+
+        /* === Botão Hamburguer (NOVO) === */
+        .hamburger-menu {
+            display: none; /* Esconde por padrão em telas maiores */
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100; /* Acima da sidebar */
+            background: var(--cor-principal);
+            color: var(--cor-texto);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        /* === Sidebar Lateral === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: var(--cor-fundo-sidebar);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.active { /* Mostra a sidebar em mobile */
+            transform: translateX(0);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--cor-principal);
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: var(--cor-texto-secundario);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: var(--cor-principal);
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded { /* Classe para quando a sidebar está escondida */
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--cor-borda);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            color: var(--cor-principal);
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        header p {
+            color: var(--cor-texto-secundario);
+            font-size: 16px;
+        }
+
+        /* === Seção de Calendário === */
+        .calendar-section {
+            background-color: var(--cor-fundo-sidebar);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid var(--cor-borda);
+            box-shadow: 0 0 15px var(--cor-sombra);
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            color: var(--cor-principal);
+            font-size: 22px;
+            margin: 0;
+            padding-left: 15px; /* Adicionado padding para o "guia" */
+            border-left: 4px solid var(--cor-principal); /* Adicionada borda esquerda como "guia" */
+            line-height: 1.2;
+        }
+
+        .calendar-header button {
+            background-color: var(--cor-principal);
+            color: var(--cor-texto);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .calendar-header button:hover {
+            background-color: #03a252;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .calendar-grid .day-name {
+            font-weight: bold;
+            color: var(--cor-principal);
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .calendar-grid .day {
+            background-color: #2a2a2a;
+            padding: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            color: var(--cor-texto);
+            font-size: 15px;
+            position: relative;
+        }
+
+        .calendar-grid .day:hover {
+            background-color: #3a3a3a;
+        }
+
+        .calendar-grid .day.active {
+            background-color: var(--cor-principal);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .calendar-grid .day.has-event::after {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background-color: #f1c40f; /* Cor do indicador de evento */
+            border-radius: 50%;
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .calendar-grid .empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        /* === Clientes do Dia === */
+        .clientes-dia-section {
+            background-color: var(--cor-fundo-sidebar);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid var(--cor-borda);
+            box-shadow: 0 0 15px var(--cor-sombra);
+        }
+
+        .clientes-dia-section h2 {
+            color: var(--cor-principal);
+            margin-bottom: 20px;
+            font-size: 22px;
+            padding-left: 15px; /* Adicionado padding para o "guia" */
+            border-left: 4px solid var(--cor-principal); /* Adicionada borda esquerda como "guia" */
+            line-height: 1.2;
+        }
+
+        .clientes-dia-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .clientes-dia-list li {
+            background-color: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(4, 180, 95, 0.2);
+            font-size: 15px;
+        }
+
+        .clientes-dia-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .clientes-dia-list .client-info strong {
+            color: var(--cor-principal);
+        }
+
+        .clientes-dia-list .client-info span {
+            display: block;
+            color: var(--cor-texto-secundario);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .clientes-dia-list .actions button {
+            background-color: #3498db; /* Azul para ação */
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+
+        .clientes-dia-list .actions button:hover {
+            background-color: #2185c5;
+        }
+
+        /* Estilo para "Nenhuma cobrança prevista" */
+        .clientes-dia-list p {
+            color: var(--cor-texto-secundario);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* === Janela de Sugestão e Botão WhatsApp (mantidos) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--cor-fundo-sidebar);
+            padding: 20px;
+            border: 1px solid var(--cor-principal);
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: var(--cor-fundo);
+            border: 1px solid var(--cor-principal);
+            color: var(--cor-texto);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: var(--cor-principal);
+            color: var(--cor-texto);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* ========================================= */
+        /* === MEDIA QUERIES para Responsividade === */
+        /* ========================================= */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+            }
+            header h1 {
+                font-size: 24px;
+            }
+            .calendar-section, .clientes-dia-section {
+                padding: 20px;
+            }
+            .janela-sugestao {
+                bottom: 15px;
+                right: 15px;
+                max-width: calc(100% - 30px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 70px;
+            }
+            .hamburger-menu {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            header p {
+                font-size: 14px;
+            }
+            .calendar-header h2, .clientes-dia-section h2 {
+                font-size: 20px;
+                padding-left: 10px;
+                border-left-width: 3px;
+            }
+        }
+    </style>
+    <script>
+        let currentMonth, currentYear;
+        const clientesPorData = {
+            '22/07/2025': `
+                <ul>
+                    <li>
+                        <div class="client-info">
+                            <strong>João da Silva</strong>
+                            <span>Vencimento: R$ 250,00</span>
+                        </div>
+                        <div class="actions">
+                            <button>Cobrar</button>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="client-info">
+                            <strong>Ana Paula</strong>
+                            <span>Vencimento: R$ 180,00</span>
+                        </div>
+                        <div class="actions">
+                            <button>Cobrar</button>
+                        </div>
+                    </li>
+                </ul>
+            `,
+            '25/07/2025': `
+                <ul>
+                    <li>
+                        <div class="client-info">
+                            <strong>Fernanda Lima</strong>
+                            <span>Vencimento: R$ 320,00</span>
+                        </div>
+                        <div class="actions">
+                            <button>Cobrar</button>
+                        </div>
+                    </li>
+                </ul>
+            `,
+            '10/08/2025': `
+                <ul>
+                    <li>
+                        <div class="client-info">
+                            <strong>Roberto Carlos</strong>
+                            <span>Vencimento: R$ 500,00</span>
+                        </div>
+                        <div class="actions">
+                            <button>Cobrar</button>
+                        </div>
+                    </li>
+                </ul>
+            `,
+            '01/08/2025': `
+                <ul>
+                    <li>
+                        <div class="client-info">
+                            <strong>Pedro Santos</strong>
+                            <span>Vencimento: R$ 400,00</span>
+                        </div>
+                        <div class="actions">
+                            <button>Cobrar</button>
+                        </div>
+                    </li>
+                </ul>
+            `,
+            // Adicione mais clientes e datas aqui para simulação
+        };
+
+        const datasComEventos = [
+            '22/07/2025', '25/07/2025', '10/08/2025', '01/08/2025'
+            // As datas aqui devem corresponder às chaves em clientesPorData
+        ];
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            generateCalendar(currentMonth, currentYear);
+            
+            // NOVO: Verifica se veio do dashboard para mostrar Vencem Hoje
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('view') === 'today') {
+                const todayFormatted = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+                
+                // Encontrar o elemento do dia de hoje no calendário e clicar nele
+                // Isso garante que o showClientesDoDia seja chamado e o dia seja destacado
+                const todayElement = document.querySelector(`.day[data-date="${todayFormatted}"]`);
+                if (todayElement) {
+                    todayElement.click(); // Simula um clique no dia de hoje
+                } else {
+                    // Se por algum motivo o dia de hoje não for renderizado ou encontrado,
+                    // chama showClientesDoDia diretamente para exibir "Nenhuma cobrança"
+                    showClientesDoDia(todayFormatted);
+                }
+            } else {
+                // Comportamento padrão: seleciona o dia de hoje ao carregar se não veio do dashboard
+                const todayFormatted = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+                const todayElement = document.querySelector(`.day[data-date="${todayFormatted}"]`);
+                if (todayElement) {
+                    todayElement.click(); // Seleciona o dia de hoje por padrão
+                } else {
+                    showClientesDoDia(todayFormatted);
+                }
+            }
+        });
+
+        function generateCalendar(month, year) {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const monthYearDisplay = document.getElementById('month-year-display');
+            calendarGrid.innerHTML = '';
+            
+            monthYearDisplay.textContent = new Date(year, month).toLocaleString('pt-br', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const numDays = lastDay.getDate();
+            const startDay = firstDay.getDay(); // 0 for Sunday, 1 for Monday...
+
+            const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            dayNames.forEach(day => {
+                const dayNameDiv = document.createElement('div');
+                dayNameDiv.classList.add('day-name');
+                dayNameDiv.textContent = day;
+                calendarGrid.appendChild(dayNameDiv);
+            });
+
+            for (let i = 0; i < startDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.classList.add('day', 'empty');
+                calendarGrid.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= numDays; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day');
+                dayDiv.textContent = day;
+                
+                const formattedDate = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+                dayDiv.dataset.date = formattedDate; // Armazena a data completa no elemento
+                
+                if (datasComEventos.includes(formattedDate)) {
+                    dayDiv.classList.add('has-event');
+                }
+
+                dayDiv.addEventListener('click', () => showClientesDoDia(formattedDate, dayDiv));
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        function showClientesDoDia(data, clickedDayElement = null) {
+            const clientesDiaDiv = document.getElementById('clientes-do-dia');
+            const allDays = document.querySelectorAll('.day');
+
+            allDays.forEach(day => day.classList.remove('active'));
+
+            if (clickedDayElement) {
+                clickedDayElement.classList.add('active');
+            } else {
+                // Se clickedDayElement não foi fornecido (ex: vindo da URL),
+                // tente encontrar e ativar o dia manualmente.
+                const dayElementToActivate = document.querySelector(`.day[data-date="${data}"]`);
+                if (dayElementToActivate) {
+                    dayElementToActivate.classList.add('active');
+                }
+            }
+            clientesDiaDiv.innerHTML = clientesPorData[data] || `<p>✅ Nenhuma cobrança prevista para ${data}.</p>`;
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+            document.getElementById('clientes-do-dia').innerHTML = `<p>Selecione um dia para ver as cobranças.</p>`;
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+            document.getElementById('clientes-do-dia').innerHTML = `<p>Selecione um dia para ver as cobranças.</p>`;
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso!');
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.querySelector('.hamburger-menu');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !isClickInsideSidebar && !isClickOnHamburger) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html" class="active"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Agenda de Cobranças 📆</h1>
+            <p>Gerencie seus pagamentos diários e futuros.</p>
+        </header>
+
+        <section class="calendar-section">
+            <div class="calendar-header">
+                <button onclick="prevMonth()">Mês Anterior</button>
+                <h2 id="month-year-display"></h2>
+                <button onclick="nextMonth()">Próximo Mês</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid">
+                </div>
+        </section>
+
+        <section class="clientes-dia-section">
+            <h2>Clientes do Dia Selecionado</h2>
+            <div id="clientes-do-dia" class="clientes-dia-list">
+                <p>Selecione um dia para ver as cobranças.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+</body>
+</html>
