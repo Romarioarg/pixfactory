@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novos do Mês | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* === Botão Hamburguer (NOVO) === */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        header .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header h1 {
+            color: #04b45f;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        header p {
+            color: #ccc;
+            font-size: 16px;
+        }
+        
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info .rocket-emoji {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .plan-info:hover .rocket-emoji {
+            transform: rotate(15deg) scale(1.15);
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        .plan-info::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Adicionando um estilo para a lista de clientes */
+        .clients-list {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 30px;
+        }
+        
+        .clients-list h2 {
+            color: #04b45f;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        /* === Botão Voltar === */
+        .btn-voltar {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-bottom: 20px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-voltar:hover {
+            background-color: #777;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+
+        table th,
+        table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+        }
+
+        table th {
+            background-color: #2b2b2b;
+            color: #04b45f;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Estilo da foto do cliente na tabela */
+        .client-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        /* Estilos da janela de sugestão */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* ========================================= */
+        /* === MEDIA QUERIES para Responsividade === */
+        /* ========================================= */
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            header p {
+                font-size: 14px;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            table tr {
+                border: 1px solid rgba(4, 180, 95, 0.3);
+                border-radius: 8px;
+                margin-bottom: 15px;
+                background-color: #1e1e1e;
+                display: flex;
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            table td {
+                border-bottom: 1px dashed rgba(4, 180, 95, 0.1);
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                font-size: 14px;
+            }
+
+            table td:last-child {
+                border-bottom: none;
+            }
+
+            table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #04b45f;
+            }
+            
+            table td:first-child {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            table td:first-child::before {
+                content: "Foto";
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .plan-info {
+                margin-top: 10px;
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 70px;
+            }
+            .hamburger-menu {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            header p {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso!');
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.querySelector('.hamburger-menu');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !isClickInsideSidebar && !isClickOnHamburger) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function redirectToPlanos() {
+            window.location.href = 'planos.html';
+        }
+
+        // CÓDIGO ATUALIZADO PARA BUSCAR DADOS DA API E EXIBIR A FOTO
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarClientesDoMes();
+        });
+
+        function carregarClientesDoMes() {
+            const tabelaCorpo = document.getElementById('clients-table-body');
+            tabelaCorpo.innerHTML = '<tr><td colspan="5" style="text-align: center;">Carregando clientes...</td></tr>';
+
+            // ATENÇÃO: Você precisa ter um back-end rodando em http://localhost:8080
+            // com um endpoint GET para '/api/clientes/mes' que retorna um JSON com a lista de clientes.
+            fetch('http://localhost:8080/api/clientes/mes')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar os clientes');
+                    }
+                    return response.json();
+                })
+                .then(clientes => {
+                    tabelaCorpo.innerHTML = '';
+                    if (clientes.length === 0) {
+                        tabelaCorpo.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum cliente novo neste mês.</td></tr>';
+                    } else {
+                        clientes.forEach(cliente => {
+                            const row = document.createElement('tr');
+                            
+                            // Célula da foto
+                            const fotoCell = document.createElement('td');
+                            fotoCell.setAttribute('data-label', 'Foto');
+                            // A classe CSS 'client-photo' foi criada para dar estilo à imagem
+                            fotoCell.innerHTML = `<img src="${cliente.fotoUrl}" alt="Foto de ${cliente.nome}" class="client-photo">`;
+                            row.appendChild(fotoCell);
+
+                            // Célula do nome
+                            const nomeCell = document.createElement('td');
+                            nomeCell.setAttribute('data-label', 'Nome do Cliente');
+                            nomeCell.textContent = cliente.nome;
+                            row.appendChild(nomeCell);
+
+                            // Célula do CPF
+                            const cpfCell = document.createElement('td');
+                            cpfCell.setAttribute('data-label', 'CPF');
+                            cpfCell.textContent = cliente.cpf;
+                            row.appendChild(cpfCell);
+                            
+                            // Célula da data de cadastro
+                            const dataCell = document.createElement('td');
+                            dataCell.setAttribute('data-label', 'Data de Cadastro');
+                            dataCell.textContent = cliente.dataCadastro;
+                            row.appendChild(dataCell);
+                            
+                            // Célula do status
+                            const statusCell = document.createElement('td');
+                            statusCell.setAttribute('data-label', 'Status');
+                            statusCell.textContent = 'Ativo';
+                            row.appendChild(statusCell);
+
+                            tabelaCorpo.appendChild(row);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    tabelaCorpo.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #e74c3c;">Erro ao carregar dados. Tente novamente mais tarde.</td></tr>`;
+                });
+        }
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html" class="active"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Clientes Novos do Mês</h1>
+                <p>Lista de todos os clientes cadastrados no mês de Julho</p>
+            </div>
+            <a href="planos.html" class="plan-info" onclick="redirectToPlanos()">
+                <span class="rocket-emoji">🚀</span>
+                <span>Seu Plano: Gratuito - Clique para <strong>ser Premium</strong></span>
+            </a>
+        </header>
+
+        <a href="javascript:void(0);" onclick="goBack()" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+
+        <section class="clients-list">
+            <h2>Lista de Clientes Adicionados em Julho</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th> <th>Nome do Cliente</th>
+                        <th>CPF</th>
+                        <th>Data de Cadastro</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="clients-table-body">
+                    <tr><td colspan="5" style="text-align: center;">Carregando clientes...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+</body>
+</html>

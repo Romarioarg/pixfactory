@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Contrato | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out; /* Adicionado para a transição */
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Botão Hamburguer - Visível apenas em mobile */
+        .menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 24px;
+            display: none; /* Escondido por padrão */
+        }
+        
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .header-buttons button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .header-buttons button:hover {
+            background-color: #777;
+        }
+
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon {
+            font-size: 24px;
+        }
+        .status-badge {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: #1e1e1e;
+        }
+        .status-active { background-color: #2ecc71; }
+        .status-overdue { background-color: #e74c3c; }
+        .status-paid { background-color: #f1c40f; }
+
+        /* Estilo para o aviso de atraso */
+        .contract-status-alert {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            border: 3px solid #e74c3c;
+            pointer-events: none;
+            box-sizing: border-box;
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        .client-info-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .cliente-foto-header {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #04b45f;
+        }
+        .contract-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .detail-item strong {
+            color: #04b45f;
+            font-size: 15px;
+        }
+        .detail-item span {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #2b2b2b;
+            border-radius: 20px;
+            margin-top: 15px;
+            height: 25px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #04b45f;
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            box-sizing: border-box;
+        }
+        .progress-bar-text {
+            color: #1e1e1e;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .progress-bar-container .label {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: #fff;
+            font-weight: bold;
+            z-index: 1;
+        }
+
+        /* Tabela de histórico de pagamentos */
+        .payments-table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .payments-table th, .payments-table td {
+            padding: 10px;
+            border: 1px solid #2b2b2b;
+            text-align: left;
+        }
+        .payments-table th {
+            background-color: #2b2b2b;
+            color: #04b45f;
+            font-weight: bold;
+        }
+        .payments-table .status-paga { color: #2ecc71; }
+        .payments-table .status-atrasada { color: #e74c3c; }
+        .payments-table .status-avencer { color: #f1c40f; }
+        .payments-table .payment-actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .payments-table .payment-actions button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .payments-table .payment-actions .pay-btn { background-color: #2ecc71; }
+        .payments-table .payment-actions .pay-btn:hover { background-color: #27ae60; }
+        .payments-table .payment-actions .remind-btn { background-color: #f1c40f; color: #1e1e1e; }
+        .payments-table .payment-actions .remind-btn:hover { background-color: #e6b100; }
+        .payments-table .payment-actions .paid-btn { background-color: #555; cursor: not-allowed; }
+
+        /* Simulador de Quitação Antecipada */
+        .amortizacao-antecipada {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .amortizacao-antecipada h3 {
+            color: #f1c40f;
+            margin: 0;
+            font-size: 18px;
+        }
+        .amortizacao-antecipada .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .amortizacao-antecipada .input-group input {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #f1c40f;
+            border-radius: 8px;
+            color: #fff;
+        }
+        .amortizacao-antecipada .input-group button {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            font-weight: bold;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .amortizacao-antecipada .input-group button:hover {
+            background-color: #e6b100;
+        }
+
+        .amortizacao-antecipada .simulacao-resultado {
+            background-color: #1a1a1a;
+            border-radius: 8-x;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+        
+        .suporte-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            display: none;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid #04b45f;
+        }
+
+        .suporte-modal h2 {
+            color: #04b45f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .suporte-modal textarea {
+            width: 100%;
+            min-height: 150px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        .suporte-modal .suporte-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .suporte-modal .suporte-buttons button {
+            padding: 10px 15px;
+            font-weight: normal;
+        }
+        .suporte-modal .suporte-buttons .cancel-btn {
+            background-color: #555;
+        }
+        .suporte-modal .suporte-buttons .cancel-btn:hover {
+            background-color: #444;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+        }
+
+        /* === Media Queries === */
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { transform: translateX(0);}
+            .menu-toggle { display: block; }
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+                max-width: 100%;
+                padding-top: 70px;
+            }
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: center;
+            }
+            .header-left { flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+            .header-buttons { width: 100%; justify-content: center; }
+            .contract-details-grid { grid-template-columns: 1fr; }
+            .payments-table { font-size: 12px; }
+            .payments-table .payment-actions { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html" class="active"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Detalhes do Contrato</h1>
+                <span class="header-icon">📄</span>
+            </div>
+            <div class="header-buttons">
+                <button onclick="window.history.back()">Voltar</button>
+                <button onclick="gerarPDFContrato()">Gerar PDF</button>
+            </div>
+        </header>
+        
+        <section class="section-container" id="contract-summary-section">
+            <div class="client-info-header">
+                <img id="cliente-foto" src="" alt="Foto do Cliente" class="cliente-foto-header" style="display: none;">
+                <h2 id="contract-title"><i class="fas fa-user"></i> Informações do Cliente</h2>
+            </div>
+            <div class="contract-details-grid">
+                <div class="detail-item">
+                    <strong>Cliente</strong>
+                    <span id="cliente-nome">N/A</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Telefone</strong>
+                    <span id="cliente-telefone">N/A</span>
+                </div>
+                <div class="detail-item">
+                    <strong>E-mail</strong>
+                    <span id="cliente-email">N/A</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Tipo de Contrato</strong>
+                    <span id="tipo-contrato">N/A</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Status do Contrato</strong>
+                    <span id="contrato-status-badge"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-container" id="financial-summary-section">
+            <h2><i class="fas fa-credit-card"></i> Resumo Financeiro</h2>
+            <div class="contract-details-grid">
+                <div class="detail-item">
+                    <strong>Valor Total</strong>
+                    <span id="valor-total">R$ 0,00</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Valor Pago</strong>
+                    <span id="valor-pago">R$ 0,00</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Saldo Devedor</strong>
+                    <span id="saldo-devedor">R$ 0,00</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Parcelas</strong>
+                    <span id="parcelas">0/0</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Juros Total</strong>
+                    <span id="juros-total">R$ 0,00</span>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar">
+                    <span id="progress-text" class="progress-bar-text">0%</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-container" id="payments-history-section">
+            <h2><i class="fas fa-list-ul"></i> Histórico de Pagamentos</h2>
+            <div class="contract-details-grid">
+                <div class="detail-item">
+                    <strong>Próximo Vencimento</strong>
+                    <span id="proximo-vencimento">N/A</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Próxima Parcela</strong>
+                    <span id="proxima-parcela-valor">R$ 0,00</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Parcelas Atrasadas</strong>
+                    <span id="parcelas-atrasadas">0</span>
+                </div>
+            </div>
+            <div class="payments-table-container">
+                <table class="payments-table">
+                    <thead>
+                        <tr>
+                            <th>Parcela</th>
+                            <th>Vencimento</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="section-container" id="anticipation-section">
+            <h2><i class="fas fa-dollar-sign"></i> Simular Quitação Antecipada</h2>
+            <div class="amortizacao-antecipada">
+                <p>Simule o pagamento de um valor extra para abater parcelas ou reduzir juros.</p>
+                <div class="input-group">
+                    <input type="number" id="valor-antecipado" placeholder="Valor a ser antecipado (R$)" step="0.01" />
+                    <button onclick="simularQuitacaoAntecipada()">Simular</button>
+                </div>
+                <div id="simulacao-resultado" class="simulacao-resultado" style="display: none;">
+                    </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        const mockContratos = {
+            '1': {
+                cliente: 'João da Silva',
+                telefone: '(11) 98765-4321',
+                email: 'joao.silva@exemplo.com',
+                foto: 'https://randomuser.me/api/portraits/men/1.jpg',
+                tipo: 'Empréstimo Pessoal',
+                status: 'ativo',
+                valorTotal: 1500.00,
+                valorPago: 500.00,
+                parcelas: { total: 6, pagas: 2, atrasadas: 1 },
+                jurosTotal: 250.00,
+                historicoParcelas: [
+                    { id: 1, vencimento: '10/06/2025', valor: 250.00, status: 'Paga' },
+                    { id: 2, vencimento: '10/07/2025', valor: 250.00, status: 'Atrasada' },
+                    { id: 3, vencimento: '10/08/2025', valor: 250.00, status: 'A Vencer' },
+                    { id: 4, vencimento: '10/09/2025', valor: 250.00, status: 'A Vencer' },
+                    { id: 5, vencimento: '10/10/2025', valor: 250.00, status: 'A Vencer' },
+                    { id: 6, vencimento: '10/11/2025', valor: 250.00, status: 'A Vencer' },
+                ]
+            },
+            '2': {
+                cliente: 'Maria Oliveira',
+                telefone: '(11) 99887-7665',
+                email: 'maria.oliveira@exemplo.com',
+                foto: 'https://randomuser.me/api/portraits/women/2.jpg',
+                tipo: 'Venda de Produto',
+                status: 'pago',
+                valorTotal: 800.00,
+                valorPago: 800.00,
+                parcelas: { total: 4, pagas: 4, atrasadas: 0 },
+                jurosTotal: 0,
+                historicoParcelas: [
+                    { id: 1, vencimento: '05/06/2025', valor: 200.00, status: 'Paga' },
+                    { id: 2, vencimento: '05/07/2025', valor: 200.00, status: 'Paga' },
+                    { id: 3, vencimento: '05/08/2025', valor: 200.00, status: 'Paga' },
+                    { id: 4, vencimento: '05/09/2025', valor: 200.00, status: 'Paga' },
+                ]
+            },
+            '3': {
+                cliente: 'Carlos Pereira',
+                telefone: '(21) 91234-5678',
+                email: 'carlos.pereira@exemplo.com',
+                foto: 'https://randomuser.me/api/portraits/men/3.jpg',
+                tipo: 'Empréstimo Rápido',
+                status: 'atrasado',
+                valorTotal: 300.00,
+                valorPago: 0.00,
+                parcelas: { total: 3, pagas: 0, atrasadas: 1 },
+                jurosTotal: 50.00,
+                historicoParcelas: [
+                    { id: 1, vencimento: '01/08/2025', valor: 100.00, status: 'Atrasada' },
+                    { id: 2, vencimento: '01/09/2025', valor: 100.00, status: 'A Vencer' },
+                    { id: 3, vencimento: '01/10/2025', valor: 100.00, status: 'A Vencer' },
+                ]
+            }
+        };
+
+        let currentContract = null;
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('active');
+            if (sidebar.classList.contains('active')) {
+                mainContent.style.filter = 'blur(2px)';
+                mainContent.style.pointerEvents = 'none';
+            } else {
+                mainContent.style.filter = 'none';
+                mainContent.style.pointerEvents = 'auto';
+            }
+        }
+        
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const clienteId = urlParams.get('clienteId');
+            
+            if (clienteId && mockContratos[clienteId]) {
+                currentContract = mockContratos[clienteId];
+                carregarDetalhesContrato(currentContract);
+            } else {
+                alert('Erro: Contrato não encontrado para este cliente.');
+                window.history.back();
+            }
+        });
+        
+        function carregarDetalhesContrato(contrato) {
+            document.getElementById('cliente-foto').src = contrato.foto;
+            document.getElementById('cliente-foto').style.display = 'block';
+            document.getElementById('cliente-nome').textContent = contrato.cliente;
+            document.getElementById('cliente-telefone').textContent = contrato.telefone;
+            document.getElementById('cliente-email').textContent = contrato.email;
+            document.getElementById('tipo-contrato').textContent = contrato.tipo;
+            
+            const statusBadge = document.getElementById('contrato-status-badge');
+            statusBadge.textContent = contrato.status.toUpperCase();
+            statusBadge.className = 'status-badge';
+            if (contrato.status === 'ativo') { statusBadge.classList.add('status-active'); }
+            else if (contrato.status === 'atrasado') {
+                statusBadge.classList.add('status-overdue');
+                const summarySection = document.getElementById('contract-summary-section');
+                summarySection.classList.add('contract-status-alert');
+            }
+            else if (contrato.status === 'pago') { statusBadge.classList.add('status-paid'); }
+            
+            document.getElementById('valor-total').textContent = `R$ ${contrato.valorTotal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('valor-pago').textContent = `R$ ${contrato.valorPago.toFixed(2).replace('.', ',')}`;
+            const saldoDevedor = contrato.valorTotal - contrato.valorPago;
+            document.getElementById('saldo-devedor').textContent = `R$ ${saldoDevedor.toFixed(2).replace('.', ',')}`;
+            document.getElementById('parcelas').textContent = `${contrato.parcelas.pagas}/${contrato.parcelas.total}`;
+            document.getElementById('juros-total').textContent = `R$ ${contrato.jurosTotal.toFixed(2).replace('.', ',')}`;
+
+            const progresso = (contrato.valorPago / contrato.valorTotal) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${progresso.toFixed(2)}%`;
+            document.getElementById('progress-text').textContent = `${progresso.toFixed(0)}%`;
+            if (progresso < 10) {
+                 progressBar.style.justifyContent = 'flex-start';
+                 progressBar.style.paddingLeft = '10px';
+                 document.getElementById('progress-text').style.color = '#fff';
+            }
+            
+            document.getElementById('proximo-vencimento').textContent = contrato.historicoParcelas.find(p => p.status === 'A Vencer')?.vencimento || 'N/A';
+            document.getElementById('proxima-parcela-valor').textContent = `R$ ${contrato.historicoParcelas.find(p => p.status === 'A Vencer')?.valor.toFixed(2).replace('.', ',') || '0,00'}`;
+            document.getElementById('parcelas-atrasadas').textContent = contrato.parcelas.atrasadas;
+
+            renderizarTabelaPagamentos(contrato.historicoParcelas);
+        }
+
+        function renderizarTabelaPagamentos(historico) {
+            const tbody = document.getElementById('payments-table-body');
+            tbody.innerHTML = '';
+            historico.forEach(parcela => {
+                const row = document.createElement('tr');
+                const statusClass = parcela.status === 'Paga' ? 'status-paga' : (parcela.status === 'Atrasada' ? 'status-atrasada' : 'status-avencer');
+                const actionsHtml = parcela.status !== 'Paga' ? `
+                    <button class="pay-btn" onclick="marcarComoPago(${parcela.id})"><i class="fas fa-money-bill-wave"></i> Pagar</button>
+                    <button class="remind-btn" onclick="enviarLembrete(${parcela.id})"><i class="fas fa-bell"></i> Lembrar</button>
+                ` : `
+                    <button class="paid-btn" disabled><i class="fas fa-check"></i> Pago</button>
+                `;
+
+                row.innerHTML = `
+                    <td>${parcela.id}</td>
+                    <td>${parcela.vencimento}</td>
+                    <td>R$ ${parcela.valor.toFixed(2).replace('.', ',')}</td>
+                    <td class="${statusClass}">${parcela.status}</td>
+                    <td>
+                        <div class="payment-actions">
+                            ${actionsHtml}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function marcarComoPago(parcelaId) {
+            if (confirm(`Tem certeza que deseja marcar a parcela #${parcelaId} como paga?`)) {
+                 alert(`✅ Parcela #${parcelaId} marcada como paga com sucesso!`);
+                 window.location.reload();
+            }
+        }
+        
+        function enviarLembrete(parcelaId) {
+            alert(`✅ Lembrete de pagamento enviado para a parcela #${parcelaId} do contrato!`);
+        }
+
+        function simularQuitacaoAntecipada() {
+            const valorAntecipado = parseFloat(document.getElementById('valor-antecipado').value);
+            const resultadoDiv = document.getElementById('simulacao-resultado');
+
+            if (isNaN(valorAntecipado) || valorAntecipado <= 0) {
+                alert('Por favor, insira um valor válido para simular a quitação.');
+                return;
+            }
+
+            const saldoDevedor = currentContract.valorTotal - currentContract.valorPago;
+            const jurosEconomizados = (currentContract.jurosTotal * (valorAntecipado / currentContract.valorTotal));
+            const parcelasAbatidas = Math.floor(valorAntecipado / (currentContract.valorTotal / currentContract.parcelas.total));
+            const novoSaldo = saldoDevedor - valorAntecipado;
+
+            resultadoDiv.innerHTML = `
+                <p>✅ <strong>Simulação concluída!</strong></p>
+                <p>💸 <strong>Valor antecipado:</strong> R$ ${valorAntecipado.toFixed(2).replace('.', ',')}</p>
+                <p>💰 <strong>Novo saldo devedor:</strong> R$ ${novoSaldo.toFixed(2).replace('.', ',')}</p>
+                <p>🗓️ <strong>Parcelas abatidas:</strong> ${parcelasAbatidas}</p>
+                <p>📈 <strong>Juros economizados:</strong> R$ ${jurosEconomizados.toFixed(2).replace('.', ',')}</p>
+            `;
+            resultadoDiv.style.display = 'flex';
+        }
+
+        function gerarPDFContrato() {
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.fontFamily = 'Arial, sans-serif';
+
+            const title = document.createElement('h1');
+            title.textContent = 'Detalhes do Contrato';
+            title.style.textAlign = 'center';
+            title.style.color = '#04b45f';
+            element.appendChild(title);
+            
+            const contractSummarySection = document.getElementById('contract-summary-section').cloneNode(true);
+            const financialSummarySection = document.getElementById('financial-summary-section').cloneNode(true);
+            const paymentsHistorySection = document.getElementById('payments-history-section').cloneNode(true);
+            
+            if (financialSummarySection) {
+                 const progressBarContainer = financialSummarySection.querySelector('.progress-bar-container');
+                 if (progressBarContainer) progressBarContainer.remove();
+            }
+            if (paymentsHistorySection) {
+                const actionButtons = paymentsHistorySection.querySelectorAll('.payment-actions');
+                actionButtons.forEach(btn => btn.remove());
+            }
+
+            element.appendChild(contractSummarySection);
+            element.appendChild(financialSummarySection);
+            element.appendChild(paymentsHistorySection);
+
+            const options = {
+                margin: 10,
+                filename: `contrato_${currentContract.cliente.replace(/\s/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(options).save();
+        }
+    </script>
+</body>
+</html>

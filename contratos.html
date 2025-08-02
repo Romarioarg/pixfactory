@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contratos | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Layout e cores padrão PixFactory */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+        }
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 1100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 768px) {
+            .hamburger-menu { display: block; }
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul            { color: #3498db; }
+        .verde           { color: #2ecc71; }
+        .amarelo         { color: #f1c40f; }
+        .vermelho        { color: #e74c3c; }
+        .roxo            { color: #9b59b6; }
+        .azul-claro      { color: #5dade2; }
+        .vermelho-claro  { color: #f1948a; }
+        .cinza           { color: #bdc3c7; }
+        .limao           { color: #a3e635; }
+        .roxo-claro      { color: #c084fc; }
+        .laranja         { color: #e67e22; }
+        .azul-escuro     { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px 40px 20px 40px;
+            max-width: calc(100% - 320px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        main header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        main header h1 {
+            color: #04b45f;
+            font-size: 32px;
+            margin: 0;
+        }
+        main header .header-icon {
+            font-size: 28px;
+        }
+
+        .new-contract-button {
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: max-content;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        .new-contract-button:hover {
+            background-color: #03a252;
+        }
+
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 12px;
+            padding: 20px 25px;
+            box-shadow: 0 0 15px rgba(4,180,95,0.12);
+        }
+
+        .search-and-filter-section input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #04b45f;
+            background-color: #121212;
+            color: #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .filter-buttons button {
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: 600;
+        }
+        .filter-buttons button.active,
+        .filter-buttons button:hover {
+            background-color: #03a252;
+            color: #fff; /* Muda a cor do texto para branco quando ativo/hover */
+        }
+
+        .contracts-table-container {
+            overflow-x: auto;
+        }
+
+        table.contracts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.contracts-table th, table.contracts-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #04b45f;
+            white-space: nowrap;
+        }
+        table.contracts-table th {
+            background-color: #04b45f;
+            color: #121212;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .status-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #121212;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+        .status-ativo {
+            background-color: #2ecc71;
+        }
+        .status-pendente {
+            background-color: #f1c40f;
+        }
+        .status-atrasado {
+            background-color: #e74c3c;
+        }
+        .status-encerrado {
+            background-color: #95a5a6;
+        }
+
+        .action-buttons button {
+            background-color: #04b45f;
+            border: none;
+            color: #121212;
+            padding: 6px 12px;
+            margin-right: 6px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .action-buttons button:hover {
+            background-color: #03a252;
+        }
+
+        .janela-sugestao {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            table.contracts-table th,
+            table.contracts-table td {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu" aria-label="Abrir menu">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html" class="active"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Contratos</h1>
+            <span class="header-icon">📄</span>
+        </header>
+
+        <button class="new-contract-button" id="addNewContractButton">➕ Novo Contrato</button>
+
+        <section class="section-container search-and-filter-section">
+            <input type="text" id="contractSearch" placeholder="Buscar por nome do cliente, ID do contrato, valor..." />
+            <div class="filter-buttons">
+                <button class="active" data-filter="all">Todos</button>
+                <button data-filter="ativo">Ativos</button>
+                <button data-filter="pendente">Pendentes</button>
+                <button data-filter="atrasado">Atrasados</button>
+                <button data-filter="encerrado">Encerrados</button>
+            </div>
+        </section>
+
+        <section class="section-container contracts-list-section">
+            <div class="contracts-table-container">
+                <table class="contracts-table" aria-label="Tabela de contratos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Tipo</th>
+                            <th>Valor Total</th>
+                            <th>Parcelas</th>
+                            <th>Próximo Pagamento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-status="atrasado">
+                            <td>#001</td>
+                            <td><a href="clientes.html" style="color: #04b45f; text-decoration: none;">João da Silva</a></td>
+                            <td>Empréstimo</td>
+                            <td>R$ 1.500,00</td>
+                            <td>1/6 pagas</td>
+                            <td>10/08/2025</td>
+                            <td><span class="status-tag status-atrasado">Atrasado</span></td>
+                            <td class="action-buttons">
+                                <button onclick="verCliente('João da Silva')">Ver</button>
+                                <button onclick="enviarWhatsApp('11999998888', 'João da Silva')">📩</button>
+                                <button onclick="editarCliente(1)">✏️</button>
+                            </td>
+                        </tr>
+                        <tr data-status="ativo">
+                            <td>#002</td>
+                            <td><a href="clientes.html" style="color: #04b45f; text-decoration: none;">Maria Oliveira</a></td>
+                            <td>Financiamento</td>
+                            <td>R$ 5.000,00</td>
+                            <td>3/12 pagas</td>
+                            <td>05/08/2025</td>
+                            <td><span class="status-tag status-ativo">Ativo</span></td>
+                            <td class="action-buttons">
+                                <button onclick="verCliente('Maria Oliveira')">Ver</button>
+                                <button onclick="enviarWhatsApp('11988887777', 'Maria Oliveira')">📩</button>
+                                <button onclick="editarCliente(2)">✏️</button>
+                            </td>
+                        </tr>
+                        <tr data-status="pendente">
+                            <td>#003</td>
+                            <td><a href="clientes.html" style="color: #04b45f; text-decoration: none;">Pedro Souza</a></td>
+                            <td>Serviço</td>
+                            <td>R$ 800,00</td>
+                            <td>0/3 pagas</td>
+                            <td>25/07/2025</td>
+                            <td><span class="status-tag status-pendente">Pendente</span></td>
+                            <td class="action-buttons">
+                                <button onclick="verCliente('Pedro Souza')">Ver</button>
+                                <button onclick="enviarWhatsApp('11977776666', 'Pedro Souza')">📩</button>
+                                <button onclick="editarCliente(3)">✏️</button>
+                            </td>
+                        </tr>
+                        <tr data-status="encerrado">
+                            <td>#004</td>
+                            <td><a href="clientes.html" style="color: #04b45f; text-decoration: none;">Ana Costa</a></td>
+                            <td>Empréstimo</td>
+                            <td>R$ 2.000,00</td>
+                            <td>6/6 pagas</td>
+                            <td>-</td>
+                            <td><span class="status-tag status-encerrado">Encerrado</span></td>
+                            <td class="action-buttons">
+                                <button onclick="verCliente('Ana Costa')">Ver</button>
+                                <button onclick="editarCliente(4)">✏️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display:none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        function verCliente(nome) {
+            // Redirecionar para página clientes
+            alert(`Você clicou para ver o cliente: ${nome}.`);
+            window.location.href = "clientes.html";
+        }
+
+        function enviarWhatsApp(telefone, nome) {
+            const telefoneLimpo = telefone.replace(/\D/g, "");
+            const mensagem = `Olá ${nome}, tudo bem? Estou entrando em contato sobre seu contrato no PixFactory.`;
+            const url = `https://wa.me/55${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+
+        function editarCliente(id) {
+            const url = `editar-cliente.html?id=${id}`;
+            window.location.href = url;
+        }
+
+        // Filtros
+        const filterButtons = document.querySelectorAll('.filter-buttons button');
+        const contractRows = document.querySelectorAll('.contracts-table tbody tr');
+        const searchInput = document.getElementById('contractSearch');
+
+        function setActiveFilter(button) {
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.color = '#121212'; // Texto preto padrão
+            });
+            button.classList.add('active');
+            button.style.color = '#fff'; // Texto branco quando ativo
+        }
+
+        function filterContracts(filter) {
+            contractRows.forEach(row => {
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else {
+                    const status = row.getAttribute('data-status');
+                    if (status === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                setActiveFilter(button);
+                filterContracts(button.getAttribute('data-filter'));
+                searchInput.value = '';
+            });
+        });
+
+        // Busca ao digitar
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            contractRows.forEach(row => {
+                const texto = row.textContent.toLowerCase();
+                if (texto.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            // Se estiver digitando, desmarcar filtro ativo
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.color = '#121212';
+            });
+        });
+
+        // Botão novo contrato
+        document.getElementById('addNewContractButton').addEventListener('click', () => {
+            window.location.href = 'novo_contrato.html';
+        });
+
+        // Menu hambúrguer para telas pequenas
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburgerButton = document.getElementById('hamburger-menu');
+            const sidebar = document.getElementById('sidebar');
+            const body = document.body;
+
+            hamburgerButton.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                body.classList.toggle('sidebar-open');
+            });
+
+            // Fecha menu ao clicar fora no conteúdo principal em telas pequenas
+            document.getElementById('main-content').addEventListener('click', () => {
+                if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    body.classList.remove('sidebar-open');
+                }
+            });
+
+            // Fecha menu ao clicar em qualquer link do menu em telas pequenas
+            sidebar.querySelectorAll('nav ul li a').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        body.classList.remove('sidebar-open');
+                    }
+                });
+            });
+
+            // Janela de sugestão
+            window.abrirSugestao = function() {
+                const janelaSugestao = document.getElementById('janela-sugestao');
+                janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+            };
+
+            window.enviarSugestao = function() {
+                const textarea = document.querySelector('#janela-sugestao textarea');
+                const sugestao = textarea.value.trim();
+                if (sugestao) {
+                    alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                    textarea.value = '';
+                    abrirSugestao();
+                } else {
+                    alert('Por favor, digite sua sugestão antes de enviar.');
+                }
+            };
+        });
+    </script>
+</body>
+</html>

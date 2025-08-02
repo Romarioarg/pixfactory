@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | PixFactory</title>
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .login-container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box;
+            border: 1px solid #04b45f;
+        }
+        .login-container h1 {
+            color: #04b45f;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #03a252;
+            box-shadow: 0 0 5px rgba(4, 180, 95, 0.4);
+        }
+        .form-group .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        .login-button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .login-button:hover {
+            background-color: #03a252;
+        }
+        .login-button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        .link-options {
+            margin-top: 20px;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+        }
+        .link-options a {
+            color: #04b45f;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .link-options a:hover {
+            color: #03a252;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>💵 Login</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" required />
+                <p id="error-message" class="error-message"></p>
+            </div>
+            <button type="submit" class="login-button">Entrar</button>
+        </form>
+        <div class="link-options">
+            <a href="recuperar_senha.html">Esqueceu a senha?</a>
+            <a href="cadastro-login.html">Cadastrar</a>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            // Simulação de login:
+            // No aplicativo real, você faria uma chamada para o back-end aqui.
+            if (email === 'arg.dev.java@gmail.com' && password === '72641400rR@') {
+                localStorage.setItem('userRole', 'ADMIN');
+                alert('✅ Login de Administrador realizado com sucesso!');
+                window.location.href = 'dashboard.html';
+            } else {
+                localStorage.setItem('userRole', 'USER');
+                alert('✅ Login de Usuário comum realizado com sucesso!');
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

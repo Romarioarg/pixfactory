@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exportação e Backup | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* === Botão Hamburguer (NOVO) === */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul             { color: #3498db; }
+        .verde            { color: #2ecc71; }
+        .amarelo          { color: #f1c40f; }
+        .vermelho         { color: #e74c3c; }
+        .roxo             { color: #9b59b6; }
+        .azul-claro       { color: #5dade2; }
+        .vermelho-claro   { color: #f1948a; }
+        .cinza            { color: #bdc3c7; }
+        .limao            { color: #a3e635; }
+        .roxo-claro       { color: #c084fc; }
+        .laranja          { color: #e67e22; }
+        .azul-escuro      { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        /* Ajuste para o ícone no header */
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon {
+            font-size: 24px;
+            color: #f1948a;
+        }
+
+        .section-container p {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* Botões de Exportação */
+        .export-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .export-buttons-grid button {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .export-buttons-grid button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        
+        /* Ícones dos botões de exportação */
+        .export-buttons-grid button .button-icon {
+            font-size: 22px;
+            color: #1e1e1e;
+        }
+
+        /* Campos de Seleção (Dropdowns) */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #04b45f;
+            font-weight: bold;
+        }
+
+        .form-group select,
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group select:focus,
+        .form-group input[type="date"]:focus {
+            border-color: #03a252;
+        }
+        /* Cor da seta do select em navegadores Webkit */
+        .form-group select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2304b45f%22%20d%3D%22M287%2069.1l-11.4-11.4c-4.6-4.6-11.8-4.6-16.4%200L146.2%20202.7%2033.4%2069.1c-4.6-4.6-11.8-4.6-16.4%200L5%2080.5c-4.6%204.6-4.6%2011.8%200%2016.4l132.8%20132.8c4.6%204.6%2011.8%204.6%2016.4%200L287%2085.5c4.6-4.6%204.6-11.8%200-16.4z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+            padding-right: 30px;
+        }
+        /* Para remover a seta padrão do IE/Edge */
+        .form-group select::-ms-expand {
+            display: none;
+        }
+
+        /* Mensagem de sucesso/erro (em um pop-up) */
+        #status-message {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            width: auto;
+            max-width: 90%;
+        }
+        #status-message.error {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        /* === Janela de Sugestão (do dashboard) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* ========================================= */
+        /* === MEDIA QUERIES para Responsividade === */
+        /* ========================================= */
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .janela-sugestao {
+                bottom: 15px;
+                right: 15px;
+                max-width: calc(100% - 30px);
+            }
+
+            .export-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group input[type="date"] {
+                display: block;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 70px;
+            }
+            .hamburger-menu {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            .section-container h2 {
+                font-size: 18px;
+            }
+            .section-container p {
+                font-size: 13px;
+            }
+            .export-buttons-grid button {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+    <script>
+        // Dados fictícios de clientes para preencher o dropdown
+        const mockClients = [
+            { id: 'all', name: 'Todos os Clientes' },
+            { id: 'client1', name: 'João da Silva' },
+            { id: 'client2', name: 'Maria Souza' },
+            { id: 'client3', name: 'Carlos Pereira' },
+            { id: 'client4', name: 'Ana Costa' },
+        ];
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Função genérica para exibir mensagens de status
+        function showStatusMessage(message, isError = false) {
+            const statusMessageDiv = document.getElementById('status-message');
+            const messageTextSpan = document.getElementById('message-text');
+            const iconSpan = statusMessageDiv.querySelector('.button-icon');
+
+            messageTextSpan.textContent = message;
+            statusMessageDiv.style.display = 'flex';
+            statusMessageDiv.classList.toggle('error', isError);
+
+            if (isError) {
+                iconSpan.textContent = '❌';
+            } else {
+                iconSpan.textContent = '✅';
+            }
+
+            setTimeout(() => {
+                statusMessageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function exportar(formato) {
+            const reportType = document.getElementById('reportType').value;
+            const clientSelect = document.getElementById('clientSelect');
+            const clienteId = clientSelect.value;
+            const clienteNome = clientSelect.options[clientSelect.selectedIndex].text;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            let message = '';
+            let reportName = '';
+            let dateRangeText = '';
+            
+            if (startDate && endDate) {
+                dateRangeText = ` entre ${new Date(startDate).toLocaleDateString('pt-BR')} e ${new Date(endDate).toLocaleDateString('pt-BR')}`;
+            }
+
+            switch (reportType) {
+                case 'clientes': reportName = 'Dados de Clientes'; break;
+                case 'contratos': reportName = 'Contratos'; break;
+                case 'pagamentos': reportName = 'Histórico de Pagamentos'; break;
+                case 'agenda': reportName = 'Eventos da Agenda'; break;
+            }
+
+            if (clienteId === 'all') {
+                message = `✅ Relatório de ${reportName}${dateRangeText} exportado como ${formato} com sucesso!`;
+            } else {
+                message = `✅ Relatório de ${reportName} do cliente ${clienteNome}${dateRangeText} exportado como ${formato} com sucesso!`;
+            }
+            
+            showStatusMessage(message);
+            console.log(`Solicitação de exportação: Tipo=${reportType}, Formato=${formato}, Cliente=${clienteNome}, Período: ${dateRangeText}`);
+        }
+
+        function fazerBackupManual() {
+            showStatusMessage("✅ Iniciando backup manual dos seus dados. Aguarde...");
+            setTimeout(() => {
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR').substring(0, 5);
+                document.getElementById('last-backup-date').textContent = `${formattedDate} (Manual)`;
+                showStatusMessage("✅ Backup concluído com sucesso!");
+            }, 2000);
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        // Script para fechar a sidebar ao clicar fora dela em mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.querySelector('.hamburger-menu');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !isClickInsideSidebar && !isClickOnHamburger) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Preenche o dropdown de clientes na carga da página
+        document.addEventListener('DOMContentLoaded', function() {
+            const clientSelect = document.getElementById('clientSelect');
+            mockClients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                clientSelect.appendChild(option);
+            });
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html" class="active"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Exportação e Backup</h1>
+            <span class="header-icon">📥</span>
+        </header>
+
+        <section class="section-container">
+            <h2><span class="section-icon fas fa-file-export"></span> Exportar Relatórios</h2>
+            <p>Selecione o tipo de relatório e o formato desejado para download.</p>
+
+            <div class="form-group">
+                <label for="reportType">Tipo de Relatório:</label>
+                <select id="reportType">
+                    <option value="clientes">Dados de Clientes</option>
+                    <option value="contratos">Contratos (Ativos/Encerrados)</option>
+                    <option value="pagamentos">Histórico de Pagamentos</option>
+                    <option value="agenda">Eventos da Agenda</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="clientSelect">Selecionar Cliente:</label>
+                <select id="clientSelect">
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dateRange">Período (Opcional):</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="date" id="startDate"> <span style="font-size: 14px;">a</span> <input type="date" id="endDate">
+                </div>
+            </div>
+            
+            <div class="export-buttons-grid">
+                <button onclick="exportar('PDF')">
+                    <span class="button-icon fas fa-file-pdf"></span> Exportar PDF
+                </button>
+                <button onclick="exportar('CSV')">
+                    <span class="button-icon fas fa-file-csv"></span> Exportar CSV
+                </button>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon fas fa-database"></span> Backup do Sistema</h2>
+            <p>Realize um backup completo de todos os dados do sistema. Recomendado fazer regularmente.</p>
+            <div class="export-buttons-grid">
+                <button onclick="fazerBackupManual()">
+                    <span class="button-icon fas fa-cloud-upload-alt"></span> Fazer Backup Agora
+                </button>
+            </div>
+            <p style="font-size: 13px; color: #888; margin-top: 20px;">
+                Último backup: <span id="last-backup-date">15/07/2025 às 10:30 (Automático)</span><br>
+                Próximo backup agendado: 22/07/2025 às 03:00 (Diário)
+            </p>
+        </section>
+
+        <div id="status-message">
+            <span class="button-icon fas fa-check-circle"></span> <span id="message-text"></span>
+        </div>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+</body>
+</html>

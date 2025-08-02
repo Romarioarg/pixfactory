@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Usuários | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* === Sidebar Lateral === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav { flex-grow: 1; }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li { margin-bottom: 15px; }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active { color: #04b45f; }
+        .sidebar .icon { font-size: 1em; }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            margin-top: auto;
+        }
+
+        /* --- Conteúdo Principal --- */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .main-content header {
+            margin-bottom: 0;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+        
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffc107;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon {
+            font-size: 24px;
+            color: #ffc107;
+        }
+
+        /* Tabela de Usuários */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .user-table th, .user-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+        }
+        .user-table th {
+            background-color: #2b2b2b;
+            color: #04b45f;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .user-table tbody tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+
+        /* Controles do Painel Admin */
+        .admin-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .admin-controls input,
+        .admin-controls select {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .admin-controls input { flex-grow: 1; }
+        .admin-controls button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .admin-controls button:hover { background-color: #03a252; }
+
+
+        /* Botões de Ação da Tabela */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .action-buttons button {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+        .action-buttons button:hover { background-color: #2c3e50; }
+        .action-buttons .btn-change-plan { background-color: #04b45f; }
+        .action-buttons .btn-change-plan:hover { background-color: #03a252; }
+        .action-buttons .btn-delete { background-color: #e74c3c; }
+        .action-buttons .btn-delete:hover { background-color: #c0392b; }
+        .action-buttons .btn-trial {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+        }
+        .action-buttons .btn-trial:hover { background-color: #e6b100; }
+
+        /* Estilo para o formulário de alteração de plano */
+        .change-plan-form {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .change-plan-form select {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .change-plan-form .btn-submit {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+
+        /* --- Media Queries --- */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px 15px;
+            }
+            .admin-controls { flex-direction: column; }
+            .user-table { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html" class="active"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="#" onclick="logout()"><span class="icon azul-escuro">🚪</span> Logout</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Gerenciamento de Usuários</h1>
+            <span class="header-icon fas fa-user-shield"></span>
+        </header>
+
+        <section class="section-container" id="admin-panel">
+            <h2><i class="fas fa-users-cog"></i> Lista de Usuários</h2>
+            <div class="admin-controls">
+                <input type="text" id="search-input" placeholder="Pesquisar por nome ou e-mail...">
+                <select id="plan-filter" onchange="renderUserTable()">
+                    <option value="all">Todos os Planos</option>
+                    <option value="gratuito">Gratuito</option>
+                    <option value="pro">Pro</option>
+                    <option value="premium">Premium</option>
+                </select>
+                <button onclick="addUser()"><i class="fas fa-user-plus"></i> Adicionar Novo Usuário</button>
+            </div>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Plano</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Dados de usuários simulados para demonstração
+        const mockUsers = [
+            { id: 'user1', nome: 'RomarioDev', email: 'arg.dev.java@gmail.com', plano: 'premium', isTrial: false, role: 'ADMIN' },
+            { id: 'user2', nome: 'João da Silva', email: 'joao.silva@gmail.com', plano: 'gratuito', isTrial: false, role: 'USER' },
+            { id: 'user3', nome: 'Maria Oliveira', email: 'maria.oliveira@gmail.com', plano: 'pro', isTrial: true, role: 'USER' },
+        ];
+        
+        const userRole = localStorage.getItem('userRole');
+
+        if (userRole !== 'ADMIN') {
+             alert('Acesso negado. Você não tem permissão de administrador.');
+             window.location.href = 'dashboard.html';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserTable();
+            document.getElementById('search-input').addEventListener('input', renderUserTable);
+        });
+
+        function renderUserTable() {
+            const tableBody = document.getElementById('user-table-body');
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const filterPlan = document.getElementById('plan-filter').value;
+            tableBody.innerHTML = '';
+
+            const filteredUsers = mockUsers.filter(user => {
+                const matchesSearch = user.nome.toLowerCase().includes(searchText) || user.email.toLowerCase().includes(searchText);
+                const matchesFilter = (filterPlan === 'all') || (user.plano === filterPlan);
+                return matchesSearch && matchesFilter;
+            });
+            
+            filteredUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.nome}</td>
+                    <td>${user.email}</td>
+                    <td>${user.plano.toUpperCase()} ${user.isTrial ? '(Teste)' : ''}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-change-plan" onclick="showChangePlanForm('${user.id}')">
+                                <i class="fas fa-edit"></i> Alterar Plano
+                            </button>
+                            ${user.role !== 'ADMIN' ? `
+                                <button class="btn-trial ${user.isTrial ? 'active' : ''}" onclick="toggleUserTrial('${user.id}')">
+                                    <i class="fas fa-star"></i> ${user.isTrial ? 'Desativar Teste' : 'Ativar Teste'}
+                                </button>
+                                <button class="btn-delete" onclick="deleteUser('${user.id}')">
+                                    <i class="fas fa-trash-alt"></i> Excluir
+                                </button>
+                            ` : ''}
+                        </div>
+                        <div id="change-plan-form-${user.id}" class="change-plan-form" style="display: none;">
+                            <select id="select-plan-${user.id}">
+                                <option value="gratuito">Gratuito</option>
+                                <option value="pro">Pro</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                            <button class="btn-submit" onclick="changeUserPlan('${user.id}')">Salvar</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function addUser() {
+            const newName = prompt('Digite o nome do novo usuário:');
+            const newEmail = prompt('Digite o e-mail do novo usuário:');
+            if (newName && newEmail) {
+                const newUser = {
+                    id: 'user' + (mockUsers.length + 1),
+                    nome: newName,
+                    email: newEmail,
+                    plano: 'gratuito',
+                    isTrial: false,
+                    role: 'USER'
+                };
+                mockUsers.push(newUser);
+                alert(`✅ Usuário ${newName} adicionado com sucesso!`);
+                renderUserTable();
+            }
+        }
+
+        function showChangePlanForm(userId) {
+            const form = document.getElementById(`change-plan-form-${userId}`);
+            form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        function changeUserPlan(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user) {
+                const newPlan = document.getElementById(`select-plan-${userId}`).value;
+                user.plano = newPlan;
+                alert(`✅ Plano do usuário ${user.nome} alterado para ${newPlan.toUpperCase()} com sucesso!`);
+                renderUserTable();
+            }
+        }
+        
+        function toggleUserTrial(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user && user.role !== 'ADMIN') {
+                user.isTrial = !user.isTrial;
+                if (user.isTrial) {
+                    user.plano = 'pro'; // Simula a ativação do trial para o plano Pro
+                    alert(`✅ Teste gratuito de 7 dias ativado para ${user.nome} (Plano Pro).`);
+                } else {
+                    user.plano = 'gratuito'; // Retorna ao plano gratuito se desativado
+                    alert(`✅ Teste gratuito de ${user.nome} desativado. Usuário no plano gratuito.`);
+                }
+                renderUserTable();
+            }
+        }
+        
+        function deleteUser(userId) {
+            const confirmation = confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.');
+            if (confirmation) {
+                const userIndex = mockUsers.findIndex(u => u.id === userId);
+                if (userIndex !== -1) {
+                    mockUsers.splice(userIndex, 1);
+                    alert('✅ Usuário excluído com sucesso.');
+                    renderUserTable();
+                }
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('userRole');
+            window.location.href = 'index.html';
+        }
+        
+        function abrirSugestao() { alert('Função de sugestão'); }
+        function enviarSugestao() { alert('Função de enviar sugestão'); }
+    </script>
+</body>
+</html>
