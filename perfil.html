@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul           { color: #3498db; }
+        .verde          { color: #2ecc71; }
+        .amarelo        { color: #f1c40f; }
+        .vermelho       { color: #e74c3c; }
+        .roxo           { color: #9b59b6; }
+        .azul-claro     { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza          { color: #bdc3c7; }
+        .limao          { color: #a3e635; }
+        .roxo-claro     { color: #c084fc; }
+        .laranja        { color: #e67e22; }
+        .azul-escuro    { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.5);
+        }
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .profile-info h3 {
+            font-size: 24px;
+            margin: 0 0 5px 0;
+            color: #fff;
+        }
+        .profile-info p {
+            font-size: 14px;
+            margin: 0;
+            color: #aaa;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .detail-item strong {
+            color: #04b45f;
+            font-size: 15px;
+        }
+        .detail-item span {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .action-buttons button {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-buttons button:hover {
+            background-color: #2c3e50;
+            transform: translateY(-2px);
+        }
+        .action-buttons .edit-profile-btn { background-color: #04b45f; }
+        .action-buttons .edit-profile-btn:hover { background-color: #03a252; }
+        .action-buttons .admin-btn { background-color: #3498db; }
+        .action-buttons .admin-btn:hover { background-color: #2980b9; }
+
+        .upgrade-btn {
+            background-color: #e74c3c !important;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.6) !important;
+            border-radius: 10px !important;
+            padding: 15px 22px !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .upgrade-btn:hover {
+            background-color: #c0392b !important;
+        }
+
+
+        .activity-item {
+            padding: 10px;
+            border-bottom: 1px dashed rgba(4, 180, 95, 0.2);
+            font-size: 14px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-item .activity-icon {
+            font-size: 18px;
+            color: #04b45f;
+        }
+
+        /* === Menu Hamburguer e Adaptações para Celular === */
+        .hamburger-menu {
+            display: none;
+            font-size: 28px;
+            color: #04b45f;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background-color: #1e1e1e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+                left: -260px;
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                text-align: center;
+            }
+            .profile-info h3 { font-size: 22px; }
+            .profile-info p { font-size: 13px; }
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-buttons button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .janela-sugestao {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html" class="active"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Meu Perfil</h1>
+            <span class="header-icon fas fa-user-circle"></span>
+        </header>
+
+        <section class="section-container">
+            <h2>Informações Pessoais</h2>
+            <div class="profile-header">
+                <img src="https://cdn.icon-icons.com/icons2/1736/PNG/512/4043232-avatar-male-man-person_113269.png" alt="Foto de Perfil" class="profile-picture">
+                <div class="profile-info">
+                    <h3 id="profile-name">RomarioDev</h3>
+                    <p>Membro desde 15 de Julho de 2025</p>
+                </div>
+            </div>
+            
+            <div class="profile-details">
+                <div class="detail-item">
+                    <strong>E-mail</strong>
+                    <span id="profile-email">romariodev@pixfactory.com</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Telefone</strong>
+                    <span id="profile-phone">(11) 99540-0311</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Endereço</strong>
+                    <span id="profile-address">Rua Exemplo, 123 - Centro, São Paulo - SP</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Plano Atual</strong>
+                    <span id="profile-plan">Plano Gratuito</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="edit-profile-btn" onclick="redirectToEditProfile()"><i class="fas fa-edit"></i> Editar Perfil</button>
+                <button class="upgrade-btn" onclick="redirectToPlanos()">
+                    <i class="fas fa-rocket"></i> <span style="margin-left: 5px;">FAZER UPGRADE</span>
+                </button>
+                <button id="admin-user-btn" class="action-buttons admin-btn" style="display: none;" onclick="redirectToGerenciarUsuarios()">
+                    <i class="fas fa-user-shield"></i> Gerenciar Usuários
+                </button>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <h2><i class="fas fa-history"></i> Atividade Recente</h2>
+            <ul style="list-style: none; padding: 0;">
+                <li class="activity-item">
+                    <i class="fas fa-chart-line activity-icon"></i>
+                    Último Login: 22 de Julho de 2025, 14:30
+                </li>
+                <li class="activity-item">
+                    <i class="fas fa-plus-circle activity-icon"></i>
+                    Novo Cliente Cadastrado: Maria Oliveira
+                </li>
+                <li class="activity-item">
+                    <i class="fas fa-file-contract activity-icon"></i>
+                    Último Contrato Adicionado: Contrato #12345
+                </li>
+                <li class="activity-item">
+                    <i class="fas fa-lightbulb activity-icon"></i>
+                    Sugestão enviada para a equipe do PixFactory
+                </li>
+            </ul>
+        </section>
+
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Dados de usuários simulados para demonstração
+        const mockUsers = {
+            'user123': {
+                id: 'user123',
+                nome: 'RomarioDev',
+                email: 'romariodev@pixfactory.com',
+                telefone: '(11) 99540-0311',
+                endereco: 'Rua Exemplo, 123 - Centro, São Paulo - SP',
+                plano: 'gratuito',
+                isTrial: false,
+                role: 'ADMIN'
+            },
+            'user456': {
+                id: 'user456',
+                nome: 'João da Silva',
+                email: 'joao.silva@gmail.com',
+                plano: 'pro',
+                isTrial: true,
+                role: 'USER'
+            }
+        };
+
+        // Simula o usuário logado buscando a informação no localStorage
+        // Você pode trocar o ID para testar com outro usuário simulado
+        const currentUserId = 'user123';
+        const currentUser = mockUsers[currentUserId];
+
+        // Se o usuário não estiver logado, redireciona para o login
+        const userRole = localStorage.getItem('userRole');
+        if (!userRole) {
+            window.location.href = 'index.html';
+        }
+        
+        // Função para mostrar/esconder a sidebar em telas menores
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Funções da Janela de Sugestão
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso!');
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        // Funções de redirecionamento
+        function redirectToEditProfile() {
+            window.location.href = 'editar_perfil.html';
+        }
+        function redirectToPlanos() {
+            window.location.href = 'planos.html';
+        }
+        function redirectToGerenciarUsuarios() {
+            window.location.href = 'gerenciamento_usuarios.html';
+        }
+
+        // Script para fechar o menu em mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger-menu');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !isClickInsideSidebar && !isClickOnHamburger) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
+        // Função para carregar os dados do usuário na página
+        function loadUserProfile() {
+            document.getElementById('profile-name').textContent = currentUser.nome;
+            document.getElementById('profile-email').textContent = currentUser.email;
+            document.getElementById('profile-phone').textContent = currentUser.telefone;
+            document.getElementById('profile-address').textContent = currentUser.endereco;
+            document.getElementById('profile-plan').textContent = currentUser.plano.charAt(0).toUpperCase() + currentUser.plano.slice(1);
+            
+            // Exibir botões de admin se o usuário for um admin
+            if (userRole === 'ADMIN') {
+                document.getElementById('admin-user-btn').style.display = 'block';
+            }
+        }
+        
+        window.onload = loadUserProfile;
+    </script>
+</body>
+</html>

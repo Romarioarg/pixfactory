@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Parcelas | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* === Sidebar Lateral === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            margin-top: auto;
+        }
+
+        /* --- Menu Hambúrguer --- */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        /* --- Conteúdo Principal --- */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 20px;
+            max-width: calc(100% - 300px);
+            margin-right: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .main-content header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 24px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .main-content header h1 .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        .main-content header p {
+            font-size: 14px;
+            color: #aaa;
+            margin: 0;
+        }
+
+        /* Contêiner geral para as seções */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .section-container h2 {
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+
+        /* Estilo para campos de formulário e labels */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="number"]::placeholder {
+            color: #888;
+        }
+        input[type="tel"]::placeholder {
+            color: #888;
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="tel"]:focus,
+        select:focus {
+            border-color: #03a252;
+            box-shadow: 0 0 5px rgba(4, 180, 95, 0.4);
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+        input[type="date"] {
+            color-scheme: dark;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .action-buttons button {
+             /* Estilos padrão dos botões */
+             background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-buttons button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        
+        button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 15px;
+            align-self: flex-start;
+        }
+
+        button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+
+        /* Seção de Resultado */
+        .resultado {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .resultado h2 {
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .resultado h2 span.icon {
+            font-size: 22px;
+            color: #04b45f;
+        }
+
+        .resultado p {
+            margin: 0;
+            font-size: 15px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resultado p span.icon {
+            font-size: 20px;
+        }
+        .resultado p#parcela span.icon { color: #3498db; }
+        .resultado p#total span.icon { color: #2ecc71; }
+        .resultado p#jurosTotal span.icon { color: #e74c3c; }
+
+
+        /* Seção de Amortização */
+        .amortizacao-section {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
+            display: none;
+            overflow-x: auto;
+        }
+
+        .amortizacao-section h2 {
+            color: #f1c40f;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .amortizacao-section h2 span.icon {
+            color: #f1c40f;
+            font-size: 22px;
+        }
+
+        /* Tabela de Amortização */
+        .amortizacao-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 600px;
+        }
+
+        .amortizacao-table thead th {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #03a252;
+            font-weight: bold;
+        }
+
+        .amortizacao-table tbody td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+        }
+
+        .amortizacao-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .amortizacao-table tbody tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+
+        .amortizacao-table tbody tr.total-row td {
+            font-weight: bold;
+            color: #04b45f;
+            background-color: #2a2a2a;
+        }
+
+        .periodo-customizado-container {
+            display: none;
+            margin-bottom: 15px;
+        }
+        
+        .juros-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .juros-group input {
+            flex: 1;
+        }
+        .juros-group select {
+            flex-shrink: 0;
+            width: 120px;
+        }
+        
+        .radio-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin-bottom: 0;
+            accent-color: #04b45f;
+        }
+
+        /* Seção de Juros Puros - Amortização Manual */
+        .juros-puros-amortizacao {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            background-color: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #04b45f;
+        }
+
+        .juros-puros-amortizacao p {
+            margin: 0;
+            font-size: 15px;
+            color: #ccc;
+        }
+        .juros-puros-amortizacao h3 {
+            color: #f1c40f;
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .juros-puros-amortizacao .amortizacao-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: 10px;
+        }
+
+        .juros-puros-amortizacao .amortizacao-input-group input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .juros-puros-amortizacao .amortizacao-input-group button {
+            padding: 10px 15px;
+            font-size: 14px;
+            align-self: stretch;
+        }
+
+        /* Janela de Sugestão */
+        .janela-sugestao {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        .pdf-button {
+            background-color: #e74c3c;
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        .pdf-button:hover {
+            background-color: #c0392b;
+        }
+
+        .whatsapp-button {
+            background-color: #25d366;
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        .whatsapp-button:hover {
+            background-color: #128c7e;
+        }
+
+        .graph-placeholder {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+            border: 1px dashed #444;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 100px;
+        }
+        .graph-placeholder .icon {
+            font-size: 30px;
+            color: #888;
+        }
+
+
+        /* --- Media Queries (Para celular) --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 100%;
+                left: -100%;
+                transition: left 0.3s ease-in-out;
+                padding-top: 80px;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px 15px;
+            }
+            
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content header {
+                margin-top: 60px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .main-content header h1 {
+                font-size: 22px;
+            }
+            
+            .juros-group {
+                flex-direction: column;
+            }
+            .juros-group select {
+                width: 100%;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .amortizacao-table {
+                min-width: 100%;
+            }
+
+            .juros-puros-amortizacao .amortizacao-input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .juros-puros-amortizacao .amortizacao-input-group button {
+                width: 100%;
+            }
+
+            .janela-sugestao {
+                width: calc(100% - 40px);
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+            .action-buttons button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html" class="active"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1><span class="header-icon fas fa-chart-line"></span> Simulador de Parcelas</h1>
+            <p>Calcule o valor das parcelas com base no valor e juros.</p>
+        </header>
+
+        <section class="section-container simulador-form-section">
+            <h2>Dados para Simulação</h2>
+            <form class="simulador-form">
+                <h3>Tipo de Simulação:</h3>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="tipoSimulacao" value="parcelasFixas" checked onchange="toggleSimulacaoMode()">
+                        <span class="fas fa-money-check-alt"></span> Parcelas Fixas (SAC/Price)
+                    </label>
+                    <label>
+                        <input type="radio" name="tipoSimulacao" value="jurosPuros" onchange="toggleSimulacaoMode()">
+                        <span class="fas fa-coins"></span> Juros Simples (Amortização Manual)
+                    </label>
+                </div>
+                
+                <div id="calculoTipoContainer">
+                    <h3>O que você quer calcular?</h3>
+                    <div class="radio-group" id="tipoCalculoGroup">
+                        <label>
+                            <input type="radio" name="tipoCalculo" value="parcela" checked onchange="toggleCalculationMode()">
+                            <span class="fas fa-hand-holding-usd"></span> Valor da Parcela
+                        </label>
+                        <label>
+                            <input type="radio" name="tipoCalculo" value="prazo" onchange="toggleCalculationMode()">
+                            <span class="fas fa-calendar-alt"></span> Prazo
+                        </label>
+                        <label>
+                            <input type="radio" name="tipoCalculo" value="juros" onchange="toggleCalculationMode()">
+                            <span class="fas fa-percent"></span> Taxa de Juros
+                        </label>
+                    </div>
+                </div>
+
+                <label for="nomeCliente">Nome do Cliente (opcional):</label>
+                <input type="text" id="nomeCliente" placeholder="Ex: João da Silva">
+
+                <label for="telefoneCliente">Telefone do Cliente (opcional):</label>
+                <input type="tel" id="telefoneCliente" placeholder="Ex: (11) 99999-9999" maxlength="15">
+
+
+                <label for="valor">Valor emprestado (R$):</label>
+                <input type="number" id="valor" placeholder="Ex: 10000.00" step="0.01" required>
+
+                <div id="parcelaValorContainer" style="display: none;">
+                    <label for="parcelaValorReversa">Valor da Parcela (R$):</label>
+                    <input type="number" id="parcelaValorReversa" placeholder="Ex: 500.00" step="0.01">
+                </div>
+
+                <div id="prazoContainer">
+                    <label for="prazo">Prazo Total (em meses):</label>
+                    <input type="number" id="prazo" placeholder="Ex: 12" required>
+                </div>
+
+                <div id="jurosContainer">
+                    <label for="juros">Taxa de juros (%):</label>
+                    <div class="juros-group">
+                        <input type="number" id="juros" placeholder="Ex: 12.0" step="0.01" required>
+                        <select id="jurosFrequencia">
+                            <option value="diario">Diário</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="quinzenal">Quinzenal</option>
+                            <option value="mensal" selected>Mensal</option>
+                            <option value="bimestral">Bimestral</option>
+                            <option value="trimestral">Trimestral</option>
+                            <option value="semestral">Semestral</option>
+                            <option value="anual">Anual</option>
+                            <option value="custom">Outro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="jurosCustomizadoContainer" class="periodo-customizado-container">
+                    <label for="jurosPeriodoCustomizado">Pagar a cada (dias):</label>
+                    <input type="number" id="jurosPeriodoCustomizado" placeholder="Ex: 45 (para 45 em 45 dias)" />
+                    <small style="color: #aaa; font-size: 12px; display: block; margin-top: -10px;">Informe o número de dias para a taxa de juros.</small>
+                </div>
+
+                <div id="pagamentoContainer">
+                    <label for="frequencia">Frequência de Pagamento:</label>
+                    <select id="frequencia" onchange="togglePeriodoCustomizado()">
+                        <option value="diario">Diário</option>
+                        <option value="semanal">Semanal</option>
+                        <option value="quinzenal">Quinzenal</option>
+                        <option value="mensal" selected>Mensal</option>
+                        <option value="bimestral">Bimestral</option>
+                        <option value="trimestral">Trimestral</option>
+                        <option value="semestral">Semestral</option>
+                        <option value="anual">Anual</option>
+                        <option value="custom">Outro (especificar dias)</option>
+                    </select>
+                </div>
+
+                <div id="periodoCustomizadoContainer" class="periodo-customizado-container">
+                    <label for="periodoCustomizado">Pagar a cada (dias):</label>
+                    <input type="number" id="periodoCustomizado" placeholder="Ex: 45 (para 45 em 45 dias)" />
+                    <small style="color: #aaa; font-size: 12px; display: block; margin-top: -10px;">Informe o número de dias entre os pagamentos.</small>
+                </div>
+
+                <div id="vencimentoContainer">
+                    <label for="dataPrimeiroVencimento">Data do Primeiro Vencimento:</label>
+                    <input type="date" id="dataPrimeiroVencimento">
+                </div>
+
+                <button type="submit">🧮 Calcular Simulação</button>
+            </form>
+        </section>
+        
+        <section class="section-container resultado" id="resultado">
+            <h2><span class="icon fas fa-chart-pie"></span> Resumo da Simulação</h2>
+            <p id="parcela"><span class="icon fas fa-credit-card"></span> Valor da parcela: R$ 0.00</p>
+            <p id="total"><span class="icon fas fa-sack-dollar"></span> Total a pagar: R$ 0.00</p>
+            <p id="jurosTotal"><span class="icon fas fa-hand-holding-usd"></span> Total de juros: R$ 0.00</p>
+            <p id="prazoResultado" style="display: none;"><span class="icon fas fa-calendar-check"></span> Prazo Total: 0 meses</p>
+            <p id="jurosResultado" style="display: none;"><span class="icon fas fa-percentage"></span> Taxa de Juros Anual: 0.00%</p>
+            
+            <div class="action-buttons">
+                <button class="pdf-button" onclick="generatePDF()">Gerar PDF <span class="fas fa-file-pdf"></span></button>
+                <button class="whatsapp-button" onclick="sendToWhatsApp()">Enviar para WhatsApp <span class="fab fa-whatsapp"></span></button>
+            </div>
+        </section>
+        
+        <section class="section-container juros-puros-amortizacao" id="juros-puros-amortizacao">
+            <h2><span class="icon fas fa-hand-holding-dollar"></span> Detalhes Juros Simples</h2>
+            <p id="jurosPurosValor"></p>
+            <p id="jurosPurosSaldo"></p>
+
+            <h3>Simular Amortização Extra</h3>
+            <div class="amortizacao-input-group">
+                <input type="number" id="valorAmortizacaoExtra" placeholder="Valor para amortizar (R$)" step="0.01">
+                <button type="button" onclick="simularAmortizacaoExtra()">Simular</button>
+            </div>
+            <p id="proximoJuroInfo"></p>
+            <div class="action-buttons">
+                <button class="pdf-button" onclick="generatePDF()">Gerar PDF <span class="fas fa-file-pdf"></span></button>
+                <button class="whatsapp-button" onclick="sendToWhatsApp()">Enviar para WhatsApp <span class="fab fa-whatsapp"></span></button>
+            </div>
+        </section>
+
+        <section class="section-container amortizacao-section" id="amortizacao-section">
+            <h2><span class="icon fas fa-table"></span> Plano de Amortização</h2>
+            <table class="amortizacao-table">
+                <thead>
+                    <tr>
+                        <th>Parcela</th>
+                        <th>Vencimento</th>
+                        <th>Juros (R$)</th>
+                        <th>Amortizado (R$)</th>
+                        <th>Valor Parcela (R$)</th>
+                        <th>Saldo Devedor (R$)</th>
+                    </tr>
+                </thead>
+                <tbody id="amortizacao-body">
+                    </tbody>
+            </table>
+        </section>
+
+        <div class="graph-placeholder" id="graph-placeholder">
+            <span class="icon fas fa-chart-area"></span>
+            Gráfico de Amortização (Em breve!)
+        </div>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Mapeamento de elementos DOM
+        const form = document.querySelector('.simulador-form');
+        const resultadoSection = document.getElementById('resultado');
+        const parcelaElement = document.getElementById('parcela');
+        const totalElement = document.getElementById('total');
+        const jurosTotalElement = document.getElementById('jurosTotal');
+        const frequenciaSelect = document.getElementById('frequencia');
+        const periodoCustomizadoContainer = document.getElementById('periodoCustomizadoContainer');
+        const periodoCustomizadoInput = document.getElementById('periodoCustomizado');
+        const prazoContainer = document.getElementById('prazoContainer');
+        const prazoInput = document.getElementById('prazo');
+        const jurosContainer = document.getElementById('jurosContainer');
+        const jurosInput = document.getElementById('juros');
+        const jurosFrequenciaSelect = document.getElementById('jurosFrequencia');
+        const jurosCustomizadoContainer = document.getElementById('jurosCustomizadoContainer');
+        const jurosPeriodoCustomizadoInput = document.getElementById('jurosPeriodoCustomizado');
+        const parcelaValorContainer = document.getElementById('parcelaValorContainer');
+        const parcelaValorReversaInput = document.getElementById('parcelaValorReversa');
+        const dataPrimeiroVencimentoInput = document.getElementById('dataPrimeiroVencimento');
+        const tipoCalculoGroup = document.getElementById('tipoCalculoGroup');
+        const nomeClienteInput = document.getElementById('nomeCliente');
+        const telefoneClienteInput = document.getElementById('telefoneCliente');
+        const calculoTipoContainer = document.getElementById('calculoTipoContainer');
+
+        const amortizacaoSection = document.getElementById('amortizacao-section');
+        const amortizacaoBody = document.getElementById('amortizacao-body');
+
+        const jurosPurosAmortizacaoSection = document.getElementById('juros-puros-amortizacao');
+        const jurosPurosValorElement = document.getElementById('jurosPurosValor');
+        const jurosPurosSaldoElement = document.getElementById('jurosPurosSaldo');
+        const valorAmortizacaoExtraInput = document.getElementById('valorAmortizacaoExtra');
+        const proximoJuroInfoElement = document.getElementById('proximoJuroInfo');
+
+        const prazoResultadoElement = document.getElementById('prazoResultado');
+        const jurosResultadoElement = document.getElementById('jurosResultado');
+
+        let currentPrincipal = 0;
+        let currentTaxaPeriodo = 0;
+
+        // --- Funções de Ajuda ---
+        function addMonths(date, months) {
+            const d = date.getDate();
+            const newDate = new Date(date);
+            newDate.setMonth(newDate.getMonth() + +months);
+            if (newDate.getDate() !== d) {
+                newDate.setDate(0);
+            }
+            return newDate;
+        }
+
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+        
+        // --- Gerenciamento de Visibilidade dos Campos do Formulário ---
+        function toggleSimulacaoMode() {
+            const tipoSimulacao = document.querySelector('input[name="tipoSimulacao"]:checked').value;
+
+            if (tipoSimulacao === 'jurosPuros') {
+                calculoTipoContainer.style.display = 'none';
+                
+                prazoContainer.style.display = 'none';
+                prazoInput.removeAttribute('required');
+                parcelaValorContainer.style.display = 'none';
+                parcelaValorReversaInput.removeAttribute('required');
+                dataPrimeiroVencimentoInput.removeAttribute('required');
+
+                jurosContainer.style.display = 'block';
+                jurosInput.setAttribute('required', 'required');
+
+            } else { // Parcelas Fixas (Price/SAC)
+                calculoTipoContainer.style.display = 'block';
+                toggleCalculationMode();
+            }
+
+            resultadoSection.style.display = 'none';
+            amortizacaoSection.style.display = 'none';
+            jurosPurosAmortizacaoSection.style.display = 'none';
+            amortizacaoBody.innerHTML = '';
+            proximoJuroInfoElement.textContent = '';
+            valorAmortizacaoExtraInput.value = '';
+            prazoResultadoElement.style.display = 'none';
+            jurosResultadoElement.style.display = 'none';
+        }
+
+        function toggleCalculationMode() {
+            const tipoCalculo = document.querySelector('input[name="tipoCalculo"]:checked').value;
+            const tipoSimulacao = document.querySelector('input[name="tipoSimulacao"]:checked').value;
+
+            if (tipoSimulacao === 'jurosPuros') {
+                return;
+            }
+
+            prazoContainer.style.display = (tipoCalculo === 'parcela') ? 'block' : 'none';
+            prazoInput.toggleAttribute('required', (tipoCalculo === 'parcela'));
+
+            jurosContainer.style.display = 'block';
+            jurosInput.setAttribute('required', 'required');
+
+            parcelaValorContainer.style.display = (tipoCalculo === 'prazo' || tipoCalculo === 'juros') ? 'block' : 'none';
+            parcelaValorReversaInput.toggleAttribute('required', (tipoCalculo === 'prazo' || tipoCalculo === 'juros'));
+            
+            document.getElementById('valor').setAttribute('required', 'required');
+            dataPrimeiroVencimentoInput.setAttribute('required', 'required');
+        }
+
+        function togglePeriodoCustomizado() {
+            if (frequenciaSelect.value === 'custom') {
+                periodoCustomizadoContainer.style.display = 'block';
+                periodoCustomizadoInput.setAttribute('required', 'required');
+            } else {
+                periodoCustomizadoContainer.style.display = 'none';
+                periodoCustomizadoInput.removeAttribute('required');
+                periodoCustomizadoInput.value = '';
+            }
+        }
+        
+        function toggleJurosCustomizado() {
+            if (jurosFrequenciaSelect.value === 'custom') {
+                jurosCustomizadoContainer.style.display = 'block';
+                jurosPeriodoCustomizadoInput.setAttribute('required', 'required');
+            } else {
+                jurosCustomizadoContainer.style.display = 'none';
+                jurosPeriodoCustomizadoInput.removeAttribute('required');
+                jurosPeriodoCustomizadoInput.value = '';
+            }
+        }
+
+        function setDefaultFirstPaymentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            dataPrimeiroVencimentoInput.value = `${year}-${month}-${day}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setDefaultFirstPaymentDate();
+            togglePeriodoCustomizado();
+            toggleJurosCustomizado();
+            toggleSimulacaoMode();
+            jurosFrequenciaSelect.addEventListener('change', toggleJurosCustomizado);
+            
+            document.querySelectorAll('input[name="tipoCalculo"]').forEach(radio => {
+                radio.addEventListener('change', toggleCalculationMode);
+            });
+            document.querySelectorAll('input[name="tipoSimulacao"]').forEach(radio => {
+                radio.addEventListener('change', toggleSimulacaoMode);
+            });
+
+            const hamburgerButton = document.getElementById('hamburger-menu');
+            const sidebar = document.getElementById('sidebar');
+            hamburgerButton.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+            sidebar.querySelectorAll('nav ul li a').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // --- Lógica de Cálculo Principal ---
+        form.addEventListener('submit', handleSimulation);
+
+        function handleSimulation(e) {
+            e.preventDefault();
+
+            const valorInicial = parseFloat(document.getElementById('valor').value);
+            const jurosInformado = parseFloat(document.getElementById('juros').value) / 100;
+            const jurosFrequencia = jurosFrequenciaSelect.value;
+            const jurosPeriodoCustomizado = parseInt(document.getElementById('jurosPeriodoCustomizado').value);
+            const frequencia = frequenciaSelect.value;
+            const tipoSimulacao = document.querySelector('input[name="tipoSimulacao"]:checked').value;
+            const tipoCalculo = document.querySelector('input[name="tipoCalculo"]:checked') ? document.querySelector('input[name="tipoCalculo"]:checked').value : 'parcela';
+            const parcelaValorReversa = parseFloat(document.getElementById('parcelaValorReversa').value);
+            const dataPrimeiroVencimento = new Date(document.getElementById('dataPrimeiroVencimento').value + 'T00:00:00');
+            
+            const prazoMesesTotal = document.getElementById('prazo').value ? parseInt(document.getElementById('prazo').value) : null;
+            
+            // Validações
+            if (isNaN(valorInicial) || valorInicial <= 0) {
+                alert('Por favor, preencha o Valor emprestado com um valor válido e maior que zero.');
+                return;
+            }
+            if (isNaN(jurosInformado) || jurosInformado < 0) {
+                alert('Por favor, preencha a Taxa de juros com um valor válido e maior ou igual a zero.');
+                return;
+            }
+            if (jurosFrequencia === 'custom' && (isNaN(jurosPeriodoCustomizado) || jurosPeriodoCustomizado <= 0)) {
+                 alert('Para frequência da taxa de juros customizada, informe um número de dias válido e maior que zero.');
+                return;
+            }
+            
+            // Validações específicas para Parcelas Fixas
+            if (tipoSimulacao === 'parcelasFixas') {
+                if (tipoCalculo === 'parcela' && (isNaN(prazoMesesTotal) || prazoMesesTotal <= 0)) {
+                    alert('Para "Parcelas Fixas" e "Calcular Parcela", preencha o Prazo Total com um valor válido e maior que zero.');
+                    return;
+                }
+                if ((tipoCalculo === 'prazo' || tipoCalculo === 'juros') && (isNaN(parcelaValorReversa) || parcelaValorReversa <= 0)) {
+                    alert('Para calcular Prazo ou Juros, preencha o Valor da Parcela com um valor válido e maior que zero.');
+                    return;
+                }
+            }
+
+            if (frequencia === 'custom' && (isNaN(parseInt(document.getElementById('periodoCustomizado').value)) || parseInt(document.getElementById('periodoCustomizado').value) <= 0)) {
+                alert('Para frequência de pagamento customizada, informe um número de dias válido e maior que zero.');
+                return;
+            }
+            if (document.getElementById('dataPrimeiroVencimento').value && isNaN(dataPrimeiroVencimento.getTime())) {
+                alert('Por favor, selecione uma Data do Primeiro Vencimento válida.');
+                return;
+            }
+
+            // --- Conversão da Taxa de Juros Informada para Anual ---
+            let jurosAnualEfetivo;
+            switch(jurosFrequencia) {
+                case 'diario':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 365) - 1;
+                    break;
+                case 'semanal':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 365 / 7) - 1;
+                    break;
+                case 'quinzenal':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 365 / 15) - 1;
+                    break;
+                case 'mensal':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 12) - 1;
+                    break;
+                case 'bimestral':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 6) - 1;
+                    break;
+                case 'trimestral':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 4) - 1;
+                    break;
+                case 'semestral':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 2) - 1;
+                    break;
+                case 'anual':
+                    jurosAnualEfetivo = jurosInformado;
+                    break;
+                case 'custom':
+                    jurosAnualEfetivo = Math.pow(1 + jurosInformado, 365 / jurosPeriodoCustomizado) - 1;
+                    break;
+            }
+
+            // --- Cálculo da Taxa Periódica de Pagamento ---
+            let taxaPeriodo;
+            let numeroParcelasCalculado = 0;
+            let diasPorPeriodo = 0;
+            const taxaDiariaEfetiva = Math.pow(1 + jurosAnualEfetivo, 1/365) - 1;
+
+            switch (frequencia) {
+                case 'diario':
+                    taxaPeriodo = taxaDiariaEfetiva;
+                    diasPorPeriodo = 1;
+                    break;
+                case 'semanal':
+                    taxaPeriodo = Math.pow(1 + taxaDiariaEfetiva, 7) - 1;
+                    diasPorPeriodo = 7;
+                    break;
+                case 'quinzenal':
+                    taxaPeriodo = Math.pow(1 + taxaDiariaEfetiva, 15) - 1;
+                    diasPorPeriodo = 15;
+                    break;
+                case 'mensal':
+                    taxaPeriodo = Math.pow(1 + jurosAnualEfetivo, 1/12) - 1;
+                    diasPorPeriodo = null;
+                    break;
+                case 'bimestral':
+                    taxaPeriodo = Math.pow(1 + jurosAnualEfetivo, 2/12) - 1;
+                    diasPorPeriodo = null;
+                    break;
+                case 'trimestral':
+                    taxaPeriodo = Math.pow(1 + jurosAnualEfetivo, 3/12) - 1;
+                    diasPorPeriodo = null;
+                    break;
+                case 'semestral':
+                    taxaPeriodo = Math.pow(1 + jurosAnualEfetivo, 6/12) - 1;
+                    diasPorPeriodo = null;
+                    break;
+                case 'anual':
+                    taxaPeriodo = jurosAnualEfetivo;
+                    diasPorPeriodo = null;
+                    break;
+                case 'custom':
+                    const diasCustom = parseInt(document.getElementById('periodoCustomizado').value);
+                    taxaPeriodo = Math.pow(1 + taxaDiariaEfetiva, diasCustom) - 1;
+                    diasPorPeriodo = diasCustom;
+                    break;
+            }
+
+            currentTaxaPeriodo = taxaPeriodo;
+            resultadoSection.style.display = 'flex';
+            amortizacaoSection.style.display = 'none';
+            jurosPurosAmortizacaoSection.style.display = 'none';
+            amortizacaoBody.innerHTML = '';
+            proximoJuroInfoElement.textContent = '';
+            valorAmortizacaoExtraInput.value = '';
+            prazoResultadoElement.style.display = 'none';
+            jurosResultadoElement.style.display = 'none';
+            parcelaElement.style.display = 'block';
+            totalElement.style.display = 'block';
+            jurosTotalElement.style.display = 'block';
+
+            if (tipoSimulacao === 'parcelasFixas') {
+                let parcelaValor;
+                let totalPago;
+                let totalJuros;
+                
+                if (tipoCalculo === 'parcela') {
+                    if (taxaPeriodo === 0) {
+                        parcelaValor = valorInicial / prazoMesesTotal;
+                    } else {
+                        parcelaValor = (valorInicial * taxaPeriodo) / (1 - Math.pow(1 + taxaPeriodo, -prazoMesesTotal));
+                    }
+                    
+                    if (diasPorPeriodo !== null) {
+                        numeroParcelasCalculado = Math.ceil((prazoMesesTotal * 30.4375) / diasPorPeriodo);
+                    } else {
+                        let periodosPorMes;
+                        switch (frequencia) {
+                            case 'mensal': periodosPorMes = 1; break;
+                            case 'bimestral': periodosPorMes = 1/2; break;
+                            case 'trimestral': periodosPorMes = 1/3; break;
+                            case 'semestral': periodosPorMes = 1/6; break;
+                            case 'anual': periodosPorMes = 1/12; break;
+                            default: periodosPorMes = 1;
+                        }
+                        numeroParcelasCalculado = Math.ceil(prazoMesesTotal * periodosPorMes);
+                    }
+                    
+                    totalPago = parcelaValor * numeroParcelasCalculado;
+                    totalJuros = totalPago - valorInicial;
+
+                    parcelaElement.innerHTML = ` <span class="icon fas fa-credit-card"></span> Valor da parcela (${frequencia}): ${formatCurrency(parcelaValor)}`;
+                    totalElement.innerHTML = ` <span class="icon fas fa-sack-dollar"></span> Total a pagar: ${formatCurrency(totalPago)}`;
+                    jurosTotalElement.innerHTML = ` <span class="icon fas fa-hand-holding-usd"></span> Total de juros: ${formatCurrency(totalJuros)}`;
+                    amortizacaoSection.style.display = 'block';
+                    generateAmortizationTable(valorInicial, parcelaValor, numeroParcelasCalculado, taxaPeriodo, dataPrimeiroVencimento, frequencia, diasPorPeriodo);
+
+                } else if (tipoCalculo === 'prazo') {
+                    parcelaValor = parcelaValorReversa;
+                    if (taxaPeriodo === 0) {
+                        numeroParcelasCalculado = valorInicial / parcelaValor;
+                    } else {
+                        if (parcelaValor <= valorInicial * taxaPeriodo) {
+                            alert('A parcela informada é muito baixa para amortizar o empréstimo. Tente um valor maior.');
+                            return;
+                        }
+                        numeroParcelasCalculado = -Math.log(1 - (valorInicial * taxaPeriodo) / parcelaValor) / Math.log(1 + taxaPeriodo);
+                    }
+                    numeroParcelasCalculado = Math.ceil(numeroParcelasCalculado);
+                    totalPago = parcelaValor * numeroParcelasCalculado;
+                    totalJuros = totalPago - valorInicial;
+                    let displayPrazo = '';
+                    if (diasPorPeriodo !== null) {
+                        displayPrazo = `${numeroParcelasCalculado} períodos (${(numeroParcelasCalculado * diasPorPeriodo / 30.4375).toFixed(1)} meses)`;
+                    } else {
+                        let monthsPerPeriod;
+                        switch (frequencia) {
+                            case 'mensal': monthsPerPeriod = 1; break;
+                            case 'bimestral': monthsPerPeriod = 2; break;
+                            case 'trimestral': monthsPerPeriod = 3; break;
+                            case 'semestral': monthsPerPeriod = 6; break;
+                            case 'anual': monthsPerPeriod = 12; break;
+                            default: monthsPerPeriod = 1;
+                        }
+                        displayPrazo = `${numeroParcelasCalculado} períodos (${(numeroParcelasCalculado * monthsPerPeriod).toFixed(1)} meses)`;
+                    }
+                    parcelaElement.innerHTML = ` <span class="icon fas fa-credit-card"></span> Valor da parcela (${frequencia}): ${formatCurrency(parcelaValor)}`;
+                    totalElement.innerHTML = ` <span class="icon fas fa-sack-dollar"></span> Total a pagar: ${formatCurrency(totalPago)}`;
+                    jurosTotalElement.innerHTML = ` <span class="icon fas fa-hand-holding-usd"></span> Total de juros: ${formatCurrency(totalJuros)}`;
+                    prazoResultadoElement.style.display = 'block';
+                    prazoResultadoElement.innerHTML = ` <span class="icon fas fa-calendar-check"></span> Prazo Total: ${displayPrazo}`;
+                    amortizacaoSection.style.display = 'block';
+                    generateAmortizationTable(valorInicial, parcelaValor, numeroParcelasCalculado, taxaPeriodo, dataPrimeiroVencimento, frequencia, diasPorPeriodo);
+
+                } else if (tipoCalculo === 'juros') {
+                    parcelaValor = parcelaValorReversa;
+                    if (diasPorPeriodo !== null) {
+                        numeroParcelasCalculado = Math.ceil((prazoMesesTotal * 30.4375) / diasPorPeriodo);
+                    } else {
+                        let periodosPorMes;
+                        switch (frequencia) {
+                            case 'mensal': periodosPorMes = 1; break;
+                            case 'bimestral': periodosPorMes = 1/2; break;
+                            case 'trimestral': periodosPorMes = 1/3; break;
+                            case 'semestral': periodosPorMes = 1/6; break;
+                            case 'anual': periodosPorMes = 1/12; break;
+                            default: periodosPorMes = 1;
+                        }
+                        numeroParcelasCalculado = Math.ceil(prazoMesesTotal * periodosPorMes);
+                    }
+                    if (numeroParcelasCalculado === 0) {
+                        alert('Prazo inválido para cálculo de juros.');
+                        return;
+                    }
+                    const guessRate = 0.01;
+                    const tolerance = 0.0000001;
+                    const maxIterations = 200;
+                    let rate = guessRate;
+                    for (let i = 0; i < maxIterations; i++) {
+                        const num = valorInicial * rate * Math.pow(1 + rate, numeroParcelasCalculado);
+                        const den = Math.pow(1 + rate, numeroParcelasCalculado) - 1;
+                        const f = (den === 0) ? -parcelaValor : num / den - parcelaValor;
+                        const df = valorInicial * (
+                            (Math.pow(1 + rate, numeroParcelasCalculado) * (numeroParcelasCalculado * rate + 1)) - (numeroParcelasCalculado * rate)
+                        ) / Math.pow(Math.pow(1 + rate, numeroParcelasCalculado) - 1, 2);
+                        if (Math.abs(f) < tolerance) {
+                            break;
+                        }
+                        if (df === 0) {
+                            rate += 0.0001;
+                            continue;
+                        }
+                        rate = rate - f / df;
+                    }
+                    taxaPeriodo = rate;
+                    if (taxaPeriodo <= 0) {
+                        alert('Não foi possível calcular uma taxa de juros válida com os dados fornecidos.');
+                        resultadoSection.style.display = 'none';
+                        return;
+                    }
+                    
+                    let jurosAnualCalculado;
+                    if (diasPorPeriodo !== null) {
+                        jurosAnualCalculado = Math.pow(1 + taxaPeriodo, 365 / diasPorPeriodo) - 1;
+                    } else {
+                        let periodsPerYear;
+                        switch (frequencia) {
+                            case 'mensal': periodsPerYear = 12; break;
+                            case 'bimestral': periodsPerYear = 6; break;
+                            case 'trimestral': periodsPerYear = 4; break;
+                            case 'semestral': periodsPerYear = 2; break;
+                            case 'anual': periodsPerYear = 1; break;
+                            default: periodsPerYear = 12;
+                        }
+                        jurosAnualCalculado = Math.pow(1 + taxaPeriodo, periodsPerYear) - 1;
+                    }
+                    totalPago = parcelaValor * numeroParcelasCalculado;
+                    totalJuros = totalPago - valorInicial;
+                    parcelaElement.innerHTML = ` <span class="icon fas fa-credit-card"></span> Valor da parcela (${frequencia}): ${formatCurrency(parcelaValor)}`;
+                    totalElement.innerHTML = ` <span class="icon fas fa-sack-dollar"></span> Total a pagar: ${formatCurrency(totalPago)}`;
+                    jurosTotalElement.innerHTML = ` <span class="icon fas fa-hand-holding-usd"></span> Total de juros: ${formatCurrency(totalJuros)}`;
+                    jurosResultadoElement.style.display = 'block';
+                    jurosResultadoElement.innerHTML = ` <span class="icon fas fa-percentage"></span> Taxa de Juros Anual: ${(jurosAnualCalculado * 100).toFixed(2)}%`;
+                    amortizacaoSection.style.display = 'block';
+                    generateAmortizationTable(valorInicial, parcelaValor, numeroParcelasCalculado, taxaPeriodo, dataPrimeiroVencimento, frequencia, diasPorPeriodo);
+                }
+
+            } else { // Juros Simples com Amortização Manual
+                currentPrincipal = valorInicial;
+                const jurosPuros = valorInicial * taxaPeriodo;
+                parcelaElement.innerHTML = ` <span class="icon fas fa-credit-card"></span> Juros por período: ${formatCurrency(jurosPuros)}`;
+                totalElement.style.display = 'none';
+                jurosTotalElement.style.display = 'none';
+                jurosPurosAmortizacaoSection.style.display = 'flex';
+                jurosPurosValorElement.innerHTML = `Valor do juro por período: **${formatCurrency(jurosPuros)}**`;
+                jurosPurosSaldoElement.innerHTML = `Saldo devedor atual: **${formatCurrency(currentPrincipal)}**`;
+                proximoJuroInfoElement.textContent = '';
+                valorAmortizacaoExtraInput.value = '';
+                valorAmortizacaoExtraInput.disabled = false;
+            }
+        }
+
+        // Geração da Tabela de Amortização
+        function generateAmortizationTable(valorInicial, parcelaValor, numeroParcelas, taxaPeriodo, dataPrimeiroVencimento, frequencia, diasPorPeriodo) {
+            amortizacaoBody.innerHTML = '';
+            let saldoDevedor = valorInicial;
+            let totalJurosAcumulado = 0;
+            let totalAmortizadoAcumulado = 0;
+            let totalPagoAcumulado = 0;
+            for (let i = 1; i <= numeroParcelas; i++) {
+                const jurosPeriodo = saldoDevedor * taxaPeriodo;
+                let amortizacao = parcelaValor - jurosPeriodo;
+                if (amortizacao > saldoDevedor) {
+                    amortizacao = saldoDevedor;
+                    parcelaValor = jurosPeriodo + amortizacao;
+                }
+                if (i === numeroParcelas && saldoDevedor > 0) {
+                    amortizacao = saldoDevedor;
+                    parcelaValor = jurosPeriodo + amortizacao;
+                }
+                saldoDevedor -= amortizacao;
+                if (saldoDevedor < 0.01 && saldoDevedor > -0.01) {
+                    saldoDevedor = 0;
+                }
+                totalJurosAcumulado += jurosPeriodo;
+                totalAmortizadoAcumulado += amortizacao;
+                totalPagoAcumulado += parcelaValor;
+                let dataVencimento = new Date(dataPrimeiroVencimento);
+                if (diasPorPeriodo !== null) {
+                    dataVencimento.setDate(dataVencimento.getDate() + ((i - 1) * diasPorPeriodo));
+                } else {
+                    let monthsToAdd;
+                    switch (frequencia) {
+                        case 'mensal': monthsToAdd = 1; break;
+                        case 'bimestral': monthsToAdd = 2; break;
+                        case 'trimestral': monthsToAdd = 3; break;
+                        case 'semestral': monthsToAdd = 6; break;
+                        case 'anual': monthsToAdd = 12; break;
+                        default: monthsToAdd = 0;
+                    }
+                    dataVencimento = addMonths(new Date(dataPrimeiroVencimento), (i - 1) * monthsToAdd);
+                }
+                const row = amortizacaoBody.insertRow();
+                row.innerHTML = `
+                    <td>${i}</td>
+                    <td>${dataVencimento.toLocaleDateString('pt-BR')}</td>
+                    <td>${formatCurrency(jurosPeriodo)}</td>
+                    <td>${formatCurrency(amortizacao)}</td>
+                    <td>${formatCurrency(parcelaValor)}</td>
+                    <td>${formatCurrency(saldoDevedor)}</td>
+                `;
+            }
+            const totalRow = amortizacaoBody.insertRow();
+            totalRow.classList.add('total-row');
+            totalRow.innerHTML = `
+                <td></td>
+                <td><strong>Total</strong></td>
+                <td><strong>${formatCurrency(totalJurosAcumulado)}</strong></td>
+                <td><strong>${formatCurrency(totalAmortizadoAcumulado)}</strong></td>
+                <td><strong>${formatCurrency(totalPagoAcumulado)}</strong></td>
+                <td><strong>${formatCurrency(saldoDevedor)}</strong></td>
+            `;
+        }
+
+        // Função para simular amortização extra no modo Juros Simples
+        function simularAmortizacaoExtra() {
+            const valorAmortizacaoExtra = parseFloat(valorAmortizacaoExtraInput.value);
+            if (isNaN(valorAmortizacaoExtra) || valorAmortizacaoExtra <= 0) {
+                alert('Por favor, insira um valor válido para amortizar.');
+                return;
+            }
+            if (valorAmortizacaoExtra > currentPrincipal + 0.01) {
+                alert('O valor de amortização não pode ser maior que o saldo devedor atual.');
+                return;
+            }
+            currentPrincipal -= valorAmortizacaoExtra;
+            currentPrincipal = Math.max(0, currentPrincipal);
+            const proximoJuro = currentPrincipal * currentTaxaPeriodo;
+            jurosPurosSaldoElement.innerHTML = `Saldo devedor atual: **${formatCurrency(currentPrincipal)}**`;
+            if (currentPrincipal <= 0.01) {
+                jurosPurosSaldoElement.innerHTML = `Saldo devedor atual: **${formatCurrency(0)} (Quitado!)**`;
+                proximoJuroInfoElement.innerHTML = `Parabéns! O empréstimo foi quitado com esta amortização.`;
+                valorAmortizacaoExtraInput.value = '';
+                valorAmortizacaoExtraInput.disabled = true;
+            } else {
+                proximoJuroInfoElement.innerHTML = `Após amortizar **${formatCurrency(valorAmortizacaoExtra)}**, o próximo juro será de **${formatCurrency(proximoJuro)}**.`;
+                valorAmortizacaoExtraInput.value = '';
+            }
+        }
+        
+        // Geração de PDF
+        function generatePDF() {
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.fontFamily = 'Arial, sans-serif';
+
+            const title = document.createElement('h1');
+            title.textContent = 'Simulação de Empréstimo PixFactory';
+            title.style.textAlign = 'center';
+            title.style.color = '#04b45f';
+            element.appendChild(title);
+
+            const inputData = document.createElement('div');
+            const valorEmprestado = document.getElementById('valor').value;
+            const jurosValue = document.getElementById('juros').value;
+            const jurosFrequenciaText = jurosFrequenciaSelect.options[jurosFrequenciaSelect.selectedIndex].text;
+            const frequenciaPagamentoText = frequenciaSelect.options[frequenciaSelect.selectedIndex].text;
+            const dataVencimento = new Date(dataPrimeiroVencimentoInput.value + 'T00:00:00').toLocaleDateString('pt-BR');
+
+            inputData.innerHTML = `
+                <h2>Dados da Entrada:</h2>
+                <p><strong>Valor Emprestado:</strong> ${formatCurrency(parseFloat(valorEmprestado))}</p>
+                <p><strong>Taxa de Juros:</strong> ${jurosValue}% (${jurosFrequenciaText})</p>
+                <p><strong>Frequência de Pagamento:</strong> ${frequenciaPagamentoText}</p>
+                <p><strong>Data do Primeiro Vencimento:</strong> ${dataVencimento}</p>
+                <br>
+            `;
+            element.appendChild(inputData);
+
+            const resultadoContent = resultadoSection.cloneNode(true);
+            resultadoContent.style.display = 'block';
+            const buttonToRemove = resultadoContent.querySelector('button');
+            if (buttonToRemove) buttonToRemove.remove();
+            resultadoContent.innerHTML = `<h2>Resumo da Simulação</h2>` + resultadoContent.innerHTML;
+            element.appendChild(resultadoContent);
+
+            if (amortizacaoSection.style.display === 'block') {
+                const amortizationContent = amortizacaoSection.cloneNode(true);
+                amortizationContent.style.display = 'block';
+                const table = amortizationContent.querySelector('table');
+                if (table) {
+                    table.style.width = '100%';
+                    table.style.borderCollapse = 'collapse';
+                    table.style.marginTop = '10px';
+                    table.querySelectorAll('th, td').forEach(cell => {
+                        cell.style.border = '1px solid #ddd';
+                        cell.style.padding = '8px';
+                        cell.style.textAlign = 'left';
+                    });
+                    table.querySelector('thead').style.backgroundColor = '#f2f2f2';
+                }
+                element.appendChild(amortizationContent);
+            } else if (jurosPurosAmortizacaoSection.style.display === 'flex') {
+                const jurosPurosContent = jurosPurosAmortizacaoSection.cloneNode(true);
+                jurosPurosContent.style.display = 'block';
+                const inputGroupToRemove = jurosPurosContent.querySelector('.amortizacao-input-group');
+                if (inputGroupToRemove) inputGroupToRemove.remove();
+                element.appendChild(jurosPurosContent);
+            }
+
+            const options = {
+                margin: 10,
+                filename: 'simulacao_PixFactory.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(options).save();
+        }
+
+        // Funções para janela de sugestão e WhatsApp
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const janela = document.getElementById("janela-sugestao");
+            const mensagem = janela.querySelector("textarea").value.trim();
+            if (mensagem === "") {
+                alert("Digite uma sugestão antes de enviar.");
+                return;
+            }
+            alert("✅ Sugestão enviada com sucesso!");
+            janela.style.display = "none";
+            janela.querySelector("textarea").value = "";
+        }
+        
+        // Função para gerar e enviar a simulação para o WhatsApp
+        function sendToWhatsApp() {
+            const nomeCliente = document.getElementById('nomeCliente').value;
+            const telefoneCliente = document.getElementById('telefoneCliente').value;
+
+            // Coleta dados da simulação
+            const valorInicial = formatCurrency(parseFloat(document.getElementById('valor').value));
+            const jurosInformado = document.getElementById('juros').value;
+            const jurosFrequenciaText = jurosFrequenciaSelect.options[jurosFrequenciaSelect.selectedIndex].text;
+            const frequenciaPagamentoText = frequenciaSelect.options[frequenciaSelect.selectedIndex].text;
+
+            let mensagem = `Olá`;
+            if (nomeCliente) {
+                mensagem += ` ${nomeCliente}`;
+            }
+            
+            mensagem += `! Segue a simulação solicitada:\n\n`;
+            mensagem += `*SIMULAÇÃO DE EMPRÉSTIMO*\n`;
+            mensagem += `--------------------------\n`;
+            mensagem += `💰 *Valor Emprestado:* ${valorInicial}\n`;
+            mensagem += `📈 *Taxa de Juros:* ${jurosInformado}% ${jurosFrequenciaText}\n`;
+            mensagem += `🗓️ *Frequência de Pagamento:* ${frequenciaPagamentoText}\n`;
+            
+            const tipoSimulacao = document.querySelector('input[name="tipoSimulacao"]:checked').value;
+            if (tipoSimulacao === 'parcelasFixas' && document.getElementById('resultado').style.display !== 'none') {
+                 const parcelaValue = document.getElementById('parcela').textContent.replace('Valor da parcela:', '').trim();
+                 const totalValue = document.getElementById('total').textContent.replace('Total a pagar:', '').trim();
+                 const jurosTotalValue = document.getElementById('jurosTotal').textContent.replace('Total de juros:', '').trim();
+                 
+                 mensagem += `\n*RESUMO DAS PARCELAS*\n`;
+                 mensagem += `--------------------\n`;
+                 mensagem += `💵 *Valor da Parcela:* ${parcelaValue}\n`;
+                 mensagem += `💸 *Total a Pagar:* ${totalValue}\n`;
+                 mensagem += `📈 *Juros Totais:* ${jurosTotalValue}\n`;
+            } else if (tipoSimulacao === 'jurosPuros' && document.getElementById('juros-puros-amortizacao').style.display !== 'none') {
+                const jurosPurosValor = document.getElementById('jurosPurosValor').textContent.replace('Valor do juro por período:', '').trim();
+                const saldoAtual = document.getElementById('jurosPurosSaldo').textContent.replace('Saldo devedor atual:', '').trim();
+                
+                mensagem += `\n*DETALHES DO ACORDO*\n`;
+                mensagem += `--------------------\n`;
+                mensagem += `💵 *Juros por Período:* ${jurosPurosValor}\n`;
+                mensagem += `💰 *Saldo Devedor Atual:* ${saldoAtual}\n`;
+            }
+
+            const url = `https://api.whatsapp.com/send?phone=${telefoneCliente.replace(/\D/g, '')}&text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>444

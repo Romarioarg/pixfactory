@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Clientes | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex; /* Para layout de sidebar e conteúdo principal */
+            overflow-x: hidden; /* Para evitar rolagem horizontal indesejada */
+            min-height: 100vh; /* Garante que o body ocupe a altura total da viewport */
+            flex-direction: column; /* Altera para coluna em telas pequenas */
+        }
+
+        /* Estilos do menu lateral (base padrão) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; /* Para alinhar logo, nav e footer */
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav {
+            flex-grow: 1; /* Ocupa o espaço restante */
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+        }
+
+        /* Estilos para os ícones no menu lateral */
+        .sidebar nav ul li a .icon {
+            font-size: 18px; /* Ajuste o tamanho do ícone se necessário */
+            width: 20px; /* Garante largura fixa para alinhamento */
+            text-align: center;
+        }
+        /* Cores dos ícones, se desejar customizar por link (opcional, pode remover se não usar) */
+        .sidebar nav ul li a .icon.azul { color: #3498db; } /* Mantendo o padrão verde/azul das outras páginas */
+        .sidebar nav ul li a .icon.verde { color: #2ecc71; }
+        .sidebar nav ul li a .icon.amarelo { color: #f1c40f; }
+        .sidebar nav ul li a .icon.vermelho { color: #e74c3c; }
+        .sidebar nav ul li a .icon.roxo { color: #9b59b6; }
+        .sidebar nav ul li a .icon.azul-claro { color: #5dade2; }
+        .sidebar nav ul li a .icon.vermelho-claro { color: #f1948a; }
+        .sidebar nav ul li a .icon.cinza { color: #bdc3c7; }
+        .sidebar nav ul li a .icon.limao { color: #a3e635; }
+        .sidebar nav ul li a .icon.azul-escuro { color: #2c3e50; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding-top: 20px; /* Espaço do conteúdo */
+            margin-top: auto; /* Empurra o footer para o final */
+        }
+
+        /* Conteúdo principal da página */
+        .main-content {
+            margin-left: 280px; /* Ajuste para o menu lateral + um pouco de espaço */
+            padding: 40px;
+            max-width: calc(100% - 320px); /* Ajusta a largura máxima para não colar na direita */
+            margin-right: 40px;
+            flex: 1; /* Ocupa o espaço restante horizontalmente */
+            box-sizing: border-box; /* Inclui padding na largura */
+        }
+
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex; /* Para alinhar título e ícone */
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0; /* Removido margin-bottom */
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        .main-content header p {
+            color: #ccc;
+            font-size: 16px;
+            margin-top: 5px; /* Adicionado um pouco de margem superior */
+        }
+
+        .filtro-inteligente {
+            margin-bottom: 25px;
+        }
+
+        .filtro-inteligente input {
+            width: 100%;
+            padding: 14px;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box; /* Garante que padding e border sejam incluídos na largura */
+            outline: none; /* Remove o contorno padrão ao focar */
+            transition: border-color 0.3s;
+        }
+
+        .filtro-inteligente input::placeholder {
+            color: #888;
+        }
+
+        .filtro-inteligente input:focus {
+            border-color: #03a252; /* Cor mais escura ao focar */
+        }
+
+        .lista-relatorio {
+            display: grid;
+            gap: 20px; /* Espaço entre os cards */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsividade dos cards */
+        }
+
+        .relatorio-card {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espaço entre foto e info */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .relatorio-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(4, 180, 95, 0.3);
+        }
+
+        .cliente-foto {
+            width: 70px; /* Um pouco maior */
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #04b45f; /* Borda mais grossa */
+            flex-shrink: 0; /* Evita que a imagem encolha */
+        }
+
+        .relatorio-info {
+            flex: 1;
+        }
+
+        .relatorio-info h3 {
+            margin: 0 0 8px 0;
+            color: #04b45f;
+            font-size: 18px;
+        }
+
+        .relatorio-info p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .status {
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 20px; /* Mais arredondado */
+            font-size: 13px;
+            white-space: nowrap; /* Impede que o texto quebre */
+            margin-left: auto; /* Empurra o status para a direita */
+        }
+
+        .pago {
+            background-color: #2ecc71; /* Verde mais vibrante */
+            color: #fff;
+        }
+
+        .atrasado {
+            background-color: #e74c3c; /* Vermelho */
+            color: #fff;
+        }
+
+        .aberto {
+            background-color: #f1c40f; /* Amarelo */
+            color: #000;
+        }
+
+        /* === Janela de Sugestão (do dashboard) - Adicionada para consistência === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            width: 300px; /* Largura padrão para desktop */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* === Menu Hamburguer e Adaptações para Celular === */
+        .hamburger-menu {
+            display: none; /* Esconde por padrão em desktop */
+            font-size: 28px;
+            color: #04b45f;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100; /* Acima da sidebar */
+            background-color: #1e1e1e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Media Queries para Telas Menores */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px; /* Largura da sidebar no mobile */
+                left: -260px; /* Esconde a sidebar por padrão */
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0; /* Mostra a sidebar */
+            }
+
+            .hamburger-menu {
+                display: block; /* Mostra o menu hambúrguer */
+            }
+
+            .main-content {
+                margin-left: 0; /* Remove a margem da sidebar */
+                padding: 20px;
+                max-width: 100%; /* Ocupa toda a largura */
+                margin-right: 0;
+                padding-top: 80px; /* Espaço para o menu hambúrguer fixo */
+            }
+
+            .main-content header {
+                flex-direction: column; /* Empilha título e parágrafo */
+                align-items: flex-start;
+                text-align: left; /* Garante que o texto fique à esquerda */
+            }
+            .main-content header h1 {
+                margin-bottom: 5px; /* Ajuste a margem para o parágrafo abaixo */
+            }
+
+            .filtro-inteligente input {
+                font-size: 14px; /* Texto menor para caber */
+            }
+
+            .lista-relatorio {
+                grid-template-columns: 1fr; /* Um card por linha em mobile */
+            }
+
+            .relatorio-card {
+                flex-direction: column; /* Empilha foto, info e status */
+                align-items: flex-start; /* Alinha tudo à esquerda */
+                gap: 10px;
+                padding: 15px; /* Diminui um pouco o padding */
+            }
+            .relatorio-card .status {
+                margin-left: 0; /* Remove o auto-margin para alinhar à esquerda */
+                align-self: flex-end; /* Alinha o status à direita, no final do card */
+            }
+
+            .relatorio-info h3, .relatorio-info p {
+                text-align: left; /* Garante que o texto dentro do info esteja à esquerda */
+            }
+            .relatorio-info {
+                width: 100%; /* Ocupa toda a largura disponível */
+            }
+
+
+            .janela-sugestao {
+                width: calc(100% - 40px); /* Ocupa quase toda a largura */
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>📋 Relatório de Indicações</h1>
+            <span class="header-icon">📈</span> 
+            <p>Veja quem indicou quem e acompanhe o status.</p>
+        </header>
+
+        <section class="filtro-inteligente">
+            <input type="text" id="busca" placeholder="🔍 Buscar por nome, cidade, bairro, telefone ou e-mail..." oninput="filtrarRelatorio()" />
+        </section>
+
+        <section class="lista-relatorio" id="lista-relatorio">
+            <div class="relatorio-card">
+                <img src="https://via.placeholder.com/70/04b45f/121212?text=J" alt="Foto do João" class="cliente-foto" />
+                <div class="relatorio-info">
+                    <h3>João da Silva</h3>
+                    <p>📍 São Paulo / SP · Bairro: Centro</p>
+                    <p>📞 (11) 90000-0000 · 📧 joao@email.com</p>
+                    <p>👤 Indicado por: Ana Paula · 📅 10/07/2025</p>
+                </div>
+                <div class="status pago">✅ Pago</div>
+            </div>
+
+            <div class="relatorio-card">
+                <img src="https://via.placeholder.com/70/04b45f/121212?text=M" alt="Foto da Maria" class="cliente-foto" />
+                <div class="relatorio-info">
+                    <h3>Maria Souza</h3>
+                    <p>📍 Campinas / SP · Bairro: Vila Nova</p>
+                    <p>📞 (19) 98888-0000 · 📧 maria@email.com</p>
+                    <p>👤 Indicado por: Lucas Lima · 📅 12/07/2025</p>
+                </div>
+                <div class="status atrasado">⚠️ Atrasado</div>
+            </div>
+
+            <div class="relatorio-card">
+                <img src="https://via.placeholder.com/70/04b45f/121212?text=C" alt="Foto do Carlos" class="cliente-foto" />
+                <div class="relatorio-info">
+                    <h3>Carlos Mendes</h3>
+                    <p>📍 Osasco / SP · Bairro: Bela Vista</p>
+                    <p>📞 (11) 97777-0000 · 📧 carlos@email.com</p>
+                    <p>👤 Indicado por: Fernanda Rocha · 📅 15/07/2025</p>
+                </div>
+                <div class="status aberto">⏳ Em aberto</div>
+            </div>
+            <div class="relatorio-card">
+                <img src="https://via.placeholder.com/70/04b45f/121212?text=A" alt="Foto da Ana" class="cliente-foto" />
+                <div class="relatorio-info">
+                    <h3>Ana Clara</h3>
+                    <p>📍 Rio de Janeiro / RJ · Bairro: Copacabana</p>
+                    <p>📞 (21) 96666-0000 · 📧 ana@email.com</p>
+                    <p>👤 Indicado por: Pedro Almeida · 📅 18/07/2025</p>
+                </div>
+                <div class="status pago">✅ Pago</div>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Função para mostrar/esconder a sidebar em telas menores
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Funções da Janela de Sugestão
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        // Função para abrir WhatsApp (já existente nas outras páginas)
+        function abrirWhatsApp() {
+            const numeroWhatsApp = '5511995400311';
+            const mensagem = 'Olá! Preciso de ajuda com o PixFactory.';
+            const url = `https://wa.me/${5511995400311}?text=${encodeURIComponent("Ola!Preciso de Ajuda com PixFactory")}`;
+            window.open(url, '_blank');
+        }
+
+        // Fecha a sidebar ao clicar em um item do menu (opcional, para UX em mobile)
+        document.querySelectorAll('.sidebar nav ul li a').forEach(item => {
+            item.addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Função de filtro de relatório
+        function filtrarRelatorio() {
+            const termo = document.getElementById("busca").value.toLowerCase();
+            const cards = document.querySelectorAll(".relatorio-card");
+
+            cards.forEach(card => {
+                const texto = card.innerText.toLowerCase();
+                card.style.display = texto.includes(termo) ? "flex" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
