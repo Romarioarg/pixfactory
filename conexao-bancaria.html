@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexão Bancária | PixFactory</title>
+    <!-- Link para a biblioteca Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos globais e de layout baseados no arquivo limites-gastos.html */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .rosa { color: #e84393; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .hide-values-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        
+        .hide-values-btn:hover {
+            color: #03a252;
+        }
+        
+        /* Estilo do banner de teste gratuito (copiado da sua página) */
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header-left h1 {
+            color: #04b45f;
+            margin-bottom: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        
+        .header-left p {
+            color: #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .header-left.no-description {
+            flex-direction: row;
+            align-items: center;
+        }
+        .header-left.no-description h1 {
+            margin-bottom: 0;
+        }
+
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .top-nav {
+            background-color: #1e1e1e;
+            padding: 10px 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            border: 1px solid #04b45f;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: color 0.3s, background-color 0.3s;
+            font-size: 16px;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+        
+        .main-content-wrapper {
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+
+        /* Estilos específicos para a página de conexão bancária */
+        .bank-connect-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #2b2b2b;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+            margin-bottom: 30px;
+        }
+        .bank-connect-card .icon-wallet {
+            font-size: 60px;
+            color: #f1c40f;
+            margin-bottom: 20px;
+        }
+        .bank-connect-card h2 {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .bank-connect-card p {
+            color: #ccc;
+            font-size: 16px;
+            margin-bottom: 25px;
+            max-width: 600px;
+        }
+        .connect-bank-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 30px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .connect-bank-btn:hover {
+            background-color: #03a252;
+        }
+        .connect-bank-btn i {
+            margin-right: 10px;
+        }
+        
+        .connected-banks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .bank-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+        }
+        .bank-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .bank-info .bank-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bank-info .bank-logo i {
+            font-size: 24px;
+            color: #fff;
+        }
+        .bank-details h4 {
+            margin: 0;
+            color: #fff;
+            font-size: 18px;
+        }
+        .bank-details small {
+            color: #ccc;
+            font-size: 14px;
+        }
+        .bank-actions button {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+        .bank-actions button:hover {
+            color: #03a252;
+        }
+        .bank-actions .status-new {
+            color: #f1c40f;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .security-banner {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #3498db;
+            color: #ccc;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            font-size: 14px;
+        }
+        .security-banner i {
+            color: #3498db;
+            font-size: 24px;
+        }
+        .security-banner h4 {
+            color: #fff;
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+
+        /* Media Queries para responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+            .top-nav {
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .top-nav a {
+                width: 100%;
+                text-align: center;
+            }
+            .bank-card {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+    <script>
+        // Lógica de status do plano e menu, replicada do arquivo original
+        const userStatus = {
+            plano: 'conectado', // Plano alterado para 'conectado' para esta página
+            isTrial: true,
+            trialEnds: '2025-08-08'
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+        
+        // Função para mostrar a janela de sugestão
+        function abrirSugestao() {
+            // Lógica para abrir a janela de sugestão
+            // Implementação da janela de sugestão no arquivo 'controle-de-gastos.html' não está presente, mas o código foi replicado aqui para manter a compatibilidade.
+            // Aqui você pode criar uma modal ou redirecionar para uma página de sugestões.
+            // alert('Função de Enviar Sugestão não implementada.');
+            const sugestaoJanela = document.getElementById('janela-sugestao');
+            if(sugestaoJanela){
+                sugestaoJanela.style.display = 'flex';
+            }
+        }
+        
+        // Lógica de mock de dados para simular bancos conectados
+        const connectedBanks = [
+            { id: 1, name: 'Banco do Brasil', logo: 'fa-building-columns', status: 'Atualizado agora mesmo' },
+            { id: 2, name: 'Nubank', logo: 'fa-credit-card', status: 'Novos lançamentos disponíveis', hasNew: true },
+            { id: 3, name: 'Itaú', logo: 'fa-bank', status: 'Última atualização: 08/08/2025' },
+        ];
+
+        function renderConnectedBanks() {
+            const list = document.getElementById('connected-banks-list');
+            if (!list) return;
+
+            list.innerHTML = '';
+            connectedBanks.forEach(bank => {
+                const card = document.createElement('div');
+                card.className = 'bank-card';
+                
+                const statusHtml = bank.hasNew 
+                    ? `<span class="status-new"><i class="fas fa-exclamation-circle"></i>Novos lançamentos</span>`
+                    : `<span>${bank.status}</span>`;
+
+                card.innerHTML = `
+                    <div class="bank-info">
+                        <div class="bank-logo">
+                            <i class="fas ${bank.logo}"></i>
+                        </div>
+                        <div class="bank-details">
+                            <h4>${bank.name}</h4>
+                            <small>${bank.status}</small>
+                        </div>
+                    </div>
+                    <div class="bank-actions">
+                        ${bank.hasNew ? `<button onclick="importLaunches(${bank.id})"><i class="fas fa-sync-alt"></i> Importar</button>` : `<button onclick="syncBank(${bank.id})"><i class="fas fa-sync-alt"></i> Sincronizar</button>`}
+                        <button onclick="disconnectBank(${bank.id})"><i class="fas fa-unlink"></i></button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+        
+        // Funções de ação de botões simuladas com alert() e confirm()
+        function syncBank(id) {
+            // Substitua esta lógica pela chamada à API real
+            const customAlert = document.getElementById('custom-alert');
+            const alertText = customAlert.querySelector('.alert-text');
+            alertText.textContent = `Sincronizando banco com ID ${id}...`;
+            customAlert.style.display = 'flex';
+        }
+
+        function disconnectBank(id) {
+            // Substitua esta lógica pela chamada à API real
+            const customConfirm = document.getElementById('custom-confirm');
+            const confirmText = customConfirm.querySelector('.confirm-text');
+            confirmText.textContent = `Tem certeza que deseja desconectar este banco?`;
+            
+            const confirmBtn = document.getElementById('confirm-btn');
+            confirmBtn.onclick = function() {
+                const customAlert = document.getElementById('custom-alert');
+                const alertText = customAlert.querySelector('.alert-text');
+                alertText.textContent = `Desconectando banco com ID ${id}...`;
+                customAlert.style.display = 'flex';
+                customConfirm.style.display = 'none';
+            };
+
+            const cancelBtn = document.getElementById('cancel-btn');
+            cancelBtn.onclick = function() {
+                customConfirm.style.display = 'none';
+            };
+            customConfirm.style.display = 'flex';
+        }
+        
+        function importLaunches(id) {
+            // Substitua esta lógica pela chamada à API real
+            const customAlert = document.getElementById('custom-alert');
+            const alertText = customAlert.querySelector('.alert-text');
+            alertText.textContent = `Importando novos lançamentos do banco com ID ${id}...`;
+            customAlert.style.display = 'flex';
+        }
+
+        // Lógica de alerta e confirmação customizados
+        function closeCustomAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+        }
+
+        function closeCustomConfirm() {
+            document.getElementById('custom-confirm').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const trialStatus = document.getElementById('trial-status');
+            if (userStatus.isTrial) {
+                const today = new Date();
+                const trialEnd = new Date(userStatus.trialEnds + 'T00:00:00');
+                const diffTime = trialEnd.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let message;
+                if (diffDays <= 0) {
+                    message = `
+                        <span>Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></span>
+                    `;
+                } else {
+                    message = `
+                        <span><strong>Plano manual</strong> - ${diffDays} dias restantes</span>
+                        <div class="progress-bar"><div class="progress" style="width: ${(7 - diffDays) / 7 * 100}%"></div></div>
+                        <a href="planos.html">Ver planos</a>
+                    `;
+                }
+                trialStatus.innerHTML = message;
+            }
+
+            // Exibe a lista de bancos conectados ao carregar a página
+            renderConnectedBanks();
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="controle-de-gastos.html"><span class="icon limao">💰</span> Controle de Gastos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <!-- Banner de teste gratuito com a mesma lógica do seu arquivo -->
+        <div class="trial-status" id="trial-status">
+            </div>
+
+        <header>
+            <div class="header-left">
+                <h1 style="color: #fff;">Conexão Bancária</h1>
+            </div>
+        </header>
+
+        <div class="top-nav">
+            <a href="controle-de-gastos.html">visão geral</a>
+            <a href="lancamentos.html">lançamentos</a>
+            <a href="controle-relatorios.html">relatórios</a>
+            <a href="limites-gastos.html">limite de gastos</a>
+            <a href="conexao-bancaria.html" class="active">conexão bancária</a>
+        </div>
+        
+        <section class="main-content-wrapper">
+            <!-- Card de boas-vindas e conexão inicial -->
+            <div class="bank-connect-card">
+                <span class="icon-wallet"><i class="fas fa-wallet"></i></span>
+                <h2>Conecte seus bancos e cartões</h2>
+                <p>Importe suas transações automaticamente com segurança e veja todos os seus lançamentos centralizados.</p>
+                <button class="connect-bank-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Conectar seu primeiro banco
+                </button>
+            </div>
+
+            <!-- Seção de bancos conectados (simulados) -->
+            <div class="connected-banks-list" id="connected-banks-list">
+                <!-- Cards de bancos serão injetados aqui via JS -->
+            </div>
+            
+            <!-- Banner de segurança e privacidade -->
+            <div class="security-banner">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    <h4>Sua segurança é nossa prioridade</h4>
+                    <p>Utilizamos a tecnologia Open Finance, regulamentada pelo Banco Central, para garantir uma conexão segura. Nunca armazenamos seus dados de login bancário.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Modals customizados para substituir alert() e confirm() -->
+        <div id="custom-alert" style="
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2b2b2b;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
+        ">
+            <p class="alert-text"></p>
+            <button onclick="closeCustomAlert()" style="
+                margin-top: 15px;
+                padding: 8px 15px;
+                background-color: #04b45f;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            ">OK</button>
+        </div>
+
+        <div id="custom-confirm" style="
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2b2b2b;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
+        ">
+            <p class="confirm-text"></p>
+            <button id="confirm-btn" style="
+                margin-top: 15px;
+                padding: 8px 15px;
+                background-color: #e74c3c;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-right: 10px;
+            ">Confirmar</button>
+            <button id="cancel-btn" style="
+                margin-top: 15px;
+                padding: 8px 15px;
+                background-color: #ccc;
+                color: #1e1e1e;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            ">Cancelar</button>
+        </div>
+    </main>
+</body>
+</html>

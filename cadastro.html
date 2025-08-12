@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Cliente | PixFactory</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      overflow-x: hidden;
+      display: flex;
+      min-height: 100vh;
+    }
+    .hamburger-menu {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background: #04b45f;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 24px;
+      transition: background-color 0.3s;
+    }
+    .hamburger-menu:hover { background-color: #03a252; }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background-color: #1e1e1e;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+      box-sizing: border-box;
+      z-index: 1000;
+      transform: translateX(0);
+      transition: transform 0.3s ease-in-out;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.active { transform: translateX(0); }
+    .sidebar.hidden { transform: translateX(-240px); }
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #04b45f;
+      margin-bottom: 30px;
+      text-align: left;
+      padding: 0;
+    }
+    .sidebar nav { flex-grow: 1; }
+    .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar nav ul li { margin-bottom: 15px; }
+    .sidebar nav ul li a {
+      text-decoration: none;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.3s;
+      padding: 0;
+      border-left: none;
+      font-size: 16px;
+    }
+    .sidebar nav ul li a:hover,
+    .sidebar nav ul li a.active {
+      color: #04b45f;
+      background-color: transparent;
+      border-left-color: transparent;
+    }
+    .sidebar .icon { font-size: 1em; }
+    .sidebar .fa-solid, .sidebar .fa-brands { font-size: 18px; width: 20px; text-align: center; }
+    .azul { color: #3498db; }
+    .verde { color: #2ecc71; }
+    .amarelo { color: #f1c40f; }
+    .vermelho { color: #e74c3c; }
+    .roxo { color: #9b59b6; }
+    .azul-claro { color: #5dade2; }
+    .vermelho-claro { color: #f1948a; }
+    .cinza { color: #bdc3c7; }
+    .limao { color: #a3e635; }
+    .roxo-claro { color: #c084fc; }
+    .laranja { color: #e67e22; }
+    .azul-escuro { color: #2c3e50; }
+    .sidebar footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      padding: 0;
+      border-top: none;
+      margin-top: auto;
+    }
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      padding: 40px;
+      max-width: calc(100% - 320px);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      transition: margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out;
+    }
+    .main-content header {
+      margin-bottom: 0;
+      border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+      padding-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .main-content header h1 {
+      color: #04b45f;
+      font-size: 28px;
+      margin: 0;
+    }
+    .main-content header .header-icon {
+      font-size: 28px;
+      color: #04b45f;
+    }
+    .form-section {
+      background-color: #1e1e1e;
+      border: 1px solid #04b45f;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .form-section h3 {
+      color: #04b45f;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    .form-field { display: flex; flex-direction: column; }
+    .form-field label {
+      font-weight: bold;
+      color: #ccc;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-label::before {
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      content: attr(data-icon);
+      font-size: 1.1em;
+      color: #04b45f;
+    }
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      background-color: #121212;
+      border: 1px solid #04b45f;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-field input[type="file"] { padding: 6px; }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: #03a252;
+    }
+    .form-field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .foto-upload-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .foto-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 2px solid #04b45f;
+      box-shadow: 0 0 10px rgba(4, 180, 95, 0.3);
+    }
+    .foto-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .foto-preview .fa-camera {
+      font-size: 48px;
+      color: #888;
+    }
+    .foto-upload-container input[type="file"] { display: none; }
+    .custom-file-upload {
+      background-color: #04b45f;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 14px;
+    }
+    .custom-file-upload:hover { background-color: #03a252; }
+    .botoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 20px;
+      justify-content: flex-start;
+    }
+    .botoes button {
+      background-color: #04b45f;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .botoes button:hover {
+      background-color: #03a252;
+      transform: translateY(-2px);
+    }
+    .botoes button.cancelar { background-color: #e74c3c; }
+    .botoes button.cancelar:hover { background-color: #c0392b; }
+    .main-content-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      padding-top: 20px;
+      border-top: 1px solid rgba(4, 180, 95, 0.3);
+      margin-top: auto;
+    }
+    .janela-sugestao {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #1e1e1e;
+      padding: 20px;
+      border: 1px solid #04b45f;
+      border-radius: 10px;
+      z-index: 1000;
+      flex-direction: column;
+      gap: 8px;
+      display: none;
+      max-width: 300px;
+    }
+    .janela-sugestao textarea {
+      width: 100%;
+      height: 100px;
+      background: #121212;
+      border: 1px solid #04b45f;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    .janela-sugestao button {
+      background-color: #04b45f;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      align-self: flex-end;
+      transition: background-color 0.3s;
+    }
+    .janela-sugestao button:hover { background-color: #03a252; }
+    
+    /* Novo CSS para o modal de sucesso */
+    .modal-feedback {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+    }
+    .modal-feedback-content {
+        background-color: #1e1e1e;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #04b45f;
+        width: 90%;
+        max-width: 400px;
+        position: relative;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        animation: popUp 0.3s ease-out;
+    }
+    .modal-feedback-content h3 {
+        color: #04b45f;
+        font-size: 24px;
+        margin-top: 0;
+    }
+    .modal-feedback-content p {
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+    .modal-feedback-content .icon-feedback {
+        font-size: 60px;
+        color: #04b45f;
+        margin-bottom: 15px;
+    }
+    .modal-feedback-content button {
+        background-color: #04b45f;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .modal-feedback-content button:hover {
+        background-color: #03a252;
+    }
+    
+    .file-upload-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+    }
+    .file-upload-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #121212;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 5px;
+    }
+    .file-upload-list li span {
+        font-size: 14px;
+        color: #ccc;
+    }
+    .file-upload-list li .remove-file {
+        background: none;
+        border: none;
+        color: #e74c3c;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .loading-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #04b45f;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: none;
+        margin-right: 10px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); left: 0; }
+      .sidebar.active { transform: translateX(0); }
+      .hamburger-menu { display: block; }
+      .main-content {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 20px;
+        margin-right: 0;
+      }
+      body.sidebar-open .main-content {
+        margin-left: 240px;
+        max-width: calc(100% - 240px);
+        filter: brightness(0.5);
+        pointer-events: none;
+      }
+      .main-content header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+      }
+      .main-content header h1 { font-size: 24px; }
+      .main-content header .header-icon { font-size: 24px; }
+      .form-section { padding: 15px; gap: 15px; }
+      .form-section h3 { font-size: 18px; }
+      .form-field label { font-size: 14px; }
+      .form-field input, .form-field select, .form-field textarea { font-size: 13px; padding: 8px; }
+      .botoes { flex-direction: column; gap: 10px; align-items: stretch; }
+      .botoes button { width: 100%; justify-content: center; padding: 10px 15px; font-size: 15px; }
+      .janela-sugestao { bottom: 15px; right: 15px; max-width: calc(100% - 30px); }
+    }
+    @media (max-width: 480px) {
+      .hamburger-menu { top: 15px; left: 15px; padding: 8px 12px; font-size: 20px; }
+      .main-content { padding: 15px; }
+      .main-content header h1 { font-size: 22px; }
+      .form-section h3 { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <button class="hamburger-menu" id="hamburger-menu">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">💵 PixFactory</div>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+        <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+        <li><a href="cadastro.html" class="active"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+        <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+        <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+        <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+        <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+        <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+        <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+        <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+        <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+        <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+      </ul>
+    </nav>
+    <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+  </aside>
+
+  <main class="main-content" id="main-content">
+    <header>
+      <h1>Cadastro de Cliente</h1>
+      <span class="header-icon">✨</span>
+    </header>
+
+    <form id="cadastro-form">
+      <div class="form-section">
+        <h3>Informações Pessoais</h3>
+        <div class="foto-upload-container">
+          <div class="foto-preview">
+            <img id="preview" src="#" alt="Preview da Foto">
+            <i class="fas fa-camera"></i>
+          </div>
+          <label for="foto-cliente" class="custom-file-upload">
+            <i class="fas fa-camera"></i> Upload Foto
+          </label>
+          <input type="file" id="foto-cliente" accept="image/*" onchange="previewFoto(event)">
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="nome" data-icon="📝">Nome Completo:</label>
+          <input type="text" id="nome" placeholder="Digite o nome completo do cliente" required/>
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="cpf" data-icon="🔢">CPF:</label>
+          <input type="text" id="cpf" placeholder="999.999.999-99" required/>
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="telefone" data-icon="📞">Telefone:</label>
+          <input type="text" id="telefone" placeholder="(99) 99999-9999" required/>
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="email" data-icon="✉️">Email:</label>
+          <input type="email" id="email" placeholder="email@exemplo.com" required/>
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="dataNascimento" data-icon="🎂">Data de Nascimento:</label>
+          <input type="date" id="dataNascimento" required/>
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="endereco" data-icon="🏠">Endereço:</label>
+          <textarea id="endereco" placeholder="Rua, Número, Bairro, Cidade, Estado, CEP" required></textarea>
+        </div>
+      </div>
+      <div class="form-section">
+        <h3>Detalhes Financeiros e Documentos</h3>
+        <div class="form-field">
+          <label class="icon-label" for="profissao" data-icon="💼">Profissão:</label>
+          <input type="text" id="profissao" />
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="rendaMensal" data-icon="💲">Renda Mensal (R$):</label>
+          <input type="number" id="rendaMensal" step="0.01" />
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="banco" data-icon="🏦">Banco Principal:</label>
+          <input type="text" id="banco" />
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="classificacao" data-icon="📊">Classificação:</label>
+          <select id="classificacao" required>
+            <option value="">Selecione</option>
+            <option value="Bom pagador">Bom pagador</option>
+            <option value="Médio">Médio</option>
+            <option value="Ruim">Ruim</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="icon-label" for="documentos" data-icon="📎">Anexar Documentos:</label>
+          <input type="file" id="documentos" multiple />
+          <p style="font-size:12px; color:#888; margin-top:5px;">(Max. 5 arquivos, 10MB)</p>
+          <ul id="file-list" class="file-upload-list"></ul>
+        </div>
+      </div>
+      <div class="botoes">
+        <button type="submit" id="save-button">
+          <div id="loading-spinner" class="loading-spinner"></div>
+          <i class="fas fa-save"></i> Salvar Cliente
+        </button>
+        <button type="button" class="cancelar" onclick="window.history.back()">❌ Cancelar</button>
+      </div>
+    </form>
+    <footer class="main-content-footer">Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+  </main>
+  <div id="janela-sugestao" class="janela-sugestao">
+    <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+    <button onclick="enviarSugestao()">Enviar</button>
+  </div>
+  
+  <!-- Novo Modal de Feedback -->
+  <div id="modal-feedback" class="modal-feedback">
+    <div class="modal-feedback-content">
+      <i id="feedback-icon" class="icon-feedback"></i>
+      <h3 id="feedback-title"></h3>
+      <p id="feedback-message"></p>
+      <button onclick="closeModalFeedback()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const hamburgerButton = document.getElementById('hamburger-menu');
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const body = document.body;
+      const fileInput = document.getElementById('documentos');
+      const fileList = document.getElementById('file-list');
+      const form = document.getElementById('cadastro-form');
+      const saveButton = document.getElementById('save-button');
+      const spinner = document.getElementById('loading-spinner');
+
+      hamburgerButton.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+      });
+      mainContent.addEventListener('click', () => {
+        if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+          sidebar.classList.remove('active');
+          body.classList.remove('sidebar-open');
+        }
+      });
+      sidebar.querySelectorAll('nav ul li a').forEach(item => {
+        item.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove('active');
+            body.classList.remove('sidebar-open');
+          }
+        });
+      });
+      
+      fileInput.addEventListener('change', () => {
+        fileList.innerHTML = '';
+        for (const file of fileInput.files) {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span><i class="fas fa-file-alt"></i> ${file.name}</span>
+            <button type="button" class="remove-file" data-filename="${file.name}">&times;</button>
+          `;
+          fileList.appendChild(li);
+        }
+      });
+      
+      fileList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-file')) {
+          const filenameToRemove = e.target.getAttribute('data-filename');
+          const dataTransfer = new DataTransfer();
+          const files = Array.from(fileInput.files).filter(file => file.name !== filenameToRemove);
+          files.forEach(file => dataTransfer.items.add(file));
+          fileInput.files = dataTransfer.files;
+          e.target.closest('li').remove();
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        saveButton.disabled = true;
+        spinner.style.display = 'block';
+        saveButton.style.opacity = '0.7';
+
+        // Lógica de simulação da API com atraso
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // CAPTURA E MONTA O OBJETO DO CLIENTE (dados fictícios para simulação)
+        const cliente = {
+          nome: document.getElementById('nome').value.trim(),
+          cpf: document.getElementById('cpf').value.trim(),
+          telefone: document.getElementById('telefone').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          dataNascimento: document.getElementById('dataNascimento').value.trim(),
+          endereco: document.getElementById('endereco').value.trim(),
+          profissao: document.getElementById('profissao').value.trim(),
+          rendaMensal: document.getElementById('rendaMensal').value.trim(),
+          banco: document.getElementById('banco').value.trim(),
+          classificacao: document.getElementById('classificacao').value,
+          documentos: Array.from(fileInput.files).map(file => file.name),
+        };
+
+        try {
+            // AQUI SERIA A CHAMADA FETCH REAL PARA O BACKEND
+            console.log("Cliente a ser salvo:", cliente);
+            
+            // Simulação de resposta de sucesso
+            showModalFeedback('✅ Sucesso!', 'Cliente salvo com sucesso!');
+            form.reset();
+            fileList.innerHTML = '';
+            document.getElementById('preview').src = '#';
+            document.getElementById('preview').style.display = 'none';
+            document.querySelector('.foto-preview .fa-camera').style.display = 'block';
+
+        } catch (error) {
+            console.error('Erro ao salvar cliente:', error);
+            showModalFeedback('❌ Erro!', 'Ocorreu um erro ao salvar o cliente. Tente novamente.', true);
+        } finally {
+            saveButton.disabled = false;
+            spinner.style.display = 'none';
+            saveButton.style.opacity = '1';
+        }
+      });
+    });
+
+    function previewFoto(event) {
+      const img = document.getElementById('preview');
+      img.src = URL.createObjectURL(event.target.files[0]);
+      img.style.display = 'block';
+      document.querySelector('.foto-preview .fa-camera').style.display = 'none';
+    }
+    
+    // Funções do Modal de Feedback
+    function showModalFeedback(title, message, isError = false) {
+      const modal = document.getElementById('modal-feedback');
+      const icon = document.getElementById('feedback-icon');
+      const titleElement = document.getElementById('feedback-title');
+      const messageElement = document.getElementById('feedback-message');
+      
+      titleElement.textContent = title;
+      messageElement.textContent = message;
+
+      if (isError) {
+          icon.className = 'fas fa-times-circle icon-feedback vermelho';
+      } else {
+          icon.className = 'fas fa-check-circle icon-feedback verde';
+      }
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeModalFeedback() {
+      document.getElementById('modal-feedback').style.display = 'none';
+    }
+
+    window.abrirSugestao = function () {
+      const janela = document.getElementById('janela-sugestao');
+      janela.style.display = janela.style.display === 'flex' ? 'none' : 'flex';
+    };
+    window.enviarSugestao = function () {
+      const textarea = document.querySelector('#janela-sugestao textarea');
+      const sugestao = textarea.value.trim();
+      if (sugestao) {
+        showModalFeedback('✅ Sucesso!', 'Sugestão enviada com sucesso!', false);
+        textarea.value = '';
+        abrirSugestao();
+      } else {
+        showModalFeedback('⚠️ Atenção!', 'Por favor, digite sua sugestão antes de enviar.', true);
+      }
+    };
+  </script>
+</body>
+</html>

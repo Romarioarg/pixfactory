@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Usuários | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* === Sidebar Lateral === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul             { color: #3498db; }
+        .verde            { color: #2ecc71; }
+        .amarelo          { color: #f1c40f; }
+        .vermelho         { color: #e74c3c; }
+        .roxo             { color: #9b59b6; }
+        .azul-claro       { color: #5dade2; }
+        .vermelho-claro   { color: #f1948a; }
+        .cinza            { color: #bdc3c7; }
+        .limao            { color: #a3e635; }
+        .roxo-claro       { color: #c084fc; }
+        .laranja          { color: #e67e22; }
+        .azul-escuro      { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+        
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #04b45f;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #03a252;
+        }
+
+        /* Tabela de Usuários */
+        .user-table-container {
+            overflow-x: auto;
+        }
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .user-table th, .user-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            white-space: nowrap;
+        }
+        .user-table th {
+            background-color: #2b2b2b;
+            color: #04b45f;
+        }
+        .user-table td .user-actions {
+             display: flex;
+             gap: 5px;
+        }
+        .user-table td .user-actions button {
+            background: none;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .user-table td .user-actions button:hover {
+            background-color: #444;
+        }
+        
+        /* Novas cores para os botões */
+        .user-table td .user-actions .alter-plan-btn {
+            background-color: #04b45f;
+            color: #1e1e1e;
+        }
+        .user-table td .user-actions .alter-plan-btn:hover {
+            background-color: #03a252;
+        }
+
+        .user-table td .user-actions .toggle-test-btn {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+        }
+        .user-table td .user-actions .toggle-test-btn:hover {
+            background-color: #e6b100;
+        }
+
+        .user-table td .user-actions .delete-btn {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .user-table td .user-actions .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .role-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #121212;
+            display: inline-block;
+        }
+        .role-admin { background-color: #e74c3c; color: #fff; }
+        .role-editor { background-color: #f1c40f; }
+        .role-user { background-color: #2ecc71; }
+        
+        /* Botão Adicionar Usuário */
+        .add-user-btn {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .add-user-btn:hover {
+            background-color: #03a252;
+        }
+        
+        /* Modal de Feedback */
+        .modal-feedback {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-feedback-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .modal-feedback-content h3 {
+            color: #04b45f;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        .modal-feedback-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .modal-feedback-content .icon-feedback {
+            font-size: 60px;
+            color: #04b45f;
+            margin-bottom: 15px;
+        }
+        .modal-feedback-content button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-feedback-content button:hover {
+            background-color: #03a252;
+        }
+        .error-title { color: #e74c3c; }
+
+        /* Janela de sugestão */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+        }
+        
+        .modal-edit-user-content {
+             padding: 20px;
+             max-width: 500px;
+             text-align: left;
+        }
+        .modal-edit-user-content .form-buttons {
+             display: flex;
+             gap: 10px;
+             margin-top: 20px;
+        }
+
+        /* Menu Hamburguer e Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                left: 0;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+            }
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .user-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="gerenciamento_usuarios.html" class="active"><span class="icon cinza">⚙️</span> Gerenciamento de Usuários</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Gerenciamento de Usuários</h1>
+            <span class="header-icon fas fa-users"></span>
+        </header>
+
+        <section class="section-container">
+            <h2><i class="fas fa-search"></i> Filtrar Usuários</h2>
+            <div class="form-group">
+                <input type="text" id="userSearch" placeholder="Buscar por nome, e-mail ou tipo de usuário...">
+            </div>
+            <button class="add-user-btn" onclick="adicionarUsuario()"><i class="fas fa-user-plus"></i> Adicionar Novo Usuário</button>
+        </section>
+
+        <section class="section-container">
+            <h2><i class="fas fa-list"></i> Lista de Usuários</h2>
+            <div class="user-table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Função</th>
+                            <th>Plano</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body">
+                        <!-- Conteúdo dinâmico será injetado aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <div id="status-message" class="modal-feedback" style="display: none;">
+            <div class="modal-feedback-content">
+                <i id="feedback-icon" class="icon-feedback"></i>
+                <h3 id="feedback-title"></h3>
+                <p id="feedback-message"></p>
+                <button onclick="closeModalFeedback()">OK</button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal para editar usuário -->
+    <div id="edit-user-modal" class="modal-feedback">
+      <div class="modal-feedback-content modal-edit-user-content">
+        <h3 style="text-align: center;">Editar Usuário</h3>
+        <form id="edit-user-form">
+            <input type="hidden" id="edit-user-id">
+            <div class="form-group">
+                <label for="edit-nome">Nome:</label>
+                <input type="text" id="edit-nome" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-email">Email:</label>
+                <input type="email" id="edit-email" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-role">Função:</label>
+                <select id="edit-role">
+                    <option value="USER">Usuário Comum</option>
+                    <option value="EDITOR">Editor</option>
+                    <option value="ADMIN">Administrador</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-plano">Plano:</label>
+                <select id="edit-plano">
+                    <option value="gratuito">Gratuito</option>
+                    <option value="pro">Pro</option>
+                    <option value="premium">Premium</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-status">Status:</label>
+                <select id="edit-status">
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" style="background-color: #04b45f; color: #fff;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+                <button type="button" onclick="closeEditUserModal()" style="background-color: #e74c3c; color: #fff;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Modal de Confirmação para Ações -->
+    <div id="confirm-modal" class="modal-feedback" style="display: none;">
+        <div class="modal-feedback-content">
+            <i id="confirm-icon" class="fas fa-question-circle" style="color: #f1c40f; font-size: 60px; margin-bottom: 15px;"></i>
+            <h3 id="confirm-title" style="color: #f1c40f;">Confirmação Necessária</h3>
+            <p id="confirm-message">Você tem certeza que deseja realizar esta ação?</p>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button id="confirm-action-btn" style="background-color: #e74c3c; color: #fff;">Confirmar</button>
+                <button onclick="closeConfirmModal()" style="background-color: #555; color: #fff;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display: none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        let mockUsers = [
+            { id: 1, nome: "João Admin", email: "admin@pix.com", role: "ADMIN", plano: "premium", status: "ativo", isTrial: false },
+            { id: 2, nome: "Maria Usuária", email: "maria@pix.com", role: "USER", plano: "gratuito", status: "ativo", isTrial: false },
+            { id: 3, nome: "Pedro Editor", email: "pedro@pix.com", role: "EDITOR", plano: "pro", status: "inativo", isTrial: true, trialEnds: new Date("2025-08-25") }
+        ];
+
+        function renderUserTable(users) {
+            const tableBody = document.getElementById('user-table-body');
+            tableBody.innerHTML = '';
+
+            if (users.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Nenhum usuário encontrado.</td></tr>`;
+                return;
+            }
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                let roleTagClass = '';
+                switch(user.role) {
+                    case 'ADMIN': roleTagClass = 'role-admin'; break;
+                    case 'EDITOR': roleTagClass = 'role-editor'; break;
+                    case 'USER': roleTagClass = 'role-user'; break;
+                }
+                
+                let planoDisplay = user.plano.toUpperCase();
+                let trialButton = '';
+
+                if (user.isTrial) {
+                     planoDisplay += ' (Teste)';
+                     trialButton = `<button class="toggle-test-btn" onclick="confirmarAcao('desativar-teste', ${user.id})">Desativar Teste</button>`;
+                } else if (user.plano === 'gratuito' && user.role !== 'ADMIN') {
+                     trialButton = `<button class="toggle-test-btn" onclick="confirmarAcao('ativar-teste', ${user.id})">Ativar Teste</button>`;
+                }
+
+
+                row.innerHTML = `
+                    <td>${user.nome}</td>
+                    <td>${user.email}</td>
+                    <td><span class="role-tag ${roleTagClass}">${user.role}</span></td>
+                    <td>${planoDisplay}</td>
+                    <td><span style="color: ${user.status === 'ativo' ? '#2ecc71' : '#e74c3c'};">${user.status}</span></td>
+                    <td class="user-actions">
+                         <button class="alter-plan-btn" onclick="openEditUserModal(${user.id})"><i class="fas fa-pen"></i> Alterar Plano</button>
+                         ${trialButton}
+                         <button class="delete-btn" onclick="confirmarAcao('deletar', ${user.id})"><i class="fas fa-trash"></i> Excluir</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function filtrarUsuarios() {
+            const termo = document.getElementById("userSearch").value.trim().toLowerCase();
+            const filtrados = mockUsers.filter(user =>
+                (user.nome && user.nome.toLowerCase().includes(termo)) ||
+                (user.email && user.email.toLowerCase().includes(termo)) ||
+                (user.role && user.role.toLowerCase().includes(termo))
+            );
+            renderUserTable(filtrados);
+        }
+
+        function adicionarUsuario() {
+             showModalFeedback('Funcionalidade em desenvolvimento', 'A funcionalidade de adicionar um novo usuário será implementada em breve. Redirecionando para a página de cadastro...', false);
+             setTimeout(() => {
+                window.location.href = 'cadastro-login.html';
+            }, 2000);
+        }
+        
+        // --- Lógica do Modal de Edição de Usuário ---
+        function openEditUserModal(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('edit-user-id').value = user.id;
+            document.getElementById('edit-nome').value = user.nome;
+            document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-role').value = user.role;
+            document.getElementById('edit-plano').value = user.plano;
+            document.getElementById('edit-status').value = user.status;
+            
+            document.getElementById('edit-user-modal').style.display = 'flex';
+        }
+        
+        function closeEditUserModal() {
+            document.getElementById('edit-user-modal').style.display = 'none';
+        }
+        
+        document.getElementById('edit-user-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('edit-user-id').value);
+            const user = mockUsers.find(u => u.id === id);
+
+            if (user) {
+                user.nome = document.getElementById('edit-nome').value;
+                user.email = document.getElementById('edit-email').value;
+                user.role = document.getElementById('edit-role').value;
+                user.plano = document.getElementById('edit-plano').value;
+                user.status = document.getElementById('edit-status').value;
+                
+                renderUserTable(mockUsers);
+                showModalFeedback('✅ Sucesso', `Usuário "${user.nome}" atualizado com sucesso!`);
+                closeEditUserModal();
+            }
+        });
+        
+        // --- Lógica do Modal de Confirmação para Ações ---
+        function confirmarAcao(acao, userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            const modal = document.getElementById('confirm-modal');
+            const confirmBtn = modal.querySelector('#confirm-action-btn');
+
+            if (user.role === 'ADMIN' && acao === 'deletar') {
+                 showModalFeedback('⚠️ Erro!', 'Você não pode deletar um usuário administrador.', true);
+                 return;
+            }
+
+            if (acao === 'deletar') {
+                 modal.querySelector('#confirm-message').textContent = `Tem certeza que deseja deletar o usuário "${user.nome}"? Esta ação não pode ser desfeita.`;
+                 confirmBtn.onclick = () => deletarUsuario(userId);
+            } else if (acao === 'ativar-teste') {
+                 modal.querySelector('#confirm-message').textContent = `Deseja ativar o teste gratuito para "${user.nome}" por mais 7 dias?`;
+                 confirmBtn.onclick = () => ativarTeste(userId);
+            } else if (acao === 'desativar-teste') {
+                 modal.querySelector('#confirm-message').textContent = `Deseja desativar o teste gratuito para "${user.nome}"? O usuário voltará para o plano gratuito.`;
+                 confirmBtn.onclick = () => desativarTeste(userId);
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+        }
+
+        function ativarTeste(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user) {
+                user.isTrial = true;
+                user.plano = 'pro';
+                user.trialEnds = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                renderUserTable(mockUsers);
+                showModalFeedback('✅ Sucesso', `Teste gratuito de 7 dias ativado para "${user.nome}".`);
+                closeConfirmModal();
+            }
+        }
+        
+        function desativarTeste(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user) {
+                user.isTrial = false;
+                user.plano = 'gratuito';
+                renderUserTable(mockUsers);
+                showModalFeedback('✅ Sucesso', `Teste gratuito de "${user.nome}" desativado. Usuário no plano gratuito.`);
+                closeConfirmModal();
+            }
+        }
+
+        function deletarUsuario(userId) {
+            const index = mockUsers.findIndex(u => u.id === userId);
+            if (index !== -1) {
+                const user = mockUsers[index];
+                mockUsers.splice(index, 1);
+                renderUserTable(mockUsers);
+                showModalFeedback('✅ Sucesso', `Usuário "${user.nome}" deletado com sucesso.`);
+                closeConfirmModal();
+            }
+        }
+        
+        function resetarSenha(userId) {
+            const user = mockUsers.find(u => u.id === userId);
+            if (user) {
+                showModalFeedback('✅ Sucesso', `Um e-mail de redefinição de senha foi enviado para ${user.email}.`);
+            }
+        }
+
+        // Funções da Janela de Sugestão
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showModalFeedback('✅ Sucesso!', 'Sugestão enviada com sucesso!', false);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showModalFeedback('⚠️ Atenção!', 'Por favor, digite sua sugestão antes de enviar.', true);
+            }
+        }
+        
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Funções do Modal de Feedback
+        function showModalFeedback(title, message, isError = false) {
+            const modal = document.getElementById('status-message');
+            const icon = modal.querySelector('#feedback-icon');
+            const titleElement = modal.querySelector('#feedback-title');
+            const messageElement = modal.querySelector('#feedback-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            if (isError) {
+                modal.classList.add('error');
+            } else {
+                modal.classList.remove('error');
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModalFeedback() {
+            const modal = document.getElementById('status-message');
+            modal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUserTable(mockUsers);
+            document.getElementById('userSearch').addEventListener('input', filtrarUsuarios);
+        });
+    </script>
+</body>
+</html>

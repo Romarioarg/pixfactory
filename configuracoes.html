@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-y: auto;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul             { color: #3498db; }
+        .verde            { color: #2ecc71; }
+        .amarelo          { color: #f1c40f; }
+        .vermelho         { color: #e74c3c; }
+        .roxo             { color: #9b59b6; }
+        .azul-claro       { color: #5dade2; }
+        .vermelho-claro   { color: #f1948a; }
+        .cinza            { color: #bdc3c7; }
+        .limao            { color: #a3e635; }
+        .roxo-claro       { color: #c084fc; }
+        .laranja          { color: #e67e22; }
+        .azul-escuro      { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out;
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        /* Ajuste para o ícone no header */
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon {
+            font-size: 24px;
+            color: #5dade2;
+        }
+
+        .section-container p {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        /* Formulários */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #04b45f;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="password"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #03a252;
+        }
+
+        /* Estilo da seta do select */
+        .form-group select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2304b45f%22%20d%3D%22M287%2069.1l-11.4-11.4c-4.6-4.6-11.8-4.6-16.4%200L146.2%20202.7%2033.4%2069.1c-4.6-4.6-11.8-4.6-16.4%200L5%2080.5c-4.6%204.6-4.6%2011.8%200%2016.4l132.8%20132.8c4.6%204.6%2011.8%204.6%2016.4%200L287%2085.5c4.6-4.6%204.6-11.8%200-16.4z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+            padding-right: 30px;
+        }
+        .form-group select:focus {
+            border-color: #03a252;
+        }
+        .form-group select::-ms-expand {
+            display: none;
+        }
+
+        /* Toggle Switch (para opções on/off) */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 45px;
+            height: 25px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 25px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #04b45f;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #04b45f;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Botão Salvar */
+        .save-button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            width: fit-content;
+        }
+
+        .save-button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        
+        .action-button {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-button:hover {
+            background-color: #2c3e50;
+            transform: translateY(-2px);
+        }
+        
+        /* Novo estilo para o botão de adicionar usuário */
+        .add-user-btn {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .add-user-btn:hover {
+            background-color: #03a252;
+        }
+        
+        /* Tabela de Usuários */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .user-table th, .user-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+        }
+        .user-table th {
+            background-color: #2b2b2b;
+            color: #04b45f;
+        }
+        .user-table td .user-actions button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 8px;
+            transition: color 0.3s;
+        }
+        .user-table td .user-actions button:hover {
+            color: #04b45f;
+        }
+
+        /* Mensagem de sucesso/erro (agora em um pop-up) */
+        #status-message {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            width: auto;
+            max-width: 90%;
+        }
+        #status-message.error {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        /* Mensagem de recurso premium */
+        .premium-feature-note {
+            font-size: 12px;
+            color: #f1c40f;
+            margin-top: -15px;
+        }
+
+
+        /* === Janela de Sugestão (do dashboard) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+        
+        /* === Botão Hamburguer para Mobile === */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 1001;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        /* === Media Queries para Responsividade === */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                left: 0;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+                margin-right: 0;
+            }
+            body.sidebar-open .main-content {
+                margin-left: 240px;
+                max-width: calc(100% - 240px);
+                filter: brightness(0.5);
+                pointer-events: none;
+            }
+
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-container {
+                padding: 15px;
+            }
+
+            .section-container h2 {
+                font-size: 18px;
+            }
+            
+            .form-group label,
+            .form-group input,
+            .form-group select,
+            .form-group textarea,
+            .switch-container label {
+                font-size: 13px;
+            }
+            .form-group input,
+            .form-group select {
+                padding: 8px;
+            }
+
+            .save-button,
+            .action-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #status-message {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .janela-sugestao {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu">☰</button> <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html" class="active"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Configurações</h1>
+            <span class="header-icon">⚙️</span>
+        </header>
+
+        <section class="section-container">
+            <h2><span class="section-icon">🌐</span> Geral</h2>
+            <form id="general-config-form">
+                <div class="form-group">
+                    <label for="companyName">Nome da Empresa:</label>
+                    <input type="text" id="companyName" placeholder="PixFactory" value="PixFactory">
+                </div>
+
+                <div class="form-group">
+                    <label for="slogan">Slogan:</label>
+                    <input type="text" id="slogan" placeholder="Sua plataforma de gestão financeira" value="Sua plataforma de gestão financeira">
+                </div>
+
+                <div class="form-group">
+                    <label for="defaultInterestRate">Taxa de Juros Padrão (%):</label>
+                    <input type="number" id="defaultInterestRate" placeholder="Ex: 2.5" value="2.5" step="0.1" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="referralReward">Recompensa por Indicação (R$):</label>
+                    <input type="number" id="referralReward" placeholder="Ex: 20.00" value="20.00" step="0.01" min="0">
+                </div>
+                
+                <button type="submit" class="save-button"><span class="button-icon">💾</span> Salvar Configurações Gerais</button>
+            </form>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon">💾</span> Backup e Dados</h2>
+            <p style="font-size: 13px; color: #888; margin-bottom: 20px;">
+                Mantenha seus dados seguros e faça backups regularmente.
+            </p>
+            <div class="form-group">
+                <label for="lastBackup">Último Backup:</label>
+                <input type="text" id="lastBackup" value="21/07/2025 às 14:00" disabled>
+            </div>
+            <button type="button" class="action-button" onclick="manualBackup()"><i class="fas fa-database"></i> Fazer Backup Manual</button>
+            <button type="button" class="action-button" onclick="restoreBackup()"><i class="fas fa-undo"></i> Restaurar Backup</button>
+        </section>
+
+
+        <section class="section-container">
+            <h2><span class="section-icon">🔔</span> Notificações e Comunicações</h2>
+            <form id="notifications-config-form">
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="welcomeMessageToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="welcomeMessageToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Ativar Mensagem de Boas-Vindas</label>
+                </div>
+
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="paymentRemindersToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="paymentRemindersToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Lembretes de Pagamento Automáticos</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailNotifications">Notificações por E-mail:</label>
+                    <select id="emailNotifications">
+                        <option value="all">Todas as Notificações</option>
+                        <option value="important" selected>Somente Importantes</option>
+                        <option value="none">Desativar E-mails</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="save-button"><span class="button-icon">💾</span> Salvar Notificações</button>
+            </form>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon">🎨</span> Aparência</h2>
+            <form id="appearance-config-form">
+                <div class="form-group">
+                    <label for="systemTheme">Tema do Sistema:</label>
+                    <select id="systemTheme">
+                        <option value="dark" selected>Escuro (ativo)</option>
+                        <option value="light" disabled>Claro (em breve)</option>
+                        <option value="custom" disabled>Personalizado (em breve)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="accentColor">Cor de Destaque (principal):</label>
+                    <input type="text" id="accentColor" placeholder="#04b45f" value="#04b45f">
+                    <p style="font-size: 12px; color: #888; margin-top: 5px;">(Ex: #04b45f para verde)</p>
+                </div>
+                
+                <button type="submit" class="save-button"><span class="button-icon">💾</span> Salvar Aparência</button>
+            </form>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon">🔒</span> Segurança</h2>
+            <form id="security-config-form">
+                <div class="form-group">
+                    <label for="currentPassword">Senha Atual:</label>
+                    <input type="password" id="currentPassword" placeholder="******" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Nova Senha:</label>
+                    <input type="password" id="newPassword" placeholder="******" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Nova Senha:</label>
+                    <input type="password" id="confirmPassword" placeholder="******" required minlength="8">
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="twoFactorAuth" disabled>
+                        <span class="slider round"></span>
+                    </label>
+                    <div>
+                        <label for="twoFactorAuth" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Ativar Autenticação de Dois Fatores (2FA)</label>
+                        <small class="premium-feature-note">(Disponível apenas para o Plano Premium)</small>
+                    </div>
+                </div>
+                
+                <button type="submit" class="save-button"><span class="button-icon">🔐</span> Alterar Senha</button>
+            </form>
+        </section>
+
+        <div id="status-message" class="section-container" style="display:none;">
+            <span class="button-icon"></span> <span id="message-text"></span>
+        </div>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Função genérica para exibir mensagens de status
+        function showStatusMessage(message, isError = false) {
+            const statusMessageDiv = document.getElementById('status-message');
+            const messageTextSpan = document.getElementById('message-text');
+            const iconSpan = statusMessageDiv.querySelector('.button-icon');
+
+            messageTextSpan.textContent = message;
+            statusMessageDiv.style.display = 'flex';
+            statusMessageDiv.classList.toggle('error', isError);
+
+            if (isError) {
+                iconSpan.textContent = '❌';
+            } else {
+                iconSpan.textContent = '✅';
+            }
+
+            setTimeout(() => {
+                statusMessageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function manualBackup() {
+            // Simulação de um processo de backup
+            showStatusMessage("✅ Iniciando backup manual dos seus dados. Aguarde...");
+            setTimeout(() => {
+                document.getElementById('lastBackup').value = new Date().toLocaleString('pt-BR');
+                showStatusMessage("✅ Backup concluído com sucesso!");
+            }, 2000);
+        }
+
+        function restoreBackup() {
+            showStatusMessage("❌ O processo de restauração de backup requer confirmação por e-mail e está disponível apenas para o plano premium. Contate o suporte para mais informações.", true);
+        }
+
+
+        // Funções para salvar configurações (simuladas)
+        document.getElementById('general-config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const companyName = document.getElementById('companyName').value;
+            const slogan = document.getElementById('slogan').value;
+            const defaultInterestRate = document.getElementById('defaultInterestRate').value;
+            const referralReward = document.getElementById('referralReward').value;
+            
+            console.log("Configurações Gerais Salvas:", { companyName, slogan, defaultInterestRate, referralReward });
+            showStatusMessage("✅ Configurações gerais salvas com sucesso!");
+        });
+
+        document.getElementById('notifications-config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const welcomeMessageToggle = document.getElementById('welcomeMessageToggle').checked;
+            const paymentRemindersToggle = document.getElementById('paymentRemindersToggle').checked;
+            const emailNotifications = document.getElementById('emailNotifications').value;
+
+            console.log("Configurações de Notificações Salvas:", { welcomeMessageToggle, paymentRemindersToggle, emailNotifications });
+            showStatusMessage("✅ Configurações de notificações salvas com sucesso!");
+        });
+
+        document.getElementById('appearance-config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const systemTheme = document.getElementById('systemTheme').value;
+            const accentColor = document.getElementById('accentColor').value;
+            
+            console.log("Configurações de Aparência Salvas:", { systemTheme, accentColor });
+            showStatusMessage("✅ Configurações de aparência salvas com sucesso!");
+        });
+
+        document.getElementById('security-config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const twoFactorAuth = document.getElementById('twoFactorAuth').checked;
+
+            if (newPassword !== confirmPassword) {
+                showStatusMessage("❌ As novas senhas não coincidem!", true);
+                return;
+            }
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showStatusMessage("❌ Preencha todos os campos de senha.", true);
+                return;
+            }
+            if (newPassword.length < 8) {
+                showStatusMessage("❌ A nova senha deve ter no mínimo 8 caracteres.", true);
+                return;
+            }
+
+            console.log("Alteração de Senha Solicitada:", { currentPassword, newPassword, confirmPassword, twoFactorAuth });
+            showStatusMessage("✅ Senha alterada com sucesso!");
+            
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        });
+
+
+        // Funções da Janela de Sugestão
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        // Função para abrir WhatsApp (já existente nas outras páginas)
+        function abrirWhatsApp() {
+            const numeroWhatsApp = '5511995400311';
+            const mensagem = 'Olá! Preciso de ajuda com o PixFactory.';
+            const url = `https://wa.me/${11995400311}?text=${encodeURIComponent("Olá ! Preciso de Ajuda com PixFacatory")}`;
+            window.open(url, '_blank');
+        }
+
+        // === Lógica do Menu Hamburguer ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburgerButton = document.getElementById('hamburger-menu');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const body = document.body;
+
+            hamburgerButton.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                body.classList.toggle('sidebar-open');
+            });
+
+            mainContent.addEventListener('click', () => {
+                if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    body.classList.remove('sidebar-open');
+                }
+            });
+
+            sidebar.querySelectorAll('nav ul li a').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        body.classList.remove('sidebar-open');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

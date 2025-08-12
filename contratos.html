@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contratos | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Layout e cores padrão PixFactory */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+
+
+        .new-contract-button {
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: max-content;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        .new-contract-button:hover {
+            background-color: #03a252;
+        }
+
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 12px;
+            padding: 20px 25px;
+            box-shadow: 0 0 15px rgba(4,180,95,0.12);
+        }
+
+        .search-and-filter-section input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #04b45f;
+            background-color: #121212;
+            color: #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .filter-buttons button {
+            background-color: #2b2b2b;
+            color: #ccc;
+            border: 1px solid #04b45f;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: 600;
+        }
+        .filter-buttons button.active,
+        .filter-buttons button:hover {
+            background-color: #04b45f;
+            color: #fff;
+        }
+
+        .contracts-table-container {
+            overflow-x: auto;
+        }
+
+        table.contracts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.contracts-table th, table.contracts-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            white-space: nowrap;
+        }
+        table.contracts-table th {
+            background-color: #04b45f;
+            color: #121212;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .progress-container {
+            width: 100px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #2ecc71;
+            transition: width 0.5s ease;
+        }
+        .status-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #121212;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+        .status-ativo {
+            background-color: #2ecc71;
+        }
+        .status-pendente {
+            background-color: #f1c40f;
+        }
+        .status-atrasado {
+            background-color: #e74c3c;
+        }
+        .status-encerrado {
+            background-color: #95a5a6;
+        }
+        .status-hold {
+            background-color: #bdc3c7;
+            color: #121212;
+        }
+        .status-falecido {
+            background-color: #7f8c8d;
+            color: #fff;
+        }
+        .status-acordo-extrajudicial {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+
+        .action-buttons button {
+            background-color: #04b45f;
+            border: none;
+            color: #121212;
+            padding: 6px 12px;
+            margin-right: 6px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .action-buttons button:hover {
+            background-color: #03a252;
+        }
+        
+        .janela-sugestao {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+        
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+        
+        /* CSS DO NOVO MODAL AVANÇADO */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-close {
+            color: #ccc;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal-content .modal-header h2 {
+            color: #04b45f;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .modal-content .modal-header p {
+            text-align: center;
+            font-size: 14px;
+            color: #ccc;
+            margin-top: 0;
+        }
+
+        .modal-content .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding-right: 15px;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #2b2b2b;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background-color: #04b45f;
+            border-radius: 10px;
+        }
+
+        .modal-content .section-container {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(4, 180, 95, 0.3);
+            background-color: #121212;
+            border-radius: 8px;
+        }
+        
+        .modal-content .section-container h3 {
+            font-size: 18px;
+            color: #04b45f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-content h4 {
+            color: #ccc;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        .modal-content .contract-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-content .contract-info-card {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .modal-content .contract-info-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #ccc;
+        }
+        .modal-content .contract-info-card strong {
+            display: block;
+            font-size: 18px;
+            margin-top: 5px;
+            color: #fff;
+        }
+        .modal-content .contract-info-card .valor-atraso {
+            color: #e74c3c;
+        }
+        .modal-content .contract-info-card .valor-pago {
+            color: #2ecc71;
+        }
+
+        .modal-content .action-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .modal-content .action-buttons-grid button {
+            background-color: #2ecc71; /* Padronizado para verde */
+            color: #121212;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+        }
+        .modal-content .action-buttons-grid button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        /* Classes de cor para os botões originais e novos */
+        .btn-renegociar { background-color: #2ecc71 !important; color: #121212 !important; }
+        .btn-renegociar:hover { background-color: #27ae60 !important; }
+        .btn-remover-juros { background-color: #e67e22 !important; color: #fff !important; }
+        .btn-remover-juros:hover { background-color: #d35400 !important; }
+        .btn-quitar { background-color: #2ecc71 !important; color: #121212 !important; }
+        .btn-quitar:hover { background-color: #27ae60 !important; }
+        .btn-amortizar { background-color: #c084fc !important; color: #fff !important; }
+        .btn-amortizar:hover { background-color: #a855f7 !important; }
+        .btn-hold { background-color: #888 !important; color: #fff !important; }
+        .btn-hold:hover { background-color: #666 !important; }
+        .btn-anexos { background-color: #5dade2 !important; color: #fff !important; }
+        .btn-anexos:hover { background-color: #3498db !important; }
+        .btn-auditoria { background-color: #f1948a !important; color: #121212 !important; }
+        .btn-auditoria:hover { background-color: #e57373 !important; }
+        .btn-acordo { background-color: #e74c3c !important; color: #fff !important; }
+        .btn-acordo:hover { background-color: #c0392b !important; }
+        .btn-simular { background-color: #04b45f !important; color: #121212 !important; }
+        .btn-simular:hover { background-color: #03a252 !important; }
+        .btn-juros { background-color: #f1c40f !important; color: #121212 !important; }
+        .btn-juros:hover { background-color: #d8ac00 !important; }
+        .btn-prorrogar { background-color: #3498db !important; color: #fff !important; }
+        .btn-prorrogar:hover { background-color: #2980b9 !important; }
+        .btn-adicionar { background-color: #04b45f !important; color: #121212 !important; }
+        .btn-adicionar:hover { background-color: #03a252 !important; }
+        .btn-bem { background-color: #9b59b6 !important; color: #fff !important; }
+        .btn-bem:hover { background-color: #8e44ad !important; }
+        .btn-falecimento { background-color: #7f8c8d !important; color: #fff !important; }
+        .btn-falecimento:hover { background-color: #7f8c8d !important; }
+        .btn-transferir { background-color: #e67e22 !important; color: #fff !important; }
+        .btn-transferir:hover { background-color: #d35400 !important; }
+        .btn-reativar { background-color: #2ecc71 !important; color: #121212 !important; }
+        .btn-reativar:hover { background-color: #27ae60 !important; }
+        
+        .modal-content .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .modal-content .form-group label {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .modal-content .form-group input,
+        .modal-content .form-group select,
+        .modal-content .form-group textarea {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 6px;
+            color: #fff;
+            padding: 10px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .modal-content .form-group textarea {
+            resize: vertical;
+        }
+
+        .modal-content .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-content .button-group button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .modal-content .button-group .btn-cancel {
+            background-color: #333;
+            color: #fff;
+        }
+        .modal-content .button-group .btn-cancel:hover {
+            background-color: #555;
+        }
+        .modal-content .button-group .btn-confirm {
+            background-color: #04b45f;
+            color: #121212;
+        }
+        .modal-content .button-group .btn-confirm:hover {
+            background-color: #03a252;
+        }
+
+        /* Estilo da lista de pagamentos */
+        .payment-history-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        .payment-history-list li {
+            background-color: #1e1e1e;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        .payment-history-list li strong {
+            color: #04b45f;
+        }
+
+        /* Modal customizado para mensagens */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 3000;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .custom-modal .modal-content {
+            padding: 20px;
+            max-width: 450px;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+        }
+        .custom-modal .modal-content h3 {
+            font-size: 20px;
+            color: #04b45f;
+            border-bottom: none;
+        }
+        .custom-modal .modal-content .form-group label {
+            color: #ccc;
+        }
+        .custom-modal-alert .modal-content p {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        .custom-modal-alert .modal-content button {
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .renegociar-form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .hamburger-menu { display: block; }
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+                max-width: 100%;
+                padding-top: 80px;
+            }
+            .main-content header {
+                flex-direction: column;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .main-content header h1 {
+                font-size: 24px;
+            }
+            .main-content header .header-icon {
+                font-size: 24px;
+            }
+            .section-container {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+                padding: 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            table.contracts-table th,
+            table.contracts-table td {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+            .modal-content .action-buttons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html" class="active"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <div class="trial-status">Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></div>
+        <header>
+            <h1>Contratos</h1>
+            <span class="header-icon">📄</span>
+        </header>
+
+        <button class="new-contract-button" id="addNewContractButton">➕ Novo Contrato</button>
+
+        <section class="section-container search-and-filter-section">
+            <input type="text" id="contractSearch" placeholder="Buscar por nome do cliente, ID do contrato, valor..." />
+            <div class="filter-buttons">
+                <button class="active" data-filter="all">Todos</button>
+                <button data-filter="ativo">Ativos</button>
+                <button data-filter="pendente">Pendentes</button>
+                <button data-filter="atrasado">Atrasados</button>
+                <button data-filter="encerrado">Encerrados</button>
+            </div>
+        </section>
+
+        <section class="section-container contracts-list-section">
+            <div class="contracts-table-container">
+                <table class="contracts-table" aria-label="Tabela de contratos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Valor Total</th>
+                            <th>Pago/Total</th>
+                            <th>Próx. Pagamento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contracts-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    
+    <div id="contrato-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeContratoModal()">&times;</span>
+            <div id="modal-content-inner">
+                </div>
+        </div>
+    </div>
+
+    <div id="pagamento-detalhado-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePagamentoDetalhadoModal()">&times;</span>
+            <h3>Registrar Pagamento</h3>
+            <form id="pagamento-detalhado-form">
+                <input type="hidden" id="pagamento-detalhado-contract-id">
+                <div class="form-group">
+                    <label for="pagamento-total">Valor Total Recebido (R$):</label>
+                    <input type="number" id="pagamento-total" step="0.01" required placeholder="Ex: 400,00">
+                </div>
+                 <div class="form-group">
+                    <label for="pagamento-juros-tipo">Tipo de Pagamento:</label>
+                    <select id="pagamento-juros-tipo">
+                        <option value="juros">Juros</option>
+                        <option value="multas">Multas</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pagamento-amortizacao">Valor para Amortização (R$):</label>
+                    <input type="number" id="pagamento-amortizacao" step="0.01" value="0.00" placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label for="pagamento-data">Data do Pagamento:</label>
+                    <input type="date" id="pagamento-data" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closePagamentoDetalhadoModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyPagamentoDetalhado()">Confirmar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="alongar-prazo-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAlongarPrazoModal()">&times;</span>
+            <h3>Alongar Prazo do Contrato</h3>
+            <form id="alongar-prazo-form">
+                <input type="hidden" id="alongar-prazo-contract-id">
+                <div class="form-group">
+                    <label for="alongar-prazo-meses">Novo número de meses:</label>
+                    <input type="number" id="alongar-prazo-meses" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="alongar-prazo-data">Nova data de vencimento (opcional):</label>
+                    <input type="date" id="alongar-prazo-data">
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closeAlongarPrazoModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyAlongarPrazo()">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="adicionar-emprestimo-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAdicionarEmprestimoModal()">&times;</span>
+            <h3>Adicionar Novo Empréstimo</h3>
+            <form id="adicionar-emprestimo-form">
+                <input type="hidden" id="adicionar-emprestimo-contract-id">
+                <div class="form-group">
+                    <label for="novo-valor-emprestimo">Valor do novo empréstimo (R$):</label>
+                    <input type="number" id="novo-valor-emprestimo" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="nova-taxa-juros">Nova taxa de juros mensal (%):</label>
+                    <input type="number" id="nova-taxa-juros" step="0.01" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closeAdicionarEmprestimoModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyAdicionarEmprestimo()">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="pagamento-bem-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePagamentoBemModal()">&times;</span>
+            <h3>Registrar Pagamento com Bem</h3>
+            <form id="pagamento-bem-form">
+                <input type="hidden" id="pagamento-bem-contract-id">
+                <div class="form-group">
+                    <label for="bem-descricao">Descrição do bem (Ex: Carro Fiat Uno, TV 50'):</label>
+                    <input type="text" id="bem-descricao" required>
+                </div>
+                <div class="form-group">
+                    <label for="bem-valor">Valor de abatimento acordado (R$):</label>
+                    <input type="number" id="bem-valor" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="bem-observacoes">Observações (opcional):</label>
+                    <textarea id="bem-observacoes" rows="3"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closePagamentoBemModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyPagamentoComBem()">Confirmar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="renegociar-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeRenegociarModal()">&times;</span>
+            <h3>Renegociar Contrato</h3>
+            <form id="renegociar-form">
+                <input type="hidden" id="renegociar-contract-id">
+                <div class="form-group">
+                    <label for="renegociar-juros">Nova Taxa de Juros Mensal (%):</label>
+                    <input type="number" id="renegociar-juros" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="renegociar-multa">Nova Multa de Atraso (R$):</label>
+                    <input type="number" id="renegociar-multa" step="0.01" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closeRenegociarModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyRenegociacao()">Salvar Renegociação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="falecimento-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeFalecimentoModal()">&times;</span>
+            <h3>Encerrar por Falecimento</h3>
+            <p>Tem certeza que deseja encerrar este contrato por falecimento do cliente? Esta ação irá parar todas as cobranças.</p>
+            <div class="button-group">
+                <button type="button" class="btn-cancel" onclick="closeFalecimentoModal()">Cancelar</button>
+                <button type="button" class="btn-confirm" onclick="finalizarPorFalecimento(document.getElementById('falecimento-contract-id').value)">Confirmar</button>
+            </div>
+            <input type="hidden" id="falecimento-contract-id">
+        </div>
+    </div>
+
+    <div id="quitar-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeQuitarModal()">&times;</span>
+            <h3>Confirmar Quitação</h3>
+            <p id="quitar-mensagem"></p>
+            <div class="button-group">
+                <button type="button" class="btn-cancel" onclick="closeQuitarModal()">Cancelar</button>
+                <button type="button" class="btn-confirm" id="quitar-confirm-button">Confirmar</button>
+            </div>
+            <input type="hidden" id="quitar-contract-id">
+        </div>
+    </div>
+
+    <div id="acordo-extrajudicial-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAcordoExtrajudicialModal()">&times;</span>
+            <h3>Acordo Extrajudicial</h3>
+            <form id="acordo-extrajudicial-form">
+                <input type="hidden" id="acordo-extrajudicial-contract-id">
+                <div class="form-group">
+                    <label for="acordo-valor">Valor Total do Acordo (R$):</label>
+                    <input type="number" id="acordo-valor" step="0.01" required placeholder="Ex: 1500,00">
+                </div>
+                <div class="form-group">
+                    <label for="acordo-data">Data de Vencimento do Acordo:</label>
+                    <input type="date" id="acordo-data" required>
+                </div>
+                <div class="form-group">
+                    <label for="acordo-observacoes">Observações:</label>
+                    <textarea id="acordo-observacoes" rows="3"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closeAcordoExtrajudicialModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyAcordoExtrajudicial()">Salvar Acordo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="transferir-contrato-modal" class="custom-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeTransferirContratoModal()">&times;</span>
+            <h3>Transferir Contrato</h3>
+            <form id="transferir-contrato-form">
+                <input type="hidden" id="transferir-contrato-id">
+                <div class="form-group">
+                    <label for="transferir-cliente">Novo Cliente:</label>
+                    <select id="transferir-cliente" required>
+                        <option value="">Selecione um cliente</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-cancel" onclick="closeTransferirContratoModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="applyTransferirContrato()">Confirmar Transferência</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="custom-alert" class="custom-modal custom-modal-alert">
+        <div class="modal-content">
+            <p id="alert-text"></p>
+            <button onclick="closeCustomAlert()">OK</button>
+        </div>
+    </div>
+    
+    <div id="janela-sugestao" class="janela-sugestao" style="display:none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Dados de clientes e contratos fictícios, com mais detalhes para simulação
+        const mockClients = [
+            { id: '1', nome: 'João da Silva', telefone: '11987654321' },
+            { id: '2', nome: 'Maria Oliveira', telefone: '11998877665' },
+            { id: '3', nome: 'Pedro Souza', telefone: '11912345678' },
+            { id: '4', nome: 'Ana Costa', telefone: '11966660004' },
+            { id: '5', nome: 'Carlos Ferreira', telefone: '11955551111' },
+            { id: '6', nome: 'Beatriz Martins', telefone: '11944442222' },
+        ];
+
+        const mockContracts = [
+            { id: '001', clienteId: '1', clienteNome: 'João da Silva', tipo: 'Empréstimo', valorTotal: 1500.00, valorPago: 250.00, parcelasPagas: 1, parcelasTotais: 6, proximoPagamento: '10/08/2025', status: 'atrasado', juros: 2.5, multa: 20.00, saldoDevedor: 1250.00, jurosPendentes: 25.00, multaPendente: 20.00, historico: [
+                { data: '10/07/2025', descricao: 'Pagamento de R$ 250,00 recebido' },
+                { data: '11/07/2025', descricao: 'Atraso de pagamento. Multa e juros aplicados.' }
+            ] },
+            { id: '002', clienteId: '2', clienteNome: 'Maria Oliveira', tipo: 'Financiamento', valorTotal: 5000.00, valorPago: 1250.00, parcelasPagas: 3, parcelasTotais: 12, proximoPagamento: '05/08/2025', status: 'ativo', juros: 1.8, multa: 15.00, saldoDevedor: 3750.00, jurosPendentes: 0, multaPendente: 0, historico: [
+                { data: '05/05/2025', descricao: 'Pagamento de R$ 416,67 recebido' },
+                { data: '05/06/2025', descricao: 'Pagamento de R$ 416,67 recebido' },
+                { data: '05/07/2025', descricao: 'Pagamento de R$ 416,67 recebido' }
+            ] },
+            { id: '003', clienteId: '3', clienteNome: 'Pedro Souza', tipo: 'Serviço', valorTotal: 800.00, valorPago: 0.00, parcelasPagas: 0, parcelasTotais: 3, proximoPagamento: '25/07/2025', status: 'pendente', juros: 0, multa: 0, saldoDevedor: 800.00, jurosPendentes: 0, multaPendente: 0, historico: [] },
+            { id: '004', clienteId: '4', clienteNome: 'Ana Costa', tipo: 'Empréstimo', valorTotal: 2000.00, valorPago: 2000.00, parcelasPagas: 6, parcelasTotais: 6, proximoPagamento: '-', status: 'encerrado', juros: 2.0, multa: 0, saldoDevedor: 0.00, jurosPendentes: 0, multaPendente: 0, historico: [
+                { data: '10/01/2025', descricao: 'Pagamento de R$ 333,33 recebido' },
+                { data: '10/02/2025', descricao: 'Pagamento de R$ 333,33 recebido' },
+                { data: '10/03/2025', descricao: 'Pagamento de R$ 333,33 recebido' },
+                { data: '10/04/2025', descricao: 'Pagamento de R$ 333,33 recebido' },
+                { data: '10/05/2025', descricao: 'Pagamento de R$ 333,33 recebido' },
+                { data: '10/06/2025', descricao: 'Pagamento de R$ 333,33 recebido' },
+                { data: '10/06/2025', descricao: 'Contrato encerrado por quitação.' }
+            ] },
+        ];
+
+        // Função genérica para exibir alertas customizados
+        function showCustomAlert(message) {
+            const customAlert = document.getElementById('custom-alert');
+            const alertText = customAlert.querySelector('p');
+            alertText.textContent = message;
+            customAlert.style.display = 'flex';
+        }
+
+        // Função para fechar o alerta customizado
+        function closeCustomAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+        }
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showCustomAlert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showCustomAlert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+        
+        const filterButtons = document.querySelectorAll('.filter-buttons button');
+        const contractSearchInput = document.getElementById('contractSearch');
+        const contractsTableBody = document.getElementById('contracts-table-body');
+        
+        function renderContracts(contracts) {
+            contractsTableBody.innerHTML = '';
+            if (contracts.length === 0) {
+                contractsTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Nenhum contrato encontrado.</td></tr>`;
+                return;
+            }
+
+            contracts.forEach(contract => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-status', contract.status);
+                
+                const statusClass = `status-${contract.status.replace(' ', '-')}`;
+                const statusText = {
+                    'ativo': 'Ativo',
+                    'pendente': 'Pendente',
+                    'atrasado': 'Atrasado',
+                    'encerrado': 'Encerrado',
+                    'hold': 'Em Espera',
+                    'falecido': 'Falecido',
+                    'acordo-extrajudicial': 'Acordo'
+                }[contract.status.replace(' ', '-')];
+
+                const progresso = (contract.valorPago / contract.valorTotal) * 100;
+
+                row.innerHTML = `
+                    <td>#${contract.id}</td>
+                    <td><a href="clientes.html" style="color: #04b45f; text-decoration: none;">${contract.clienteNome}</a></td>
+                    <td>R$ ${contract.valorTotal.toFixed(2).replace('.', ',')}</td>
+                    <td>
+                        <span>${contract.valorPago.toFixed(2).replace('.', ',')} / ${contract.valorTotal.toFixed(2).replace('.', ',')}</span>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${progresso}%"></div>
+                        </div>
+                    </td>
+                    <td>${contract.proximoPagamento}</td>
+                    <td><span class="status-tag ${statusClass}">${statusText}</span></td>
+                    <td class="action-buttons">
+                        <button onclick="openContratoModal('${contract.id}')">Gerenciar</button>
+                    </td>
+                `;
+                contractsTableBody.appendChild(row);
+            });
+        }
+        
+        function filterContracts(filter) {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            let filteredContracts = mockContracts;
+            if (filter !== 'all') {
+                filteredContracts = mockContracts.filter(c => c.status === filter);
+            }
+            renderContracts(filteredContracts);
+        }
+        
+        function searchContracts() {
+            const query = contractSearchInput.value.toLowerCase();
+            const filteredContracts = mockContracts.filter(contract =>
+                (contract.clienteNome && contract.clienteNome.toLowerCase().includes(query)) ||
+                (contract.id && contract.id.includes(query)) ||
+                (contract.tipo && contract.tipo.toLowerCase().includes(query))
+            );
+            renderContracts(filteredContracts);
+        }
+
+        // --- Lógica do MODAL PRINCIPAL de Gerenciamento ---
+        function openContratoModal(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+            const modalContent = document.getElementById('modal-content-inner');
+            
+            const historicoHTML = contrato.historico.map(item => `
+                <li><strong>${item.data}</strong> - ${item.descricao}</li>
+            `).join('');
+            
+            // Adicionado novo botão para 'transferirContrato'
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <h2>Gerenciar Contrato #${contrato.id}</h2>
+                    <p>Cliente: ${contrato.clienteNome}</p>
+                </div>
+                <div class="modal-body">
+                    <section class="section-container">
+                        <h3><i class="fas fa-info-circle"></i> Resumo do Contrato</h3>
+                        <div class="contract-info-grid">
+                            <div class="contract-info-card">
+                                <p>Status</p>
+                                <strong class="status-tag status-${contrato.status.replace(' ', '-')}">${contrato.status}</strong>
+                            </div>
+                            <div class="contract-info-card">
+                                <p>Valor Total</p>
+                                <strong>R$ ${contrato.valorTotal.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="contract-info-card">
+                                <p>Valor Pago</p>
+                                <strong class="valor-pago">R$ ${contrato.valorPago.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="contract-info-card">
+                                <p>Saldo Devedor</p>
+                                <strong class="${(contrato.status === 'atrasado' || contrato.status === 'hold' || contrato.status === 'acordo-extrajudicial') ? 'valor-atraso' : ''}">R$ ${contrato.saldoDevedor.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="contract-info-card">
+                                <p>Juros/Multa Pendentes</p>
+                                <strong class="${(contrato.jurosPendentes > 0 || contrato.multaPendente > 0) ? 'valor-atraso' : ''}">R$ ${(contrato.jurosPendentes + contrato.multaPendente).toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                            <div class="contract-info-card">
+                                <p>Próximo Pagamento</p>
+                                <strong>${contrato.proximoPagamento}</strong>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section-container">
+                        <h3><i class="fas fa-money-check-alt"></i> Ações de Pagamento</h3>
+                        <div class="action-buttons-grid" style="grid-template-columns: 1fr 1fr;">
+                            <button onclick="openPagamentoDetalhadoModal('${contrato.id}')" class="btn-quitar">
+                                <i class="fas fa-money-check-dollar"></i> Pagamento Detalhado
+                            </button>
+                            <button onclick="openPagamentoBemModal('${contrato.id}')" class="btn-bem">
+                                <i class="fas fa-car-side"></i> Pagamento com Bem
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="section-container">
+                        <h3><i class="fas fa-cog"></i> Ferramentas de Negociação</h3>
+                        <div class="action-buttons-grid">
+                            <button class="btn-renegociar" onclick="openRenegociarModal('${contrato.id}')">
+                                <i class="fas fa-exchange-alt"></i> Editar Juros/Multa
+                            </button>
+                            <button class="btn-remover-juros" onclick="removerJurosMultas('${contrato.id}')">
+                                <i class="fas fa-eraser"></i> Remover Juros
+                            </button>
+                            <button class="btn-quitar" onclick="quitarAntecipado('${contrato.id}')">
+                                <i class="fas fa-gavel"></i> Quitar
+                            </button>
+                            <button class="btn-adicionar" onclick="openAdicionarEmprestimoModal('${contrato.id}')">
+                                <i class="fas fa-plus"></i> Adicionar Empréstimo
+                            </button>
+                            <button class="btn-prorrogar" onclick="openAlongarPrazoModal('${contrato.id}')">
+                                <i class="fas fa-calendar-plus"></i> Alongar Prazo
+                            </button>
+                            <button class="btn-hold" onclick="putOnHold('${contrato.id}')">
+                                <i class="fas fa-pause-circle"></i> Colocar em Hold
+                            </button>
+                            <button class="btn-acordo" onclick="openAcordoExtrajudicialModal('${contrato.id}')">
+                                <i class="fas fa-file-contract"></i> Acordo Extrajudicial
+                            </button>
+                            <button class="btn-anexos" onclick="anexarDocumentos('${contrato.id}')">
+                                <i class="fas fa-paperclip"></i> Anexar Documentos
+                            </button>
+                        </div>
+                    </section>
+                    
+                    <section class="section-container">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Situações Especiais</h3>
+                        <div class="action-buttons-grid">
+                            <button class="btn-falecimento" onclick="openFalecimentoModal('${contrato.id}')">
+                                <i class="fas fa-skull-crossbones"></i> Encerrar por Falecimento
+                            </button>
+                            <button class="btn-transferir" onclick="openTransferirContratoModal('${contrato.id}')">
+                                <i class="fas fa-people-arrows-left-right"></i> Transferir Contrato
+                            </button>
+                            <button class="btn-reativar" onclick="reativarContrato('${contrato.id}')">
+                                <i class="fas fa-undo"></i> Reativar Contrato
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="section-container">
+                        <h3><i class="fas fa-history"></i> Histórico do Contrato</h3>
+                        <ul class="payment-history-list">
+                            ${historicoHTML.length > 0 ? historicoHTML : `<li>Nenhum histórico disponível.</li>`}
+                        </ul>
+                    </section>
+                </div>
+            `;
+            document.getElementById('contrato-modal').style.display = 'flex';
+        }
+        
+        function closeContratoModal() {
+            document.getElementById('contrato-modal').style.display = 'none';
+        }
+        
+        // --- FUNÇÕES DOS NOVOS MODAIS ---
+
+        // Função para abrir o modal de pagamento detalhado
+        function openPagamentoDetalhadoModal(contratoId) {
+            document.getElementById('pagamento-detalhado-contract-id').value = contratoId;
+            document.getElementById('pagamento-detalhado-modal').style.display = 'flex';
+        }
+
+        // Função para fechar o modal de pagamento detalhado
+        function closePagamentoDetalhadoModal() {
+            document.getElementById('pagamento-detalhado-modal').style.display = 'none';
+            document.getElementById('pagamento-detalhado-form').reset();
+        }
+
+        // Lógica para aplicar o pagamento detalhado
+        function applyPagamentoDetalhado() {
+            const contratoId = document.getElementById('pagamento-detalhado-contract-id').value;
+            const valorTotal = parseFloat(document.getElementById('pagamento-total').value) || 0;
+            const valorAmortizacao = parseFloat(document.getElementById('pagamento-amortizacao').value) || 0;
+            const tipoPagamento = document.getElementById('pagamento-juros-tipo').value;
+            const data = document.getElementById('pagamento-data').value;
+            
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+
+            if (valorTotal <= 0 && valorAmortizacao <= 0) {
+                showCustomAlert('⚠️ Por favor, digite um valor de pagamento.');
+                return;
+            }
+            
+            let descricao = `Pagamento de R$ ${valorTotal.toFixed(2).replace('.', ',')} recebido. `;
+
+            if (valorAmortizacao > 0) {
+                contrato.saldoDevedor -= valorAmortizacao;
+                contrato.valorPago += valorAmortizacao;
+                descricao += `(R$ ${valorAmortizacao.toFixed(2).replace('.', ',')} para amortização do principal). `;
+            }
+            
+            const valorRestante = valorTotal - valorAmortizacao;
+            if (valorRestante > 0) {
+                contrato.jurosPendentes = Math.max(0, contrato.jurosPendentes - valorRestante);
+                descricao += `(R$ ${valorRestante.toFixed(2).replace('.', ',')} para ${tipoPagamento}). `;
+            }
+
+            contrato.historico.push({
+                data: data,
+                descricao: descricao
+            });
+
+            showCustomAlert('✅ Pagamento detalhado registrado com sucesso!');
+            renderContracts(mockContracts);
+            closePagamentoDetalhadoModal();
+            closeContratoModal();
+        }
+
+        // Função para abrir o modal de Alongar Prazo
+        function openAlongarPrazoModal(contratoId) {
+            document.getElementById('alongar-prazo-contract-id').value = contratoId;
+            document.getElementById('alongar-prazo-modal').style.display = 'flex';
+        }
+
+        // Função para fechar o modal de Alongar Prazo
+        function closeAlongarPrazoModal() {
+            document.getElementById('alongar-prazo-modal').style.display = 'none';
+        }
+
+        // Lógica para aplicar a prorrogação
+        function applyAlongarPrazo() {
+            const contratoId = document.getElementById('alongar-prazo-contract-id').value;
+            const meses = parseInt(document.getElementById('alongar-prazo-meses').value);
+            const novaData = document.getElementById('alongar-prazo-data').value;
+            
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+
+            contrato.parcelasTotais += meses;
+            contrato.proximoPagamento = novaData || `Ajustado para ${meses} meses`;
+            contrato.historico.push({
+                data: new Date().toLocaleDateString('pt-BR'),
+                descricao: `Prazo do contrato alongado em ${meses} meses. Novo total de parcelas: ${contrato.parcelasTotais}.`
+            });
+
+            showCustomAlert('✅ Prazo do contrato alongado com sucesso!');
+            renderContracts(mockContracts);
+            closeAlongarPrazoModal();
+            closeContratoModal();
+        }
+
+        // Função para abrir o modal de Adicionar Empréstimo
+        function openAdicionarEmprestimoModal(contratoId) {
+            document.getElementById('adicionar-emprestimo-contract-id').value = contratoId;
+            document.getElementById('adicionar-emprestimo-modal').style.display = 'flex';
+        }
+
+        // Função para fechar o modal de Adicionar Empréstimo
+        function closeAdicionarEmprestimoModal() {
+            document.getElementById('adicionar-emprestimo-modal').style.display = 'none';
+        }
+
+        // Lógica para adicionar o novo empréstimo
+        function applyAdicionarEmprestimo() {
+            const contratoId = document.getElementById('adicionar-emprestimo-contract-id').value;
+            const novoValor = parseFloat(document.getElementById('novo-valor-emprestimo').value);
+            const novaTaxa = parseFloat(document.getElementById('nova-taxa-juros').value);
+
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+
+            const novoSaldoDevedor = contrato.saldoDevedor + novoValor;
+            contrato.valorTotal = novoSaldoDevedor; // Recalculamos o valor total
+            contrato.saldoDevedor = novoSaldoDevedor;
+            contrato.juros = novaTaxa;
+            contrato.historico.push({
+                data: new Date().toLocaleDateString('pt-BR'),
+                descricao: `Adicionado novo empréstimo de R$ ${novoValor.toFixed(2).replace('.', ',')}. Novo saldo devedor: R$ ${novoSaldoDevedor.toFixed(2).replace('.', ',')}. Nova taxa de juros: ${novaTaxa}%.`
+            });
+
+            showCustomAlert('✅ Novo empréstimo adicionado e contrato reajustado com sucesso!');
+            renderContracts(mockContracts);
+            closeAdicionarEmprestimoModal();
+            closeContratoModal();
+        }
+
+        // Função para abrir o modal de Pagamento com Bem
+        function openPagamentoBemModal(contratoId) {
+            document.getElementById('pagamento-bem-contract-id').value = contratoId;
+            document.getElementById('pagamento-bem-modal').style.display = 'flex';
+        }
+        
+        // Função para fechar o modal de Pagamento com Bem
+        function closePagamentoBemModal() {
+            document.getElementById('pagamento-bem-modal').style.display = 'none';
+        }
+
+        // Lógica para registrar o pagamento com o bem
+        function applyPagamentoComBem() {
+            const contratoId = document.getElementById('pagamento-bem-contract-id').value;
+            const bemDescricao = document.getElementById('bem-descricao').value;
+            const bemValor = parseFloat(document.getElementById('bem-valor').value);
+
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+
+            contrato.saldoDevedor -= bemValor;
+            contrato.valorPago += bemValor;
+            contrato.historico.push({
+                data: new Date().toLocaleDateString('pt-BR'),
+                descricao: `Pagamento de R$ ${bemValor.toFixed(2).replace('.', ',')} registrado com o bem: ${bemDescricao}.`
+            });
+
+            showCustomAlert(`✅ Pagamento com o bem "${bemDescricao}" no valor de R$ ${bemValor.toFixed(2).replace('.', ',')} registrado com sucesso!`);
+            renderContracts(mockContracts);
+            closePagamentoBemModal();
+            closeContratoModal();
+        }
+
+        // Lógica para abrir o modal de Renegociação (mantido, mas com modal customizado)
+        function openRenegociarModal(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+            document.getElementById('renegociar-contract-id').value = contratoId;
+            document.getElementById('renegociar-juros').value = contrato.juros;
+            document.getElementById('renegociar-multa').value = contrato.multa;
+            document.getElementById('renegociar-modal').style.display = 'flex';
+        }
+
+        // Lógica para fechar o modal de Renegociação
+        function closeRenegociarModal() {
+            document.getElementById('renegociar-modal').style.display = 'none';
+        }
+
+        // Lógica para aplicar a renegociação
+        function applyRenegociacao() {
+            const contratoId = document.getElementById('renegociar-contract-id').value;
+            const novosJuros = parseFloat(document.getElementById('renegociar-juros').value);
+            const novaMulta = parseFloat(document.getElementById('renegociar-multa').value);
+            
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (contrato) {
+                contrato.juros = novosJuros;
+                contrato.multa = novaMulta;
+                contrato.historico.push({
+                    data: new Date().toLocaleDateString('pt-BR'),
+                    descricao: `Contrato renegociado. Novos juros: ${novosJuros}%, Nova multa: R$ ${novaMulta.toFixed(2)}.`
+                });
+                showCustomAlert('✅ Renegociação salva com sucesso!');
+                renderContracts(mockContracts);
+                closeRenegociarModal();
+                closeContratoModal();
+            }
+        }
+
+        // Lógica para abrir o modal de Falecimento
+        function openFalecimentoModal(contratoId) {
+             document.getElementById('falecimento-contract-id').value = contratoId;
+             document.getElementById('falecimento-modal').style.display = 'flex';
+        }
+
+        // Lógica para fechar o modal de Falecimento
+        function closeFalecimentoModal() {
+            document.getElementById('falecimento-modal').style.display = 'none';
+        }
+
+        // Lógica para encerrar contrato por falecimento
+        function finalizarPorFalecimento(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (contrato) {
+                contrato.status = 'falecido';
+                contrato.historico.push({
+                    data: new Date().toLocaleDateString('pt-BR'),
+                    descricao: `Contrato encerrado por falecimento do cliente. Cobranças suspensas.`
+                });
+                showCustomAlert('✅ Contrato encerrado por falecimento com sucesso!');
+                renderContracts(mockContracts);
+                closeFalecimentoModal();
+                closeContratoModal();
+            }
+        }
+        
+        // --- NOVO Modal de Quitação ---
+        function openQuitarModal(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+
+            const valorQuitar = contrato.saldoDevedor + contrato.jurosPendentes + contrato.multaPendente;
+            const mensagem = `O valor para quitação antecipada é de R$ ${valorQuitar.toFixed(2).replace('.', ',')}. Deseja prosseguir?`;
+
+            document.getElementById('quitar-mensagem').textContent = mensagem;
+            document.getElementById('quitar-contract-id').value = contratoId;
+            document.getElementById('quitar-confirm-button').onclick = () => confirmQuitarAntecipado(contratoId);
+
+            document.getElementById('quitar-modal').style.display = 'flex';
+        }
+
+        function closeQuitarModal() {
+            document.getElementById('quitar-modal').style.display = 'none';
+        }
+
+        function confirmQuitarAntecipado(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (contrato) {
+                const valorQuitar = contrato.saldoDevedor + contrato.jurosPendentes + contrato.multaPendente;
+                contrato.status = 'encerrado';
+                contrato.saldoDevedor = 0;
+                contrato.valorPago = contrato.valorTotal; // Simulação de quitação total
+                contrato.jurosPendentes = 0;
+                contrato.multaPendente = 0;
+
+                 contrato.historico.push({
+                    data: new Date().toLocaleDateString('pt-BR'),
+                    descricao: `Contrato quitado antecipadamente com o valor de R$ ${valorQuitar.toFixed(2).replace('.', ',')}.`
+                 });
+                 
+                 showCustomAlert(`✅ Contrato #${contratoId} quitado com sucesso!`);
+                 renderContracts(mockContracts);
+                 closeQuitarModal();
+                 closeContratoModal();
+            }
+        }
+
+        // Funções mantidas do código original
+        function removerJurosMultas(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (contrato && (contrato.jurosPendentes > 0 || contrato.multaPendente > 0)) {
+                showCustomAlert(`✅ Juros e multas do contrato #${contratoId} foram removidos e o saldo foi recalculado.`);
+                contrato.jurosPendentes = 0;
+                contrato.multaPendente = 0;
+                contrato.historico.push({
+                    data: new Date().toLocaleDateString('pt-BR'),
+                    descricao: 'Remissão total de juros e multas.'
+                });
+                renderContracts(mockContracts);
+                closeContratoModal();
+            } else {
+                 showCustomAlert('⚠️ Este contrato não possui juros ou multas para serem removidos.');
+            }
+        }
+        
+        function quitarAntecipado(contratoId) {
+            openQuitarModal(contratoId);
+        }
+
+        function enviarWhatsApp(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            const cliente = mockClients.find(c => c.id === contrato.clienteId);
+            if (!cliente.telefone) {
+                showCustomAlert("Cliente sem telefone cadastrado.");
+                return;
+            }
+            const telefoneLimpo = cliente.telefone.replace(/\D/g, "");
+            const mensagem = `Olá ${cliente.nome}, tudo bem? Aqui é do PixFactory. Estamos entrando em contato sobre seu contrato #${contrato.id}. O próximo pagamento vence em ${contrato.proximoPagamento}. Saldo atual: R$ ${contrato.saldoDevedor.toFixed(2).replace('.', ',')}. Qualquer dúvida, estamos à disposição!`;
+            const url = `https://wa.me/55${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+
+        function openAcordoExtrajudicialModal(contratoId) {
+            document.getElementById('acordo-extrajudicial-contract-id').value = contratoId;
+            document.getElementById('acordo-extrajudicial-modal').style.display = 'flex';
+        }
+
+        function closeAcordoExtrajudicialModal() {
+            document.getElementById('acordo-extrajudicial-modal').style.display = 'none';
+        }
+
+        function applyAcordoExtrajudicial() {
+            const contratoId = document.getElementById('acordo-extrajudicial-contract-id').value;
+            const valorAcordo = parseFloat(document.getElementById('acordo-valor').value) || 0;
+            const dataAcordo = document.getElementById('acordo-data').value;
+            const observacoesAcordo = document.getElementById('acordo-observacoes').value.trim();
+
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (!contrato) return;
+            
+            if (valorAcordo <= 0 || !dataAcordo) {
+                 showCustomAlert('⚠️ Por favor, preencha o valor e a data do acordo.');
+                 return;
+            }
+
+            contrato.status = 'acordo extrajudicial';
+            contrato.saldoDevedor = valorAcordo;
+            contrato.proximoPagamento = dataAcordo;
+            
+            const descricao = `Acordo extrajudicial de R$ ${valorAcordo.toFixed(2).replace('.', ',')} registrado com vencimento em ${dataAcordo}. Observações: ${observacoesAcordo || 'Nenhuma.'}`;
+            contrato.historico.push({
+                data: new Date().toLocaleDateString('pt-BR'),
+                descricao: descricao
+            });
+
+            showCustomAlert(`✅ Acordo extrajudicial para o contrato #${contratoId} registrado com sucesso!`);
+            renderContracts(mockContracts);
+            closeAcordoExtrajudicialModal();
+            closeContratoModal();
+        }
+
+        function openTransferirContratoModal(contratoId) {
+            document.getElementById('transferir-contrato-id').value = contratoId;
+            const selectCliente = document.getElementById('transferir-cliente');
+            selectCliente.innerHTML = `<option value="">Selecione um cliente</option>`;
+            
+            const contratoAtual = mockContracts.find(c => c.id === contratoId);
+            mockClients.forEach(cliente => {
+                if (cliente.id !== contratoAtual.clienteId) {
+                    const option = document.createElement('option');
+                    option.value = cliente.id;
+                    option.textContent = cliente.nome;
+                    selectCliente.appendChild(option);
+                }
+            });
+
+            document.getElementById('transferir-contrato-modal').style.display = 'flex';
+        }
+
+        function closeTransferirContratoModal() {
+            document.getElementById('transferir-contrato-modal').style.display = 'none';
+        }
+
+        function applyTransferirContrato() {
+            const contratoId = document.getElementById('transferir-contrato-id').value;
+            const novoClienteId = document.getElementById('transferir-cliente').value;
+
+            if (!novoClienteId) {
+                showCustomAlert('⚠️ Por favor, selecione um cliente para a transferência.');
+                return;
+            }
+
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            const novoCliente = mockClients.find(c => c.id === novoClienteId);
+
+            if (!contrato || !novoCliente) return;
+
+            const clienteAntigoNome = contrato.clienteNome;
+            contrato.clienteId = novoClienteId;
+            contrato.clienteNome = novoCliente.nome;
+            contrato.historico.push({
+                data: new Date().toLocaleDateString('pt-BR'),
+                descricao: `Contrato transferido de ${clienteAntigoNome} para ${novoCliente.nome}.`
+            });
+
+            showCustomAlert(`✅ Contrato #${contratoId} transferido com sucesso para ${novoCliente.nome}.`);
+            renderContracts(mockContracts);
+            closeTransferirContratoModal();
+            closeContratoModal();
+        }
+
+        function anexarDocumentos(contratoId) {
+            showCustomAlert(`📎 A funcionalidade de anexar documentos ao contrato #${contratoId} ainda será implementada.`);
+        }
+        
+        function reativarContrato(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if (contrato && (contrato.status === 'encerrado' || contrato.status === 'falecido' || contrato.status === 'hold' || contrato.status === 'acordo extrajudicial')) {
+                contrato.status = 'ativo';
+                contrato.historico.push({
+                    data: new Date().toLocaleDateString('pt-BR'),
+                    descricao: `Contrato reativado. Status alterado para 'Ativo'.`
+                });
+                showCustomAlert(`✅ Contrato #${contratoId} foi reativado e agora está ativo.`);
+                renderContracts(mockContracts);
+                closeContratoModal();
+            } else {
+                showCustomAlert(`⚠️ O contrato #${contratoId} não pode ser reativado neste momento.`);
+            }
+        }
+        
+        function putOnHold(contratoId) {
+            const contrato = mockContracts.find(c => c.id === contratoId);
+            if(contrato.status !== 'hold') {
+                 contrato.status = 'hold';
+                 showCustomAlert(`⏸️ Contrato #${contratoId} colocado em status de 'Hold'. A cobrança e os juros foram suspensos.`);
+            } else {
+                 contrato.status = 'ativo';
+                 showCustomAlert(`▶️ Contrato #${contratoId} retomado.`);
+            }
+            renderContracts(mockContracts);
+            closeContratoModal();
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContracts(mockContracts);
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => filterContracts(button.getAttribute('data-filter')));
+            });
+            contractSearchInput.addEventListener('input', searchContracts);
+            document.getElementById('addNewContractButton').addEventListener('click', () => {
+                window.location.href = 'novo_contrato.html';
+            });
+        });
+    </script>
+</body>
+</html>

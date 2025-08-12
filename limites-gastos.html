@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limites de Gastos | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos globais e de layout */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .rosa { color: #e84393; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .hide-values-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        
+        .hide-values-btn:hover {
+            color: #03a252;
+        }
+        
+        /* Estilo do banner de teste gratuito (copiado das outras páginas) */
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Alinha o conteúdo ao centro */
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+        .trial-status .progress-bar {
+            display: none; /* Esconde a barra de progresso para um visual mais limpo */
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header-left h1 {
+            color: #04b45f;
+            margin-bottom: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        
+        .header-left p {
+            color: #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .header-left.no-description {
+            flex-direction: row;
+            align-items: center;
+        }
+        .header-left.no-description h1 {
+            margin-bottom: 0;
+        }
+
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .top-nav {
+            background-color: #1e1e1e;
+            padding: 10px 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            border: 1px solid #04b45f;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: color 0.3s, background-color 0.3s;
+            font-size: 16px;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+
+        .limits-main-content {
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+
+        .limits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .limits-header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .limits-header .period-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #ccc;
+        }
+        .limits-header .period-nav button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .limits-overview-card {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .limits-overview-card .overview-chart {
+            width: 120px;
+            height: 120px;
+        }
+        .limits-overview-card .overview-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            text-align: center;
+        }
+        .limits-overview-card .overview-info h3 {
+            color: #fff;
+            font-size: 20px;
+            margin: 0;
+        }
+        .limits-overview-card .overview-info small {
+            color: #ccc;
+        }
+
+        .budgets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .budget-card {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+        }
+        .budget-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .budget-card-header h4 {
+            color: #ccc;
+            margin: 0;
+        }
+        .budget-card-header .budget-value {
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .budget-card-body {
+            margin-top: 15px;
+        }
+        .budget-progress-bar {
+            background-color: #1e1e1e;
+            height: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .budget-progress-fill {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .progress-green { background-color: #2ecc71; }
+        .progress-yellow { background-color: #f1c40f; }
+        .progress-red { background-color: #e74c3c; }
+
+        .budget-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .limits-add-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 25px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s;
+        }
+        .limits-add-button:hover {
+            background-color: #03a252;
+        }
+        .limits-add-button i {
+            margin-right: 10px;
+        }
+
+        .limits-filters-bar {
+            background-color: #2b2b2b;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+        }
+        .limits-filters-bar .filter-dropdown {
+            position: relative;
+        }
+        .limits-filters-bar .filter-dropdown > a {
+            background-color: #333;
+            color: #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .limits-filters-bar .filter-dropdown > a:hover {
+            background-color: #444;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            margin-top: 10px;
+            width: 250px;
+            max-height: 300px; /* Altura máxima para a rolagem */
+            overflow-y: auto;  /* Habilita a rolagem vertical */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            list-style: none;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 200;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            position: relative;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu a:hover {
+            background-color: #2b2b2b;
+            color: #fff;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu a.active::before {
+            content: "\f00c";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: #04b45f;
+            margin-right: 8px;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu h4 {
+            color: #04b45f;
+            margin: 10px 10px 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .limits-filters-bar .filter-dropdown .dropdown-menu hr {
+            border-color: #444;
+            margin: 5px 0;
+        }
+        
+        .date-pickers {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .date-pickers label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .date-pickers input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #2b2b2b;
+            color: #fff;
+            border: 1px solid #04b45f;
+        }
+        
+        /* Modal de Adicionar Limite */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-close {
+            color: #ccc;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content h2 {
+            text-align: center;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #2b2b2b;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        .modal-content .save-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .modal-content .save-btn:hover {
+            background-color: #03a252;
+        }
+
+        /* Modal para alertas customizados */
+        #custom-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2b2b2b;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 300px;
+        }
+        #custom-alert .alert-text {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        #custom-alert button {
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+            .top-nav {
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .top-nav a {
+                width: 100%;
+                text-align: center;
+            }
+            .limits-overview-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+        }
+    </style>
+    <script>
+        const userStatus = {
+            plano: 'manual',
+            isTrial: true,
+            trialEnds: '2025-08-08'
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleDropdown(event, id) {
+            event.preventDefault();
+            const dropdown = document.getElementById(id);
+            const isVisible = dropdown.style.display === 'flex';
+            
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+
+            if (!isVisible) {
+                dropdown.style.display = 'flex';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.filter-dropdown a')) {
+                const dropdowns = document.querySelectorAll('.dropdown-menu');
+                dropdowns.forEach(dropdown => {
+                    if (dropdown.style.display === 'flex') {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        function showDatePickers(show) {
+            const datePickers = document.getElementById('date-pickers');
+            datePickers.style.display = show ? 'flex' : 'none';
+        }
+        
+        function showCustomAlert(message) {
+            const customAlert = document.getElementById('custom-alert');
+            const alertText = customAlert.querySelector('.alert-text');
+            alertText.textContent = message;
+            customAlert.style.display = 'flex';
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+        }
+        
+        function openAddLimitModal() {
+            const modal = document.getElementById('add-limit-modal');
+            modal.style.display = 'flex';
+        }
+        
+        function closeAddLimitModal() {
+            const modal = document.getElementById('add-limit-modal');
+            modal.style.display = 'none';
+        }
+        
+        function salvarLimite() {
+            const categoria = document.getElementById('limit-categoria').value;
+            const valor = document.getElementById('limit-valor').value;
+            if (categoria && valor) {
+                showCustomAlert(`✅ Novo limite de gasto salvo! Categoria: ${categoria}, Valor: R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`);
+                closeAddLimitModal();
+            } else {
+                showCustomAlert('⚠️ Por favor, preencha todos os campos.');
+            }
+        }
+        
+        // Lógica de navegação de período
+        let currentMonthYear = new Date();
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        function renderMonthYear() {
+            const monthYearSpan = document.getElementById('month-year-title');
+            if (monthYearSpan) {
+                const month = monthNames[currentMonthYear.getMonth()];
+                const year = currentMonthYear.getFullYear();
+                monthYearSpan.textContent = `${month} ${year}`;
+            }
+        }
+
+        function changeMonth(direction) {
+            currentMonthYear.setMonth(currentMonthYear.getMonth() + direction);
+            renderMonthYear();
+            // Aqui você chamaria a função para atualizar os dados de orçamentos para o novo mês
+            console.log(`Mês alterado para: ${monthNames[currentMonthYear.getMonth()]}`);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const trialStatus = document.getElementById('trial-status');
+            if (userStatus.isTrial) {
+                const today = new Date();
+                const trialEnd = new Date(userStatus.trialEnds + 'T00:00:00');
+                const diffTime = trialEnd.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let message;
+                if (diffDays <= 0) {
+                    message = `
+                        <span>Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></span>
+                    `;
+                } else {
+                    message = `
+                        <span><strong>Plano manual</strong> - ${diffDays} dias restantes</span>
+                        <a href="planos.html">Ver planos</a>
+                    `;
+                }
+                if (trialStatus) {
+                    trialStatus.innerHTML = message;
+                }
+            }
+
+            // Lógica dos orçamentos
+            const budgets = [
+                { category: 'Alimentação', limit: 800, spent: 750 },
+                { category: 'Transporte', limit: 200, spent: 210 },
+                { category: 'Moradia', limit: 1500, spent: 1200 },
+                { category: 'Lazer', limit: 300, spent: 150 },
+            ];
+            
+            const budgetList = document.getElementById('budgets-list');
+            let totalLimit = 0;
+            let totalSpent = 0;
+            
+            budgets.forEach(budget => {
+                totalLimit += budget.limit;
+                totalSpent += budget.spent;
+                
+                const percentage = (budget.spent / budget.limit) * 100;
+                let progressClass = 'progress-green';
+                if (percentage >= 80 && percentage < 100) {
+                    progressClass = 'progress-yellow';
+                } else if (percentage >= 100) {
+                    progressClass = 'progress-red';
+                }
+                
+                const spentValue = `R$ ${budget.spent.toFixed(2).replace('.', ',')}`;
+                const limitValue = `R$ ${budget.limit.toFixed(2).replace('.', ',')}`;
+                
+                const budgetItem = document.createElement('div');
+                budgetItem.className = 'budget-card';
+                budgetItem.innerHTML = `
+                    <div class="budget-card-header">
+                        <h4>${budget.category}</h4>
+                        <div class="budget-value">${spentValue}</div>
+                    </div>
+                    <div class="budget-card-body">
+                        <div class="budget-progress-bar">
+                            <div class="budget-progress-fill ${progressClass}" style="width: ${Math.min(percentage, 100)}%;"></div>
+                        </div>
+                        <div class="budget-info">
+                            <span>Gasto: ${spentValue}</span>
+                            <span>Limite: ${limitValue}</span>
+                        </div>
+                    </div>
+                `;
+                budgetList.appendChild(budgetItem);
+            });
+            
+            // Atualiza os valores da visão geral
+            document.getElementById('overview-total').textContent = `Seu orçamento total: R$ ${totalLimit.toFixed(2).replace('.', ',')}`;
+            document.getElementById('overview-spent').textContent = `Você já gastou: R$ ${totalSpent.toFixed(2).replace('.', ',')}`;
+            
+            const overviewChart = document.getElementById('overviewChart');
+            if (overviewChart) {
+                const ctxOverview = overviewChart.getContext('2d');
+                new Chart(ctxOverview, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Gasto', 'Restante'],
+                        datasets: [{
+                            data: [totalSpent, totalLimit - totalSpent],
+                            backgroundColor: ['#e74c3c', '#2ecc71'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: R$ ${context.raw.toFixed(2).replace('.', ',')}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Inicializa a exibição do mês e ano
+            renderMonthYear();
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="controle-de-gastos.html"><span class="icon limao">💰</span> Controle de Gastos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="trial-status" id="trial-status">
+            </div>
+
+        <header>
+            <div class="header-left">
+                <h1 style="color: #fff;">Limites de Gastos</h1>
+            </div>
+        </header>
+
+        <div class="top-nav">
+            <a href="controle-de-gastos.html">visão geral</a>
+            <a href="lancamentos.html">lançamentos</a>
+            <a href="controle-relatorios.html">relatórios</a>
+            <a href="limites-gastos.html" class="active">limite de gastos</a>
+            <a href="conexao-bancaria.html">conexão bancária</a>
+        </div>
+        
+        <section class="limits-main-content">
+            <div class="limits-header">
+                <h1>Orçamentos de <span id="month-year-title"></span></h1>
+                <div class="period-nav">
+                    <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="limits-filters-bar">
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-periodo')">
+                        <span>Período</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-periodo">
+                        <li><a href="#" class="active" onclick="showDatePickers(false)">Mês atual</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Últimos 7 dias</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Últimos 30 dias</a></li>
+                        <hr>
+                        <li><a href="#" onclick="showDatePickers(false)">Janeiro 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Fevereiro 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Março 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Abril 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Maio 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Junho 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Julho 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Agosto 2025</a></li>
+                        <hr>
+                        <li><a href="#" onclick="showDatePickers(false)">Ano atual</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Ano anterior</a></li>
+                        <hr>
+                        <li><a href="#" onclick="showDatePickers(true)">Período customizado</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-contas')">
+                        <span>Contas & Cartões</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-contas">
+                        <li><a href="#" class="active">Todas as contas e cartões</a></li>
+                        <hr>
+                        <h4>Contas</h4>
+                        <li><a href="#">Conta Corrente</a></li>
+                        <li><a href="#">Poupança</a></li>
+                        <li><a href="#">Carteira</a></li>
+                        <hr>
+                        <h4>Cartões de Crédito</h4>
+                        <li><a href="#">Cartão Nubank</a></li>
+                        <li><a href="#">Cartão Banco do Brasil</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-categorias')">
+                        <span>Categorias</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-categorias">
+                        <li><a href="#" class="active">Todas as categorias</a></li>
+                        <hr>
+                        <h4>Categorias de despesa</h4>
+                        <li><a href="#">Alimentação</a></li>
+                        <li><a href="#">Assinaturas e serviços</a></li>
+                        <li><a href="#">Bares e restaurantes</a></li>
+                        <li><a href="#">Casa</a></li>
+                        <li><a href="#">Compras</a></li>
+                        <li><a href="#">Cuidados pessoais</a></li>
+                        <li><a href="#">Dívidas e empréstimos</a></li>
+                        <li><a href="#">Educação</a></li>
+                        <li><a href="#">Família e filhos</a></li>
+                        <li><a href="#">Impostos e Taxas</a></li>
+                        <li><a href="#">Investimentos</a></li>
+                        <li><a href="#">Lazer e hobbies</a></li>
+                        <li><a href="#">Mercado</a></li>
+                        <li><a href="#">Outros</a></li>
+                        <li><a href="#">Pets</a></li>
+                        <li><a href="#">Presentes e doações</a></li>
+                        <li><a href="#">Roupas</a></li>
+                        <li><a href="#">Saúde</a></li>
+                        <li><a href="#">Trabalho</a></li>
+                        <li><a href="#">Transporte</a></li>
+                        <li><a href="#">Viagem</a></li>
+                        <hr>
+                        <h4>Categorias de receita</h4>
+                        <li><a href="#">Empréstimos</a></li>
+                        <li><a href="#">Investimentos</a></li>
+                        <li><a href="#">Outras receitas</a></li>
+                        <li><a href="#">Salário</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="date-pickers" class="limits-filters-bar date-pickers">
+                <div class="filter-group">
+                    <label for="start-date">Data de Início</label>
+                    <input type="date" id="start-date" value="2025-08-01">
+                </div>
+                <div class="filter-group">
+                    <label for="end-date">Data de Fim</label>
+                    <input type="date" id="end-date" value="2025-08-31">
+                </div>
+            </div>
+
+            <div class="limits-overview-card">
+                <div class="overview-info">
+                    <h3>Visão Geral</h3>
+                    <small id="overview-total">Seu orçamento total: R$ 0,00</small>
+                    <small id="overview-spent">Você já gastou: R$ 0,00</small>
+                </div>
+                <div class="overview-chart">
+                    <canvas id="overviewChart"></canvas>
+                </div>
+            </div>
+
+            <div class="budgets-list" id="budgets-list">
+                </div>
+            
+            <button class="limits-add-button" onclick="openAddLimitModal()">
+                <i class="fas fa-plus"></i>
+                Adicionar Limite de Gasto
+            </button>
+        </section>
+    </main>
+
+    <!-- Modal de Adicionar Limite -->
+    <div id="add-limit-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAddLimitModal()">&times;</span>
+            <h2>Adicionar Limite de Gasto</h2>
+            <form>
+                <div class="form-group">
+                    <label for="limit-categoria">Categoria</label>
+                    <select id="limit-categoria" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="moradia">Moradia</option>
+                        <option value="lazer">Lazer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="limit-valor">Valor do Limite</label>
+                    <input type="number" id="limit-valor" placeholder="R$ 0,00" required>
+                </div>
+                <button type="button" class="save-btn" onclick="salvarLimite()">Salvar Limite</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal para alertas customizados -->
+    <div id="custom-alert" style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #2b2b2b;
+        border: 1px solid #04b45f;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 2000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        text-align: center;
+        max-width: 300px;
+    ">
+        <p class="alert-text"></p>
+        <button onclick="closeCustomAlert()" style="
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        ">OK</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos globais e de layout */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .rosa { color: #e84393; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .hide-values-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        
+        .hide-values-btn:hover {
+            color: #03a252;
+        }
+        
+        /* Estilo do banner de teste gratuito (copiado das outras páginas) */
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+        .trial-status .progress-bar {
+            display: none;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header-left h1 {
+            color: #04b45f;
+            margin-bottom: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        
+        .header-left p {
+            color: #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .header-left.no-description {
+            flex-direction: row;
+            align-items: center;
+        }
+        .header-left.no-description h1 {
+            margin-bottom: 0;
+        }
+
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        .plan-info::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .top-nav {
+            background-color: #1e1e1e;
+            padding: 10px 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            border: 1px solid #04b45f;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: color 0.3s, background-color 0.3s;
+            font-size: 16px;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+
+        .relatorios-main-content {
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+        
+        .relatorios-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .relatorios-header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        /* Estilo do botão de exportar relatórios */
+        .relatorios-header .export-btn {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(45deg, #04b45f, #03a252);
+            box-shadow: 0 4px 15px rgba(4, 180, 95, 0.4);
+        }
+        .relatorios-header .export-btn:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(4, 180, 95, 0.6);
+        }
+        .relatorios-header .period-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #ccc;
+        }
+        .relatorios-header .period-nav button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .reports-filters-bar {
+            background-color: #2b2b2b;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .reports-filters-bar .filter-dropdown {
+            position: relative;
+        }
+        .reports-filters-bar .filter-dropdown > a {
+            background-color: #333;
+            color: #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            width: 100%; /* Garante que toda a área do botão seja clicável */
+            box-sizing: border-box;
+        }
+        .reports-filters-bar .filter-dropdown > a:hover {
+            background-color: #444;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            margin-top: 10px;
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            list-style: none;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 200;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            position: relative;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu a:hover {
+            background-color: #2b2b2b;
+            color: #fff;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu a.active::before {
+            content: "\f00c";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: #04b45f;
+            margin-right: 8px;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu h4 {
+            color: #04b45f;
+            margin: 10px 10px 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .reports-filters-bar .filter-dropdown .dropdown-menu hr {
+            border-color: #444;
+            margin: 5px 0;
+        }
+        
+        .date-pickers {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .date-pickers label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .date-pickers input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #2b2b2b;
+            color: #fff;
+            border: 1px solid #04b45f;
+        }
+
+        .reports-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .report-card {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+        }
+        .report-card h3 {
+            color: #04b45f;
+            margin-bottom: 15px;
+            text-align: center; /* Centraliza o título do card */
+        }
+        .report-card canvas {
+            max-height: 300px;
+        }
+        
+        /* Estilos para a lista de maiores gastos */
+        .gastos-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .gasto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #444;
+        }
+        .gasto-item:last-child {
+            border-bottom: none;
+        }
+        .gasto-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .gasto-icon {
+            font-size: 20px;
+            color: #e74c3c;
+        }
+        .gasto-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Novo card para insights do Gemini */
+        .insights-card {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .insights-card h3 {
+            color: #fff;
+        }
+        .insights-card button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .insights-card button:hover {
+            background-color: #03a252;
+        }
+        .insights-result {
+            margin-top: 20px;
+            text-align: left;
+            color: #ccc;
+            white-space: pre-wrap;
+        }
+        .loading-spinner {
+            display: none;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #04b45f;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+            .top-nav {
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .top-nav a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+    <script>
+        // Lógica de status do plano
+        const userStatus = {
+            plano: 'manual',
+            isTrial: true,
+            trialEnds: '2025-08-08'
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleDropdown(event, id) {
+            event.preventDefault();
+            const dropdown = document.getElementById(id);
+            const isVisible = dropdown.style.display === 'flex';
+            
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+
+            if (!isVisible) {
+                dropdown.style.display = 'flex';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-dropdown')) {
+                const dropdowns = document.querySelectorAll('.dropdown-menu');
+                dropdowns.forEach(dropdown => {
+                    if (dropdown.style.display === 'flex') {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        function showDatePickers(show) {
+            const datePickers = document.getElementById('date-pickers');
+            if (datePickers) {
+                datePickers.style.display = show ? 'flex' : 'none';
+            }
+        }
+        
+        function showCustomAlert(message) {
+            const customAlert = document.getElementById('custom-alert');
+            if (customAlert) {
+                const alertText = customAlert.querySelector('.alert-text');
+                alertText.textContent = message;
+                customAlert.style.display = 'flex';
+            }
+        }
+
+        function closeCustomAlert() {
+            const customAlert = document.getElementById('custom-alert');
+            if (customAlert) {
+                customAlert.style.display = 'none';
+            }
+        }
+        
+        // Dados simulados para os gráficos e lista
+        const receitasData = [1200, 1900, 3000, 5000, 2300, 3100, 4500];
+        const despesasData = [800, 1200, 2000, 3500, 1800, 2500, 3200];
+        const labelsMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'];
+        
+        const despesasPorCategoria = {
+            labels: ['Alimentação', 'Moradia', 'Transporte', 'Lazer', 'Outros'],
+            data: [300, 150, 100, 80, 50],
+            backgroundColor: ['#e74c3c', '#3498db', '#f1c40f', '#9b59b6', '#bdc3c7']
+        };
+        
+        const maioresGastos = [
+            { categoria: 'Moradia', valor: 1200, icon: 'fas fa-home' },
+            { categoria: 'Alimentação', valor: 750, icon: 'fas fa-hamburger' },
+            { categoria: 'Transporte', valor: 210, icon: 'fas fa-car' },
+            { categoria: 'Lazer', valor: 150, icon: 'fas fa-futbol' },
+        ];
+
+
+        async function getGeminiInsights() {
+            const insightsButton = document.getElementById('insights-button');
+            const insightsResult = document.getElementById('insights-result');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            insightsButton.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            insightsResult.textContent = '';
+            
+            const prompt = `Analise os dados de despesas por categoria e maiores gastos do mês. Crie um resumo financeiro e forneça 3 sugestões práticas para economizar dinheiro neste mês.
+            Dados:
+            Despesas por Categoria: ${JSON.stringify(despesasPorCategoria)}
+            Maiores Gastos: ${JSON.stringify(maioresGastos)}`;
+
+            let retries = 0;
+            const maxRetries = 5;
+            const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
+            while (retries < maxRetries) {
+                try {
+                    const payload = {
+                        contents: [{
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }],
+                    };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        insightsResult.textContent = text;
+                        break;
+                    } else {
+                        throw new Error("Unexpected API response format");
+                    }
+                } catch (error) {
+                    console.error("Erro ao chamar a API do Gemini:", error);
+                    retries++;
+                    await delay(Math.pow(2, retries) * 1000);
+                }
+            }
+
+            loadingSpinner.style.display = 'none';
+            insightsButton.style.display = 'block';
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const trialStatus = document.getElementById('trial-status');
+            if (trialStatus && userStatus.isTrial) {
+                const today = new Date();
+                const trialEnd = new Date(userStatus.trialEnds + 'T00:00:00');
+                const diffTime = trialEnd.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let message;
+                if (diffDays <= 0) {
+                    message = `
+                        <span>Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></span>
+                    `;
+                } else {
+                    message = `
+                        <span><strong>Plano manual</strong> - ${diffDays} dias restantes</span>
+                        <a href="planos.html">Ver planos</a>
+                    `;
+                }
+                trialStatus.innerHTML = message;
+            }
+
+            const ctxLineElement = document.getElementById('lineChart');
+            if (ctxLineElement) {
+                const ctxLine = ctxLineElement.getContext('2d');
+                const lineChart = new Chart(ctxLine, {
+                    type: 'line',
+                    data: {
+                        labels: labelsMeses,
+                        datasets: [{
+                            label: 'Receitas',
+                            data: receitasData,
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Despesas',
+                            data: despesasData,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const ctxPieElement = document.getElementById('pieChart');
+            if (ctxPieElement) {
+                const ctxPie = ctxPieElement.getContext('2d');
+                const pieChart = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                        labels: despesasPorCategoria.labels,
+                        datasets: [{
+                            data: despesasPorCategoria.data,
+                            backgroundColor: despesasPorCategoria.backgroundColor,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                    }
+                });
+            }
+
+            const maioresGastosList = document.getElementById('maiores-gastos-list');
+            const maioresGastosPlaceholder = document.querySelector('#maiores-gastos-card .placeholder');
+            
+            if (maioresGastosList) {
+                if (maioresGastos.length > 0) {
+                    if (maioresGastosPlaceholder) {
+                        maioresGastosPlaceholder.style.display = 'none';
+                    }
+                    maioresGastos.forEach(gasto => {
+                        const item = document.createElement('li');
+                        item.className = 'gasto-item';
+                        item.innerHTML = `
+                            <div class="gasto-info">
+                                <i class="${gasto.icon}"></i>
+                                <span>${gasto.categoria}</span>
+                            </div>
+                            <div class="gasto-value">R$ ${gasto.valor.toFixed(2).replace('.', ',')}</div>
+                        `;
+                        maioresGastosList.appendChild(item);
+                    });
+                } else {
+                    if (maioresGastosPlaceholder) {
+                        maioresGastosPlaceholder.style.display = 'block';
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="controle-de-gastos.html"><span class="icon limao">💰</span> Controle de Gastos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="trial-status" id="trial-status">
+            </div>
+
+        <header>
+            <div class="header-left">
+                <h1 style="color: #fff;">Relatórios</h1>
+            </div>
+            <button class="export-btn" onclick="showCustomAlert('Funcionalidade de exportação em desenvolvimento!')">
+                <i class="fas fa-download"></i>
+                Exportar Relatório
+            </button>
+        </header>
+
+        <div class="top-nav">
+            <a href="controle-de-gastos.html">visão geral</a>
+            <a href="lancamentos.html">lançamentos</a>
+            <a href="controle-relatorios.html" class="active">relatórios</a>
+            <a href="limites-gastos.html">limite de gastos</a>
+            <a href="conexao-bancaria.html">conexão bancária</a>
+        </div>
+
+        <section class="reports-main-content">
+            <div class="reports-filters-bar">
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-periodo')">
+                        <span>Período</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-periodo">
+                        <li><a href="#" class="active" onclick="showDatePickers(false)">Mês atual</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Últimos 7 dias</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Últimos 30 dias</a></li>
+                        <hr>
+                        <li><a href="#" onclick="showDatePickers(false)">Janeiro 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Fevereiro 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Março 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Abril 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Maio 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Junho 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Julho 2025</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Agosto 2025</a></li>
+                        <hr>
+                        <li><a href="#" onclick="showDatePickers(false)">Ano atual</a></li>
+                        <li><a href="#" onclick="showDatePickers(false)">Ano anterior</a></li>
+                        <hr>
+                        <li><a href="#" onclick="showDatePickers(true)">Período customizado</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-contas')">
+                        <span>Contas & Cartões</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-contas">
+                        <li><a href="#" class="active">Todas as contas e cartões</a></li>
+                        <hr>
+                        <h4>Contas</h4>
+                        <li><a href="#">Conta Corrente</a></li>
+                        <li><a href="#">Poupança</a></li>
+                        <li><a href="#">Carteira</a></li>
+                        <hr>
+                        <h4>Cartões de Crédito</h4>
+                        <li><a href="#">Cartão Nubank</a></li>
+                        <li><a href="#">Cartão Banco do Brasil</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-categorias')">
+                        <span>Categorias</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-categorias">
+                        <li><a href="#" class="active">Todas as categorias</a></li>
+                        <hr>
+                        <h4>Categorias de despesa</h4>
+                        <li><a href="#">Alimentação</a></li>
+                        <li><a href="#">Assinaturas e serviços</a></li>
+                        <li><a href="#">Bares e restaurantes</a></li>
+                        <li><a href="#">Casa</a></li>
+                        <li><a href="#">Compras</a></li>
+                        <li><a href="#">Cuidados pessoais</a></li>
+                        <li><a href="#">Dívidas e empréstimos</a></li>
+                        <li><a href="#">Educação</a></li>
+                        <li><a href="#">Família e filhos</a></li>
+                        <li><a href="#">Impostos e Taxas</a></li>
+                        <li><a href="#">Investimentos</a></li>
+                        <li><a href="#">Lazer e hobbies</a></li>
+                        <li><a href="#">Mercado</a></li>
+                        <li><a href="#">Outros</a></li>
+                        <li><a href="#">Pets</a></li>
+                        <li><a href="#">Presentes e doações</a></li>
+                        <li><a href="#">Roupas</a></li>
+                        <li><a href="#">Saúde</a></li>
+                        <li><a href="#">Trabalho</a></li>
+                        <li><a href="#">Transporte</a></li>
+                        <li><a href="#">Viagem</a></li>
+                        <hr>
+                        <h4>Categorias de receita</h4>
+                        <li><a href="#">Empréstimos</a></li>
+                        <li><a href="#">Investimentos</a></li>
+                        <li><a href="#">Outras receitas</a></li>
+                        <li><a href="#">Salário</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="date-pickers" class="reports-filters-bar date-pickers">
+                <div class="filter-group">
+                    <label for="start-date">Data de Início</label>
+                    <input type="date" id="start-date" value="2025-08-01">
+                </div>
+                <div class="filter-group">
+                    <label for="end-date">Data de Fim</label>
+                    <input type="date" id="end-date" value="2025-08-31">
+                </div>
+            </div>
+
+            <div class="reports-content">
+                <div class="report-card" id="receita-meta-card">
+                    <h3><i class="fas fa-chart-line"></i> Meta de Receita Mensal</h3>
+                    <p>Receita Projetada: <span id="meta-receita" style="font-weight: bold; color: #04b45f;"></span></p>
+                    <p>Receita Recebida: <span id="receita-recebida" style="font-weight: bold; color: #2ecc71;"></span></p>
+                    <div class="progress-bar-container">
+                        <div id="receita-progresso" class="progress-fill"></div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic;" id="alerta-progresso"></p>
+                </div>
+                
+                <div class="report-card">
+                    <h3><i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i> Análise de Inadimplência</h3>
+                    <ul class="inadimplencia-list" id="inadimplencia-list">
+                        <!-- Conteúdo dinâmico -->
+                    </ul>
+                </div>
+                
+                <div class="report-card" id="maiores-gastos-card">
+                    <h3>Maiores Despesas</h3>
+                    <ul class="gastos-list" id="maiores-gastos-list">
+                        <!-- Itens de maiores gastos serão injetados aqui -->
+                    </ul>
+                    <div class="placeholder">
+                        <p>Aqui aparecerá uma lista com os seus maiores gastos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card com a funcionalidade do Gemini -->
+            <div class="insights-card">
+                <h3>Insights Financeiros (Beta)</h3>
+                <p>Clique abaixo para obter uma análise detalhada dos seus gastos e dicas personalizadas para economizar. Esta funcionalidade é alimentada por IA.</p>
+                <button id="insights-button" onclick="getGeminiInsights()">Gerar Insights</button>
+                <div id="loading-spinner" class="loading-spinner"></div>
+                <div id="insights-result" class="insights-result"></div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Modal para alertas customizados -->
+    <div id="custom-alert" style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #2b2b2b;
+        border: 1px solid #04b45f;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 2000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        text-align: center;
+        max-width: 300px;
+    ">
+        <p class="alert-text"></p>
+        <button onclick="closeCustomAlert()" style="
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        ">OK</button>
+    </div>
+</body>
+</html>

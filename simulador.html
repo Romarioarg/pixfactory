@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-y: auto;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul             { color: #3498db; }
+        .verde            { color: #2ecc71; }
+        .amarelo          { color: #f1c40f; }
+        .vermelho         { color: #e74c3c; }
+        .roxo             { color: #9b59b6; }
+        .azul-claro       { color: #5dade2; }
+        .vermelho-claro   { color: #f1948a; }
+        .cinza            { color: #bdc3c7; }
+        .limao            { color: #a3e635; }
+        .roxo-claro       { color: #c084fc; }
+        .laranja          { color: #e67e22; }
+        .azul-escuro      { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out;
+        }
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+        
+        /* Seção principal do simulador */
+        .simulator-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .simulator-form-card, .simulator-result-card {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        /* Tabs para diferentes tipos de simulação */
+        .simulator-tabs {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #04b45f;
+        }
+        .simulator-tabs button {
+            background-color: transparent;
+            color: #ccc;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s, border-bottom 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .simulator-tabs button.active {
+            color: #04b45f;
+            border-bottom-color: #04b45f;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+
+        .simulator-form-card h2, .simulator-result-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .simulator-form-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group select {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #03a252;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .form-buttons button {
+            flex: 1;
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .form-buttons button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        .form-buttons .clear-btn {
+            background-color: #555;
+            color: #fff;
+        }
+        .form-buttons .clear-btn:hover {
+            background-color: #777;
+        }
+
+        /* Área de Resultados */
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #ccc;
+        }
+        .result-item span {
+            font-weight: bold;
+            font-size: 16px;
+            color: #04b45f;
+        }
+        .result-item .total {
+            font-size: 20px;
+        }
+        .result-item .juros {
+            color: #e74c3c;
+        }
+        .whatsapp-button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .whatsapp-button-container button {
+            background-color: #25D366;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .whatsapp-button-container button:hover {
+            background-color: #1EBE53;
+        }
+
+
+        /* Mensagens de feedback e janelas de sugestão */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        .modal-feedback {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-feedback-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .modal-feedback-content h3 {
+            color: #04b45f;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        .modal-feedback-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .modal-feedback-content .icon-feedback {
+            font-size: 60px;
+            color: #04b45f;
+            margin-bottom: 15px;
+        }
+        .modal-feedback-content button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-feedback-content button:hover {
+            background-color: #03a252;
+        }
+        .error-title { color: #e74c3c; }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .hamburger-menu { display: block; }
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .simulator-container { flex-direction: column; }
+            .form-buttons { flex-direction: column; }
+            .modal-feedback-content { max-width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html" class="active"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Simulador Financeiro</h1>
+            <span class="header-icon">📊</span>
+        </header>
+
+        <div class="simulator-container">
+            <div class="simulator-form-card">
+                <div class="simulator-tabs">
+                    <button id="tab-emprestimo" class="active" onclick="showTab('emprestimo')">Calcular Empréstimo</button>
+                    <button id="tab-juros" onclick="showTab('juros')">Calcular Apenas Juros</button>
+                </div>
+
+                <div id="tab-emprestimo-content" class="tab-content active">
+                    <form id="emprestimo-form">
+                        <div class="form-group">
+                            <label for="nome-cliente">Nome do Cliente:</label>
+                            <input type="text" id="nome-cliente" placeholder="Nome do cliente" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="telefone-cliente">Telefone do Cliente:</label>
+                            <input type="tel" id="telefone-cliente" placeholder="(99) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="valor-emprestimo">Valor do Empréstimo (R$):</label>
+                            <input type="number" id="valor-emprestimo" value="1000" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taxa-juros">Taxa de Juros Mensal (%):</label>
+                            <input type="number" id="taxa-juros" value="2.5" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="num-parcelas">Número de Parcelas:</label>
+                            <input type="number" id="num-parcelas" value="12" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="frequencia-pagamento">Frequência de Pagamento:</label>
+                            <select id="frequencia-pagamento">
+                                <option value="mensal">Mensal</option>
+                                <option value="diario">Diário</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="anual">Anual</option>
+                            </select>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="button" onclick="simularEmprestimo()">Calcular</button>
+                            <button type="button" class="clear-btn" onclick="limparEmprestimo()">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="tab-juros-content" class="tab-content">
+                    <form id="juros-form">
+                        <div class="form-group">
+                            <label for="juros-nome-cliente">Nome do Cliente:</label>
+                            <input type="text" id="juros-nome-cliente" placeholder="Nome do cliente" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="juros-telefone-cliente">Telefone do Cliente:</label>
+                            <input type="tel" id="juros-telefone-cliente" placeholder="(99) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="juros-saldo-devedor">Saldo Devedor (R$):</label>
+                            <input type="number" id="juros-saldo-devedor" value="1000" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="juros-taxa">Taxa de Juros Mensal (%):</label>
+                            <input type="number" id="juros-taxa" value="2.5" step="0.01" required>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="button" onclick="calcularJuros()">Calcular Juros</button>
+                            <button type="button" class="clear-btn" onclick="limparJuros()">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="simulator-result-card">
+                <h2><i class="fas fa-file-invoice-dollar"></i> Detalhes da Simulação</h2>
+                <div id="result-container">
+                    <div class="result-item">
+                        <h4>Nome do Cliente:</h4>
+                        <span id="nome-cliente-resultado">N/A</span>
+                    </div>
+                    <div class="result-item">
+                        <h4>Valor da Parcela:</h4>
+                        <span id="valor-parcela">R$ 0,00</span>
+                    </div>
+                    <div class="result-item">
+                        <h4>Total de Juros:</h4>
+                        <span id="total-juros" class="juros">R$ 0,00</span>
+                    </div>
+                    <div class="result-item">
+                        <h4>Valor Total a Pagar:</h4>
+                        <span id="total-pagar" class="total">R$ 0,00</span>
+                    </div>
+                    <div id="amortization-table-container" style="display:none; margin-top:20px;">
+                        <h3 style="text-align:center; color:#ccc;">Tabela de Amortização</h3>
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color:#2b2b2b; color:#04b45f; padding:8px; text-align:left;">Parcela</th>
+                                        <th style="background-color:#2b2b2b; color:#04b45f; padding:8px; text-align:left;">Amortização</th>
+                                        <th style="background-color:#2b2b2b; color:#04b45f; padding:8px; text-align:left;">Juros</th>
+                                        <th style="background-color:#2b2b2b; color:#04b45f; padding:8px; text-align:left;">Valor</th>
+                                        <th style="background-color:#2b2b2b; color:#04b45f; padding:8px; text-align:left;">Saldo Devedor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="amortization-table-body">
+                                    <!-- Dados serão injetados aqui -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="whatsapp-button-container" class="whatsapp-button-container" style="display:none;">
+                        <button onclick="enviarWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> Enviar via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Feedback -->
+    <div id="modal-feedback" class="modal-feedback">
+      <div class="modal-feedback-content">
+        <i id="feedback-icon" class="icon-feedback"></i>
+        <h3 id="feedback-title"></h3>
+        <p id="feedback-message"></p>
+        <button onclick="closeModalFeedback()">OK</button>
+      </div>
+    </div>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Variáveis globais para armazenar os resultados da simulação
+        let simulationData = {};
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showModalFeedback('✅ Sucesso!', 'Sugestão enviada com sucesso!', false);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showModalFeedback('⚠️ Atenção!', 'Por favor, digite sua sugestão antes de enviar.', true);
+            }
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.simulator-tabs button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            document.getElementById(`tab-${tabName}-content`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Limpa o formulário e o resultado ao trocar de aba
+            document.getElementById('emprestimo-form').reset();
+            document.getElementById('juros-form').reset();
+            limparResultados();
+        }
+
+        function simularEmprestimo() {
+            const nomeCliente = document.getElementById('nome-cliente').value;
+            const telefoneCliente = document.getElementById('telefone-cliente').value;
+            const valorEmprestimo = parseFloat(document.getElementById('valor-emprestimo').value);
+            const taxaJuros = parseFloat(document.getElementById('taxa-juros').value) / 100;
+            const numParcelas = parseInt(document.getElementById('num-parcelas').value);
+            const frequencia = document.getElementById('frequencia-pagamento').value;
+
+            if (isNaN(valorEmprestimo) || isNaN(taxaJuros) || isNaN(numParcelas) || valorEmprestimo <= 0 || taxaJuros <= 0 || numParcelas <= 0 || !nomeCliente) {
+                showModalFeedback('⚠️ Erro!', 'Por favor, preencha todos os campos com valores válidos.', true);
+                return;
+            }
+
+            // Converter taxa de juros e número de parcelas com base na frequência
+            let taxaPeriodo = taxaJuros;
+            let numPeriodos = numParcelas;
+            
+            switch(frequencia) {
+                case 'diario':
+                    numPeriodos = numParcelas * 30;
+                    taxaPeriodo = taxaJuros / 30;
+                    break;
+                case 'semanal':
+                    numPeriodos = numParcelas * 4;
+                    taxaPeriodo = taxaJuros / 4;
+                    break;
+                case 'anual':
+                    numPeriodos = Math.ceil(numParcelas / 12);
+                    taxaPeriodo = (Math.pow(1 + taxaJuros, 12) - 1);
+                    break;
+                default: // mensal
+                    break;
+            }
+
+            const i = taxaPeriodo;
+            const n = numPeriodos;
+            const P = valorEmprestimo;
+            const parcela = P * (i / (1 - Math.pow(1 + i, -n)));
+            const totalPagar = parcela * n;
+            const totalJuros = totalPagar - valorEmprestimo;
+            
+            document.getElementById('nome-cliente-resultado').textContent = nomeCliente;
+            document.getElementById('valor-parcela').textContent = `R$ ${parcela.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-juros').textContent = `R$ ${totalJuros.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-pagar').textContent = `R$ ${totalPagar.toFixed(2).replace('.', ',')}`;
+            
+            // Armazena os dados para envio via WhatsApp
+            simulationData = { nomeCliente, telefoneCliente, valorEmprestimo, taxaJuros, numParcelas, frequencia, parcela, totalPagar, totalJuros };
+
+            gerarTabelaAmortizacao(P, taxaPeriodo, numPeriodos);
+            document.getElementById('whatsapp-button-container').style.display = 'block';
+            showModalFeedback('✅ Simulação Concluída!', 'A simulação foi calculada com sucesso.');
+        }
+
+        function calcularJuros() {
+            const nomeCliente = document.getElementById('juros-nome-cliente').value;
+            const telefoneCliente = document.getElementById('juros-telefone-cliente').value;
+            const saldoDevedor = parseFloat(document.getElementById('juros-saldo-devedor').value);
+            const taxaJuros = parseFloat(document.getElementById('juros-taxa').value) / 100;
+
+            if (isNaN(saldoDevedor) || isNaN(taxaJuros) || saldoDevedor <= 0 || taxaJuros <= 0 || !nomeCliente) {
+                showModalFeedback('⚠️ Erro!', 'Por favor, preencha todos os campos com valores válidos.', true);
+                return;
+            }
+
+            const jurosMensal = saldoDevedor * taxaJuros;
+            
+            document.getElementById('nome-cliente-resultado').textContent = nomeCliente;
+            document.getElementById('valor-parcela').textContent = `R$ ${jurosMensal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-juros').textContent = `R$ ${jurosMensal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-pagar').textContent = `R$ ${jurosMensal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('amortization-table-container').style.display = 'none';
+            document.getElementById('whatsapp-button-container').style.display = 'block';
+
+            simulationData = { nomeCliente, telefoneCliente, saldoDevedor, jurosMensal };
+
+            showModalFeedback('✅ Cálculo de Juros Concluído!', 'O cálculo foi feito com sucesso. Saldo principal não alterado.');
+        }
+
+        function gerarTabelaAmortizacao(valorEmprestimo, taxaJuros, numParcelas) {
+            const tabelaBody = document.getElementById('amortization-table-body');
+            tabelaBody.innerHTML = '';
+            document.getElementById('amortization-table-container').style.display = 'block';
+
+            let saldoDevedor = valorEmprestimo;
+            const i = taxaJuros;
+            const n = numParcelas;
+            const parcela = valorEmprestimo * (i / (1 - Math.pow(1 + i, -n)));
+
+            for (let j = 1; j <= n; j++) {
+                const jurosDoPeriodo = saldoDevedor * i;
+                const amortizacao = parcela - jurosDoPeriodo;
+                saldoDevedor -= amortizacao;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${j}</td>
+                    <td>R$ ${amortizacao.toFixed(2).replace('.', ',')}</td>
+                    <td>R$ ${jurosDoPeriodo.toFixed(2).replace('.', ',')}</td>
+                    <td>R$ ${parcela.toFixed(2).replace('.', ',')}</td>
+                    <td>R$ ${saldoDevedor.toFixed(2).replace('.', ',')}</td>
+                `;
+                tabelaBody.appendChild(row);
+            }
+        }
+        
+        function limparEmprestimo() {
+            document.getElementById('emprestimo-form').reset();
+            limparResultados();
+        }
+        
+        function limparJuros() {
+            document.getElementById('juros-form').reset();
+            limparResultados();
+        }
+        
+        function limparResultados() {
+            document.getElementById('nome-cliente-resultado').textContent = 'N/A';
+            document.getElementById('valor-parcela').textContent = `R$ 0,00`;
+            document.getElementById('total-juros').textContent = `R$ 0,00`;
+            document.getElementById('total-pagar').textContent = `R$ 0,00`;
+            document.getElementById('amortization-table-container').style.display = 'none';
+            document.getElementById('whatsapp-button-container').style.display = 'none';
+        }
+        
+        function enviarWhatsApp() {
+            if (!simulationData.telefoneCliente) {
+                showModalFeedback('⚠️ Erro!', 'Por favor, insira o número de telefone do cliente para enviar a simulação.', true);
+                return;
+            }
+            
+            let mensagem = '';
+            const telefoneLimpo = simulationData.telefoneCliente.replace(/\D/g, "");
+
+            // Prepara a mensagem baseada no tipo de simulação
+            if (simulationData.valorEmprestimo) {
+                // Simulação de Empréstimo
+                mensagem = `Olá ${simulationData.nomeCliente}, tudo bem? Aqui é do PixFactory. \n\nSua simulação de empréstimo está pronta:\n\n- Valor do Empréstimo: R$ ${simulationData.valorEmprestimo.toFixed(2).replace('.', ',')}\n- Parcelas: ${simulationData.numParcelas}x de R$ ${simulationData.parcela.toFixed(2).replace('.', ',')}\n- Juros Totais: R$ ${simulationData.totalJuros.toFixed(2).replace('.', ',')}\n- Total a Pagar: R$ ${simulationData.totalPagar.toFixed(2).replace('.', ',')}\n\nFico no aguardo do seu retorno!`;
+            } else {
+                 // Simulação de Apenas Juros
+                mensagem = `Olá ${simulationData.nomeCliente}, tudo bem? Aqui é do PixFactory. \n\nSua simulação de juros está pronta:\n\n- Saldo Devedor: R$ ${simulationData.saldoDevedor.toFixed(2).replace('.', ',')}\n- Juros Mensal: R$ ${simulationData.jurosMensal.toFixed(2).replace('.', ',')}\n\nFico no aguardo do seu retorno!`;
+            }
+
+            const url = `https://wa.me/55${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+            showModalFeedback('✅ Enviado!', 'A simulação foi enviada com sucesso para o cliente no WhatsApp.');
+        }
+
+
+        // Funções do Modal de Feedback
+        function showModalFeedback(title, message, isError = false) {
+            const modal = document.getElementById('modal-feedback');
+            const icon = document.getElementById('feedback-icon');
+            const titleElement = document.getElementById('feedback-title');
+            const messageElement = document.getElementById('feedback-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            if (isError) {
+                icon.className = 'fas fa-times-circle icon-feedback vermelho';
+                titleElement.className = 'error-title';
+            } else {
+                icon.className = 'fas fa-check-circle icon-feedback verde';
+                titleElement.className = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModalFeedback() {
+            document.getElementById('modal-feedback').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

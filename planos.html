@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Estilos do menu lateral (base padrão) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+        }
+
+        /* Estilos para os ícones no menu lateral */
+        .sidebar nav ul li a .icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        /* Cores dos ícones, se desejar customizar por link */
+        .sidebar nav ul li a .icon.azul { color: #3498db; }
+        .sidebar nav ul li a .icon.verde { color: #2ecc71; }
+        .sidebar nav ul li a .icon.amarelo { color: #f1c40f; }
+        .sidebar nav ul li a .icon.vermelho { color: #e74c3c; }
+        .sidebar nav ul li a .icon.roxo { color: #9b59b6; }
+        .sidebar nav ul li a .icon.azul-claro { color: #5dade2; }
+        .sidebar nav ul li a .icon.vermelho-claro { color: #f1948a; }
+        .sidebar nav ul li a .icon.cinza { color: #bdc3c7; }
+        .sidebar nav ul li a .icon.limao { color: #a3e635; }
+        .sidebar nav ul li a .icon.azul-escuro { color: #2c3e50; }
+        .sidebar nav ul li a .icon.laranja { color: #e67e22; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding-top: 20px;
+            margin-top: auto;
+        }
+
+        /* Conteúdo principal da página */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        .main-content header p {
+            color: #ccc;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .planos-section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .planos-section-header h2 {
+            font-size: 24px;
+            color: #f1c40f;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .planos-section-header p {
+            color: #ccc;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* Estilos específicos da página de Planos */
+        .planos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .plano-card {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .plano-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(4, 180, 95, 0.4);
+        }
+        
+        .plano-card.current-plan {
+            border-color: #f1c40f;
+            box-shadow: 0 8px 30px rgba(241, 196, 15, 0.4);
+        }
+
+        .plano-card h2 {
+            color: #04b45f;
+            font-size: 26px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .plano-card .preco {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .plano-card .preco span {
+            font-size: 20px;
+            vertical-align: super;
+        }
+
+        .plano-card .periodo {
+            color: #ccc;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+        .plano-card .periodo .destaque {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .plano-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .plano-card ul li {
+            font-size: 16px;
+            color: #ccc;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .plano-card ul li.disabled {
+            color: #666;
+            text-decoration: line-through;
+        }
+        .plano-card ul li .check-icon {
+            font-size: 18px;
+        }
+        .plano-card ul li .check-icon.checked {
+            color: #2ecc71;
+        }
+        .plano-card ul li .check-icon.unchecked {
+            color: #e74c3c;
+        }
+        .plano-card ul li.disabled .check-icon {
+            color: #666;
+        }
+
+        .plano-card button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            margin-top: auto;
+        }
+        .plano-card button.disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .plano-card button:hover:not(.disabled) {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+
+        .badge-current {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        /* Estilo para a nova seção de consultoria Premium */
+        .premium-consultoria-section {
+            background-color: #1a1a1a;
+            padding: 25px;
+            border: 1px solid #9b59b6;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+        .premium-consultoria-section h3 {
+            color: #9b59b6;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+        }
+        .premium-consultoria-section p {
+            font-size: 15px;
+            color: #ccc;
+            margin: 0 0 20px 0;
+        }
+        .premium-consultoria-section button {
+            background-color: #9b59b6;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .premium-consultoria-section button:hover {
+            background-color: #8e44ad;
+        }
+
+
+        /* === Janela de Sugestão (do dashboard) - Adicionada para consistência === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* === Menu Hamburguer e Adaptações para Celular === */
+        .hamburger-menu {
+            display: none;
+            font-size: 28px;
+            color: #04b45f;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background-color: #1e1e1e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Media Queries para Telas Menores */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+                left: -260px;
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            .main-content header h1 {
+                margin-bottom: 5px;
+            }
+
+            .planos-container {
+                grid-template-columns: 1fr;
+            }
+
+            .plano-card {
+                padding: 20px;
+            }
+
+            .plano-card h2 {
+                font-size: 22px;
+            }
+
+            .plano-card .preco {
+                font-size: 40px;
+            }
+
+            .plano-card .periodo {
+                font-size: 16px;
+            }
+
+            .plano-card ul li {
+                font-size: 14px;
+            }
+
+            .plano-card button {
+                font-size: 16px;
+                padding: 12px 20px;
+            }
+
+            .janela-sugestao {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="planos.html" class="active"><span class="icon laranja">⭐</span> Planos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>⭐ Nossos Planos</h1>
+            <span class="header-icon">🚀</span>
+            <p>Escolha o plano ideal para as suas necessidades e impulsione seu negócio!</p>
+        </header>
+
+        <div class="planos-section-header">
+            <h2><i class="fas fa-calendar-alt"></i> Pagamento Mensal</h2>
+            <p>Flexibilidade para você pagar mês a mês. Cancele a qualquer momento.</p>
+        </div>
+        <section class="planos-container">
+            <div class="plano-card" data-plan="gratuito" data-fidelidade="mensal">
+                <h2>Gratuito</h2>
+                <div class="badge-current" style="display: none;">Seu Plano Atual</div>
+                <div class="preco"><span>R$</span> 0<span>/mês</span></div>
+                <div class="periodo">Comece agora, grátis para sempre!</div>
+                <ul id="lista-gratuito-mensal"></ul>
+                <button class="disabled">Plano Atual</button>
+            </div>
+
+            <div class="plano-card" data-plan="pro" data-fidelidade="mensal">
+                <h2>Pro</h2>
+                <div class="badge-current" style="display: none;">Seu Plano Atual</div>
+                <div class="preco"><span>R$</span> 49<span>/mês</span></div>
+                <div class="periodo">Sem fidelidade</div>
+                <ul id="lista-pro-mensal"></ul>
+                <button onclick="mudarDePlano('pro', 'mensal')">Assinar Pro</button>
+            </div>
+
+            <div class="plano-card" data-plan="premium" data-fidelidade="mensal">
+                <h2>Premium</h2>
+                <div class="badge-current" style="display: none;">Seu Plano Atual</div>
+                <div class="preco"><span>R$</span> 99<span>/mês</span></div>
+                <div class="periodo">Sem fidelidade</div>
+                <ul id="lista-premium-mensal"></ul>
+                <button onclick="mudarDePlano('premium', 'mensal')">Assinar Premium</button>
+            </div>
+        </section>
+
+        <div class="planos-section-header" style="margin-top: 50px;">
+            <h2><i class="fas fa-star"></i> Pagamento Anual</h2>
+            <p>Economize <span class="destaque">até 20%</span> pagando o ano inteiro de uma só vez!</p>
+        </div>
+        <section class="planos-container">
+            <div class="plano-card" data-plan="pro" data-fidelidade="anual">
+                <h2>Pro Anual</h2>
+                <div class="badge-current" style="display: none;">Seu Plano Atual</div>
+                <div class="preco"><span>R$</span> 470<span>/ano</span></div>
+                <div class="periodo">Economia de <span class="destaque">R$ 118</span></div>
+                <ul id="lista-pro-anual"></ul>
+                <button onclick="mudarDePlano('pro', 'anual')">Assinar Pro Anual</button>
+            </div>
+            
+            <div class="plano-card" data-plan="premium" data-fidelidade="anual">
+                <h2>Premium Anual</h2>
+                <div class="badge-current" style="display: none;">Seu Plano Atual</div>
+                <div class="preco"><span>R$</span> 950<span>/ano</span></div>
+                <div class="periodo">Economia de <span class="destaque">R$ 238</span></div>
+                <ul id="lista-premium-anual"></ul>
+                <button onclick="mudarDePlano('premium', 'anual')">Assinar Premium Anual</button>
+            </div>
+        </section>
+
+        <section class="premium-consultoria-section" id="premium-consultoria" style="display: none;">
+            <h3>Sua Consultoria Especializada te espera!</h3>
+            <p>Como membro Premium, você tem acesso a consultores especializados para impulsionar seu negócio. Agende seu horário!</p>
+            <button onclick="agendarConsultoria()">Agendar Consultoria</button>
+        </section>
+
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Variável que simula o plano atual do usuário.
+        const userPlan = 'gratuito'; 
+        const userFidelidade = 'mensal';
+
+        // Estrutura de funcionalidades de cada plano
+        const funcionalidades = {
+            gratuito: {
+                clientes: true,
+                contratos: true,
+                relatorios: true,
+                suporte: false,
+                simulador: false,
+                exportacao: false,
+                consultoria: false,
+                integracaoApi: false,
+                metricas: false,
+                suporte247: false,
+                novasFunc: false,
+            },
+            pro: {
+                clientes: true,
+                contratos: true,
+                relatorios: true,
+                suporte: true,
+                simulador: true,
+                exportacao: true,
+                consultoria: false,
+                integracaoApi: false,
+                metricas: false,
+                suporte247: false,
+                novasFunc: false,
+            },
+            premium: {
+                clientes: true,
+                contratos: true,
+                relatorios: true,
+                suporte: true,
+                simulador: true,
+                exportacao: true,
+                consultoria: true,
+                integracaoApi: true,
+                metricas: true,
+                suporte247: true,
+                novasFunc: true,
+            }
+        };
+
+        const descricoes = {
+            clientes: "Gestão de clientes",
+            contratos: "Contratos e pagamentos",
+            relatorios: "Relatórios financeiros",
+            suporte: "Suporte prioritário",
+            simulador: "Simulador de parcelas",
+            exportacao: "Exportação de dados",
+            consultoria: "Consultoria especializada",
+            integracaoApi: "Integração com APIs",
+            metricas: "Painel de métricas personalizável",
+            suporte247: "Suporte 24/7",
+            novasFunc: "Novas funcionalidades em primeira mão"
+        };
+        
+        // Função que renderiza a lista de funcionalidades com ícones
+        function renderFuncionalidades(plano, elementoId) {
+            const ul = document.getElementById(elementoId);
+            ul.innerHTML = '';
+            
+            const features = funcionalidades[plano];
+            const allFeatures = Object.keys(descricoes);
+            
+            allFeatures.forEach(featureKey => {
+                const li = document.createElement('li');
+                const isAvailable = features[featureKey];
+                
+                li.className = isAvailable ? '' : 'disabled';
+                
+                const iconClass = isAvailable ? 'fas fa-check-circle check-icon checked' : 'fas fa-times-circle check-icon unchecked';
+                
+                li.innerHTML = `<span class="${iconClass}"></span> ${descricoes[featureKey]}`;
+                ul.appendChild(li);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const planosContainer = document.querySelectorAll('.plano-card');
+            const premiumSection = document.getElementById('premium-consultoria');
+
+            // Renderiza as funcionalidades para cada plano
+            renderFuncionalidades('gratuito', 'lista-gratuito-mensal');
+            renderFuncionalidades('pro', 'lista-pro-mensal');
+            renderFuncionalidades('premium', 'lista-premium-mensal');
+            renderFuncionalidades('pro', 'lista-pro-anual');
+            renderFuncionalidades('premium', 'lista-premium-anual');
+
+            planosContainer.forEach(plano => {
+                const planoName = plano.getAttribute('data-plan');
+                const fidelidade = plano.getAttribute('data-fidelidade');
+                const button = plano.querySelector('button');
+                
+                if (planoName === userPlan && fidelidade === userFidelidade) {
+                    plano.classList.add('current-plan');
+                    plano.querySelector('.badge-current').style.display = 'block';
+                    button.classList.add('disabled');
+                    button.textContent = 'Plano Atual';
+                    button.onclick = null;
+                } else if (planoName !== 'gratuito' && planoName !== userPlan) {
+                    button.textContent = `Mudar para ${plano.querySelector('h2').textContent}`;
+                } else if (planoName === userPlan && fidelidade !== userFidelidade) {
+                    button.textContent = `Mudar para ${plano.querySelector('h2').textContent}`;
+                }
+            });
+
+            if (userPlan === 'premium') {
+                premiumSection.style.display = 'block';
+            }
+        });
+
+        function mudarDePlano(plano, fidelidade) {
+            if (plano === userPlan && fidelidade === userFidelidade) {
+                alert('Este já é o seu plano atual!');
+                return;
+            }
+
+            const confirmacao = confirm(`Você deseja realmente mudar para o plano ${plano.toUpperCase()} (${fidelidade})?`);
+            if (confirmacao) {
+                alert(`✅ Solicitação de upgrade para o plano ${plano.toUpperCase()} (${fidelidade}) enviada com sucesso! Você será redirecionado para a página de pagamento.`);
+            }
+        }
+        
+        function agendarConsultoria() {
+            alert('✅ Agendamento de consultoria solicitada! Entraremos em contato em breve.');
+        }
+
+
+        // --- Funções de Ajuda (manter consistência com as outras páginas) ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        document.querySelectorAll('.sidebar nav ul li a').forEach(item => {
+            item.addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

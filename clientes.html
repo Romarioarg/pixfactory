@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* -- MANTIVE SEU CSS ORIGINALMENTE IGUAL, APENAS ADICIONANDO AS FUNÇÕES -- */
+        body {margin:0;font-family:'Segoe UI',sans-serif;background-color:#121212;color:#fff;display:flex;overflow-x:hidden;}
+        .menu-toggle{display:none;position:fixed;top:15px;left:15px;background-color:#04b45f;color:#fff;border:none;padding:10px 15px;font-size:24px;cursor:pointer;border-radius:8px;z-index:1100;box-shadow:0 2px 5px rgba(0,0,0,0.3);transition:transform 0.3s ease-in-out;}
+        .sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background-color:#1e1e1e;padding:20px;box-shadow:2px 0 10px rgba(0,0,0,0.2);overflow-y:auto;box-sizing:border-box;display:flex;flex-direction:column;z-index:1000;transform:translateX(0);transition:transform 0.3s ease-in-out;}
+        .sidebar.active{transform:translateX(0);}
+        .sidebar.hidden{transform:translateX(-100%);}
+        .sidebar .logo{font-size:22px;font-weight:bold;color:#04b45f;margin-bottom:30px;text-align:left;padding:0;}
+        .sidebar nav{flex-grow:1;}
+        .sidebar nav ul{list-style:none;padding:0;margin:0;}
+        .sidebar nav ul li{margin-bottom:15px;}
+        .sidebar nav ul li a{text-decoration:none;color:#ccc;display:flex;align-items:center;gap:10px;transition:color 0.3s;padding:0;border-left:none;}
+        .sidebar nav ul li a:hover,.sidebar nav ul li a.active{color:#04b45f;background-color:transparent;border-left-color:transparent;}
+        .sidebar .icon{font-size:1em;}
+        .sidebar .fa-solid,.sidebar .fa-brands{font-size:18px;width:20px;text-align:center;}
+        .azul{color:#3498db;}.verde{color:#2ecc71;}.amarelo{color:#f1c40f;}.vermelho{color:#e74c3c;}
+        .roxo{color:#9b59b6;}.azul-claro{color:#5dade2;}.vermelho-claro{color:#f1948a;}.cinza{color:#bdc3c7;}
+        .limao{color:#a3e635;}.roxo-claro{color:#c084fc;}.laranja{color:#e67e22;}.azul-escuro{color:#2c3e50;}
+        .sidebar footer{text-align:center;font-size:12px;color:#888;padding:0;border-top:none;margin-top:auto;}
+        .main-content{margin-left:280px;flex:1;padding:40px;max-width:calc(100% - 320px);margin-right:40px;box-sizing:border-box;display:flex;flex-direction:column;gap:0;}
+        .main-content header{margin-bottom:30px;border-bottom:1px solid rgba(4,180,95,0.3);padding-bottom:15px;display:flex;align-items:center;gap:10px;}
+        .main-content header h1{color:#04b45f;font-size:28px;margin:0;}
+        .main-content header .header-icon{font-size:28px;color:#04b45f;}
+        .section-container{background-color:#1e1e1e;border:1px solid #04b45f;border-radius:10px;padding:25px;box-shadow:0 0 15px rgba(4,180,95,0.15);display:flex;flex-direction:column;gap:0;}
+        .search-section{margin-bottom:20px;}
+        .client-details-section{margin-bottom:20px;}
+        .timeline-section{margin-bottom:20px;}
+        .history-section{margin-bottom:0;}
+        .search-section{padding-top:15px;padding-bottom:15px;}
+        .search-section input{width:100%;padding:10px;background-color:#121212;border:1px solid #04b45f;border-radius:8px;color:#fff;font-size:14px;box-sizing:border-box;outline:none;transition:border-color 0.3s;}
+        .search-section input::placeholder{color:#888;}
+        .search-section input:focus{border-color:#03a252;}
+        .client-header{display:flex;align-items:center;gap:15px;margin-bottom:15px;padding-bottom:0;border-bottom:none;}
+        .client-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #04b45f;flex-shrink:0;}
+        .client-info-main{flex-grow:1;}
+        .client-info-main h2{margin:0 0 5px 0;color:#04b45f;font-size:22px;}
+        .client-info-main p{margin:4px 0;font-size:14px;color:#ccc;line-height:1.4;}
+        .client-info-main p strong{color:#04b45f;margin-right:5px;}
+        .client-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;justify-content:center;}
+        .client-actions button{background-color:#04b45f;color:#fff;border:none;padding:10px 15px;border-radius:8px;font-size:14px;cursor:pointer;transition:background-color 0.3s,transform 0.2s;flex-grow:1;min-width:120px;}
+        .client-actions button:hover{background-color:#03a252;transform:translateY(-2px);}
+        .client-actions .contract-btn{background-color:#04b45f;}
+        .client-actions .edit-btn{background-color:#f1c40f;color:#1e1e1e;}
+        .client-actions .remove-btn{background-color:#e74c3c;}
+        .timeline-section h2,.history-section h2{display:flex;align-items:center;gap:10px;color:#04b45f;font-size:20px;margin-bottom:10px;border-bottom:1px solid rgba(4,180,95,0.2);padding-bottom:5px;}
+        .timeline-item,.history-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:14px;color:#ccc;line-height:1.4;}
+        .timeline-item:last-child,.history-item:last-child{margin-bottom:0;}
+        .timeline-icon,.history-icon,.title-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+        .timeline-item .status-pago{color:#2ecc71;}
+        .timeline-item .status-atrasado{color:#e74c3c;}
+        .timeline-item .status-proxima{color:#f1c40f;}
+        .history-item .icon-cadastro{color:#3498db;}
+        .history-item .icon-contrato{color:#9b59b6;}
+        .history-item .icon-pagamento{color:#e67e22;}
+        .history-item .icon-classificacao{color:#e74c8c;}
+        .timeline-section .title-icon-timeline{color:#3498db;}
+        .history-section .title-icon-history{color:#9b59b6;}
+        .janela-sugestao{position:fixed;bottom:20px;right:20px;background-color:#1e1e1e;padding:20px;border:1px solid #04b45f;border-radius:10px;z-index:1000;flex-direction:column;gap:8px;display:none;}
+        .janela-sugestao textarea{width:100%;height:100px;background:#121212;border:1px solid #04b45f;color:#fff;border-radius:8px;padding:10px;margin-bottom:10px;box-sizing:border-box;resize:vertical;}
+        .janela-sugestao button{background-color:#04b45f;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;align-self:flex-end;transition:background-color 0.3s;}
+        .janela-sugestao button:hover{background-color:#03a252;}
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-close {
+            color: #ccc;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal-content .modal-header h2 {
+            color: #04b45f;
+            text-align: center;
+        }
+
+        .modal-content .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .modal-content .modal-body .section-container {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-content .modal-body .section-container h2 {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .menu-toggle { display: block; }
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+                max-width: 100%;
+                padding-top: 80px;
+            }
+            .main-content header {
+                flex-direction: column;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .main-content header h1 {
+                font-size: 24px;
+            }
+            .main-content header .header-icon {
+                font-size: 24px;
+            }
+            .section-container {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            .client-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            .client-photo {
+                width: 60px;
+                height: 60px;
+            }
+            .client-info-main h2 {
+                font-size: 20px;
+            }
+            .client-info-main p {
+                font-size: 13px;
+            }
+            .client-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .client-actions button {
+                padding: 12px;
+                font-size: 16px;
+                min-width: unset;
+            }
+            .timeline-section h2, .history-section h2 {
+                font-size: 18px;
+                justify-content: center;
+                text-align: center;
+            }
+            .timeline-item, .history-item {
+                font-size: 13px;
+                align-items: center;
+                text-align: left;
+            }
+            .sidebar footer { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html" class="active"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+    <main class="main-content">
+        <header>
+            <h1>Clientes</h1>
+            <span class="header-icon">👤</span>
+        </header>
+        <section class="section-container search-section">
+            <input type="text" id="clientSearch" placeholder="Buscar por nome, cidade, bairro, telefone ou e-mail..." />
+        </section>
+        <div id="clientes-lista-container"></div>
+    </main>
+
+    <!-- Modal para visualização e edição de cliente -->
+    <div id="cliente-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeClienteModal()">&times;</span>
+            <div id="modal-content-inner">
+                <!-- Conteúdo dinâmico será injetado aqui -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="janela-sugestao" class="janela-sugestao" style="display:none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Dados de clientes fictícios
+        const clientesListaGlobal = [
+            {
+                id: 1,
+                nome: "João da Silva",
+                foto: "https://randomuser.me/api/portraits/men/1.jpg",
+                cpf: "123.456.789-00",
+                endereco: "Rua das Flores, 123 - Centro, SP",
+                telefone: "11987654321",
+                email: "joao.silva@exemplo.com",
+                classificacao: "Em Atraso",
+                contratos: [
+                    {
+                        id: 101,
+                        tipo: 'Empréstimo',
+                        valorTotal: 1500.00,
+                        parcelasTotais: 6,
+                        parcelasPagas: 1,
+                        proximoPagamento: '10/08/2025',
+                        status: 'atrasado'
+                    }
+                ],
+                historico: [
+                    { tipo: 'cadastro', data: '01/05/2025' },
+                    { tipo: 'contrato', data: '01/05/2025', info: 'Empréstimo R$ 1.500,00' },
+                    { tipo: 'pagamento', data: '10/06/2025', info: 'Parcela paga R$ 250,00' },
+                    { tipo: 'pagamento', data: '10/07/2025', info: 'Parcela em atraso' }
+                ],
+                score: 6.5
+            },
+            {
+                id: 2,
+                nome: "Maria Oliveira",
+                foto: "https://randomuser.me/api/portraits/women/2.jpg",
+                cpf: "987.654.321-00",
+                endereco: "Av. Paulista, 1500 - Bela Vista, SP",
+                telefone: "11998877665",
+                email: "maria.oliveira@exemplo.com",
+                classificacao: "Em Dia",
+                contratos: [
+                    {
+                        id: 102,
+                        tipo: 'Financiamento',
+                        valorTotal: 5000.00,
+                        parcelasTotais: 12,
+                        parcelasPagas: 3,
+                        proximoPagamento: '05/08/2025',
+                        status: 'ativo'
+                    }
+                ],
+                historico: [
+                    { tipo: 'cadastro', data: '05/04/2025' },
+                    { tipo: 'contrato', data: '05/04/2025', info: 'Financiamento R$ 5.000,00' },
+                    { tipo: 'pagamento', data: '05/05/2025', info: 'Parcela paga R$ 416,67' }
+                ],
+                score: 9.2
+            }
+        ];
+
+        function exibirListaClientes(clientes) {
+            const container = document.getElementById("clientes-lista-container");
+            container.innerHTML = "";
+            clientes.forEach(cliente => {
+                const clienteHTML = `
+                    <section class="section-container client-details-section">
+                        <div class="client-header">
+                            <img src="${cliente.foto}" alt="Foto do Cliente" class="client-photo" />
+                            <div class="client-info-main">
+                                <h2>${cliente.nome}</h2>
+                                <p><strong>⭐ Perfil:</strong> ${cliente.classificacao || 'N/A'}</p>
+                                <p>Status: <strong class="${cliente.status === 'Em Atraso' ? 'vermelho' : 'verde'}">${cliente.status}</strong></p>
+                                <p>📍 ${cliente.endereco || 'N/A'}</p>
+                                <p>📞 ${cliente.telefone || 'N/A'} · 📧 ${cliente.email || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="client-actions">
+                            <button class="contract-btn" onclick="openClienteModal(${cliente.id})">📄 Ver Detalhes</button>
+                            <button class="whats-btn" onclick="enviarCobranca('${cliente.telefone}', '${cliente.nome}')">📩 Enviar Cobrança</button>
+                            <button class="edit-btn" onclick="editarCliente(${cliente.id})">✏️ Editar Cliente</button>
+                            <button class="remove-btn" onclick="removerCliente(${cliente.id}, '${cliente.nome}')">🗑️ Remover</button>
+                        </div>
+                    </section>
+                `;
+                container.innerHTML += clienteHTML;
+            });
+        }
+        
+        function filtrarClientesLista() {
+            const termo = document.getElementById("clientSearch").value.trim().toLowerCase();
+            const filtrados = clientesListaGlobal.filter(cliente =>
+                (cliente.nome && cliente.nome.toLowerCase().includes(termo)) ||
+                (cliente.endereco && cliente.endereco.toLowerCase().includes(termo)) ||
+                (cliente.telefone && cliente.telefone.toLowerCase().includes(termo)) ||
+                (cliente.email && cliente.email.toLowerCase().includes(termo)) ||
+                (cliente.classificacao && cliente.classificacao.toLowerCase().includes(termo))
+            );
+            exibirListaClientes(filtrados);
+        }
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        // --- Lógica do Modal de Clientes ---
+        function openClienteModal(clienteId) {
+            const cliente = clientesListaGlobal.find(c => c.id === clienteId);
+            if (!cliente) return;
+
+            const modalContent = document.getElementById('modal-content-inner');
+            
+            const historicoHTML = cliente.historico.map(item => {
+                const iconMap = {
+                    'cadastro': '🗓️',
+                    'contrato': '📄',
+                    'pagamento': '💰'
+                };
+                return `
+                    <div class="history-item">
+                        <span class="history-icon">${iconMap[item.tipo]}</span>
+                        <p><strong>${item.data}</strong> — ${item.info || item.tipo}</p>
+                    </div>
+                `;
+            }).join('');
+
+            const contratosHTML = cliente.contratos.map(contrato => {
+                const statusMap = {
+                    'ativo': '✅ Ativo',
+                    'atrasado': '⚠️ Atrasado',
+                    'pendente': '⏳ Pendente'
+                };
+                const statusClass = contrato.status === 'atrasado' ? 'status-atrasado' : (contrato.status === 'ativo' ? 'status-ativo' : 'status-pendente');
+                return `
+                    <li>
+                        <p><strong>${contrato.tipo} #${contrato.id}</strong></p>
+                        <p>Valor: R$ ${contrato.valorTotal.toFixed(2)}</p>
+                        <p>Parcelas: ${contrato.parcelasPagas}/${contrato.parcelasTotais} pagas</p>
+                        <p>Próximo Pagamento: ${contrato.proximoPagamento}</p>
+                        <span class="status-tag ${statusClass}">${statusMap[contrato.status]}</span>
+                    </li>
+                `;
+            }).join('');
+
+            modalContent.innerHTML = `
+                <div class="client-header">
+                    <img src="${cliente.foto}" alt="Foto do Cliente" class="client-photo" />
+                    <div class="client-info-main">
+                        <h2>${cliente.nome}</h2>
+                        <p><strong>⭐ Perfil:</strong> ${cliente.classificacao || 'N/A'}</p>
+                        <p>Status: <strong class="${cliente.status === 'Em Atraso' ? 'vermelho' : 'verde'}">${cliente.status}</strong></p>
+                    </div>
+                </div>
+                <section class="section-container">
+                    <h2><span class="title-icon">📄</span> Contratos do Cliente</h2>
+                    <ul class="contratos-list">
+                        ${contratosHTML.length > 0 ? contratosHTML : `<p>Nenhum contrato cadastrado.</p>`}
+                    </ul>
+                </section>
+                <section class="section-container">
+                    <h2><span class="title-icon">📜</span> Histórico de Interações</h2>
+                    ${historicoHTML.length > 0 ? historicoHTML : `<p>Nenhuma interação registrada.</p>`}
+                </section>
+            `;
+            document.getElementById('cliente-modal').style.display = 'flex';
+        }
+        
+        function closeClienteModal() {
+            document.getElementById('cliente-modal').style.display = 'none';
+        }
+        
+        // Funções do seu código original
+        function removerCliente(clienteId, nome) {
+            if (!confirm(`Tem certeza que deseja remover o cliente "${nome}"?`)) {
+                return;
+            }
+            const index = clientesListaGlobal.findIndex(c => c.id === clienteId);
+            if (index !== -1) {
+                clientesListaGlobal.splice(index, 1);
+                exibirListaClientes(clientesListaGlobal);
+                alert(`✅ Cliente "${nome}" removido com sucesso!`);
+            }
+        }
+        function enviarCobranca(telefone, nome) {
+            if (!telefone) {
+                alert("Cliente sem telefone cadastrado.");
+                return;
+            }
+            const telefoneLimpo = telefone.replace(/\D/g, "");
+            const mensagem = `Olá ${nome}, tudo bem? Aqui é do PixFactory. Estamos lembrando sobre sua cobrança. Qualquer dúvida, estamos à disposição!`;
+            const url = `https://wa.me/55${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+        function editarCliente(clienteId) {
+            window.location.href = `editar-cliente.html?clienteId=${clienteId}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            exibirListaClientes(clientesListaGlobal);
+            document.getElementById("clientSearch").addEventListener("input", filtrarClientesLista);
+        });
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
+
+

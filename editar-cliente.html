@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cliente | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+        }
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 1100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active { transform: translateX(0); }
+        .sidebar.hidden { transform: translateX(-100%); }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul            { color: #3498db; }
+        .verde           { color: #2ecc71; }
+        .amarelo         { color: #f1c40f; }
+        .vermelho        { color: #e74c3c; }
+        .roxo            { color: #9b59b6; }
+        .azul-claro      { color: #5dade2; }
+        .vermelho-claro  { color: #f1948a; }
+        .cinza           { color: #bdc3c7; }
+        .limao           { color: #a3e635; }
+        .roxo-claro      { color: #c084fc; }
+        .laranja         { color: #e67e22; }
+        .azul-escuro     { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            transition: margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out;
+        }
+        .main-content header {
+            margin-bottom: 0;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+        .form-section {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-section h3 {
+            color: #04b45f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-field label {
+            font-weight: bold;
+            color: #ccc;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .icon-label::before {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            content: attr(data-icon);
+            font-size: 1.1em;
+            color: #04b45f;
+        }
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            border-color: #03a252;
+        }
+        .form-field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: flex-start;
+        }
+        .form-buttons button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-buttons button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        .form-buttons button.cancelar {
+            background-color: #e74c3c;
+        }
+        .form-buttons button.cancelar:hover {
+            background-color: #c0392b;
+        }
+        .main-content-footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding-top: 20px;
+            border-top: 1px solid rgba(4, 180, 95, 0.3);
+            margin-top: auto;
+        }
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* Modal de Feedback */
+        .modal-feedback {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-feedback-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: popUp 0.3s ease-out;
+        }
+        .modal-feedback-content h3 {
+            color: #04b45f;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        .modal-feedback-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .modal-feedback-content .icon-feedback {
+            font-size: 60px;
+            color: #04b45f;
+            margin-bottom: 15px;
+        }
+        .modal-feedback-content button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-feedback-content button:hover {
+            background-color: #03a252;
+        }
+        .error-title { color: #e74c3c; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar { transform: translateX(-100%); left: 0; }
+            .sidebar.active { transform: translateX(0); }
+            .menu-toggle { display: block; }
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 20px;
+            }
+            .main-content header h1 { font-size: 24px; }
+            .main-content header .header-icon { font-size: 24px; }
+            .form-section { padding: 15px; gap: 15px; }
+            .form-section h3 { font-size: 18px; }
+            .form-field label { font-size: 14px; }
+            .form-field input, .form-field select, .form-field textarea { font-size: 13px; padding: 8px; }
+            .form-buttons { flex-direction: column; gap: 10px; align-items: stretch; }
+            .form-buttons button { width: 100%; justify-content: center; padding: 10px 15px; font-size: 15px; }
+            .janela-sugestao { bottom: 15px; right: 15px; max-width: calc(100% - 30px); }
+        }
+        @media (max-width: 480px) {
+            .menu-toggle { top: 15px; left: 15px; padding: 8px 12px; font-size: 20px; }
+            .main-content { padding: 15px; }
+            .main-content header h1 { font-size: 22px; }
+            .form-section h3 { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html" class="active"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Editar Cliente</h1>
+            <span class="header-icon">✏️</span>
+        </header>
+        
+        <form id="formEditar">
+            <div class="form-section">
+                <h3>Informações Pessoais</h3>
+                <div class="form-field">
+                    <label class="icon-label" for="nome" data-icon="📝">Nome Completo:</label>
+                    <input type="text" id="nome" placeholder="Nome completo do cliente" required />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="cpf" data-icon="🔢">CPF:</label>
+                    <input type="text" id="cpf" placeholder="999.999.999-99" required />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="telefone" data-icon="📞">Telefone:</label>
+                    <input type="text" id="telefone" placeholder="(99) 99999-9999" required />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="email" data-icon="✉️">Email:</label>
+                    <input type="email" id="email" placeholder="email@exemplo.com" required />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="dataNascimento" data-icon="🎂">Data de Nascimento:</label>
+                    <input type="date" id="dataNascimento" required />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="endereco" data-icon="🏠">Endereço:</label>
+                    <textarea id="endereco" placeholder="Rua, Número, Bairro, Cidade, Estado, CEP" required></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Detalhes Financeiros</h3>
+                <div class="form-field">
+                    <label class="icon-label" for="profissao" data-icon="💼">Profissão:</label>
+                    <input type="text" id="profissao" />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="rendaMensal" data-icon="💲">Renda Mensal (R$):</label>
+                    <input type="number" id="rendaMensal" step="0.01" />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="banco" data-icon="🏦">Banco Principal:</label>
+                    <input type="text" id="banco" />
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="tipoDocumento" data-icon="🆔">Tipo de Documento:</label>
+                    <select id="tipoDocumento">
+                        <option value="">Selecione</option>
+                        <option value="rg">RG</option>
+                        <option value="cnh">CNH</option>
+                        <option value="passaporte">Passaporte</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="estadoCivil" data-icon="💞">Estado Civil:</label>
+                    <select id="estadoCivil">
+                        <option value="">Selecione</option>
+                        <option value="solteiro">Solteiro(a)</option>
+                        <option value="casado">Casado(a)</option>
+                        <option value="divorciado">Divorciado(a)</option>
+                        <option value="viuvo">Viúvo(a)</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label class="icon-label" for="classificacao" data-icon="📊">Classificação:</label>
+                    <select id="classificacao">
+                        <option value="Bom pagador">Bom pagador</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Ruim">Ruim</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="salvar">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+                <button type="button" class="cancelar" onclick="voltar()">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display: none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+    
+    <!-- Modal de Feedback -->
+    <div id="modal-feedback" class="modal-feedback">
+      <div class="modal-feedback-content">
+        <i id="feedback-icon" class="icon-feedback"></i>
+        <h3 id="feedback-title"></h3>
+        <p id="feedback-message"></p>
+        <button onclick="closeModalFeedback()">OK</button>
+      </div>
+    </div>
+
+    <script>
+        const clientesListaGlobal = [
+            {
+                id: 1,
+                nome: "João da Silva",
+                cpf: "123.456.789-00",
+                telefone: "11987654321",
+                email: "joao.silva@exemplo.com",
+                dataNascimento: "1990-01-15",
+                endereco: "Rua das Flores, 123 - Centro, SP",
+                profissao: "Desenvolvedor",
+                rendaMensal: 5000.00,
+                banco: "Banco do Brasil",
+                tipoDocumento: "rg",
+                estadoCivil: "casado",
+                classificacao: "Bom pagador",
+                status: "Em atraso",
+            },
+            {
+                id: 2,
+                nome: "Maria Oliveira",
+                cpf: "987.654.321-00",
+                telefone: "11998877665",
+                email: "maria.oliveira@exemplo.com",
+                dataNascimento: "1985-05-20",
+                endereco: "Av. Paulista, 1500 - Bela Vista, SP",
+                profissao: "Designer",
+                rendaMensal: 7000.00,
+                banco: "Nubank",
+                tipoDocumento: "cnh",
+                estadoCivil: "solteiro",
+                classificacao: "Bom pagador",
+                status: "Em dia",
+            }
+        ];
+        
+        function preencherFormulario(cliente) {
+            document.getElementById('nome').value = cliente.nome || "";
+            document.getElementById('cpf').value = cliente.cpf || "";
+            document.getElementById('telefone').value = cliente.telefone || "";
+            document.getElementById('email').value = cliente.email || "";
+            document.getElementById('dataNascimento').value = cliente.dataNascimento || "";
+            document.getElementById('endereco').value = cliente.endereco || "";
+            document.getElementById('profissao').value = cliente.profissao || "";
+            document.getElementById('rendaMensal').value = cliente.rendaMensal || "";
+            document.getElementById('banco').value = cliente.banco || "";
+            document.getElementById('tipoDocumento').value = cliente.tipoDocumento || "";
+            document.getElementById('estadoCivil').value = cliente.estadoCivil || "";
+            document.getElementById('classificacao').value = cliente.classificacao || "";
+        }
+        
+        function voltar() {
+            window.history.back();
+        }
+
+        document.getElementById('formEditar').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const clienteId = new URLSearchParams(window.location.search).get('clienteId');
+            const cliente = clientesListaGlobal.find(c => c.id === parseInt(clienteId));
+            
+            const nome = document.getElementById('nome').value;
+            // ... (captura de todos os outros campos)
+            
+            if (cliente) {
+                // Simulação de salvamento
+                showModalFeedback('✅ Sucesso!', `Alterações do cliente "${nome}" salvas com sucesso!`);
+                
+                // Redireciona de volta após a mensagem
+                setTimeout(() => {
+                    voltar();
+                }, 2000);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const clienteId = new URLSearchParams(window.location.search).get('clienteId');
+            const cliente = clientesListaGlobal.find(c => c.id === parseInt(clienteId));
+            if (cliente) {
+                preencherFormulario(cliente);
+            } else {
+                // Se não encontrar o cliente, redireciona ou mostra uma mensagem de erro
+                showModalFeedback('❌ Erro!', 'Cliente não encontrado.', true);
+                setTimeout(() => {
+                    window.location.href = 'clientes.html';
+                }, 2000);
+            }
+            
+            const hamburgerButton = document.getElementById('hamburger-menu');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const body = document.body;
+            hamburgerButton.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                body.classList.toggle('sidebar-open');
+            });
+            mainContent.addEventListener('click', () => {
+                if (sidebar.classList.contains('active') && window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    body.classList.remove('sidebar-open');
+                }
+            });
+            sidebar.querySelectorAll('nav ul li a').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        body.classList.remove('sidebar-open');
+                    }
+                });
+            });
+        });
+
+        // Funções do Modal de Feedback
+        function showModalFeedback(title, message, isError = false) {
+            const modal = document.getElementById('modal-feedback');
+            const icon = document.getElementById('feedback-icon');
+            const titleElement = document.getElementById('feedback-title');
+            const messageElement = document.getElementById('feedback-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            if (isError) {
+                icon.className = 'fas fa-times-circle icon-feedback vermelho';
+                titleElement.className = 'error-title';
+            } else {
+                icon.className = 'fas fa-check-circle icon-feedback verde';
+                titleElement.className = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModalFeedback() {
+            document.getElementById('modal-feedback').style.display = 'none';
+        }
+
+        window.abrirSugestao = function () {
+            const janela = document.getElementById('janela-sugestao');
+            janela.style.display = janela.style.display === 'flex' ? 'none' : 'flex';
+        };
+        window.enviarSugestao = function () {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showModalFeedback('✅ Sucesso!', 'Sugestão enviada com sucesso!', false);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showModalFeedback('⚠️ Atenção!', 'Por favor, digite sua sugestão antes de enviar.', true);
+            }
+        };
+    </script>
+</body>
+</html>

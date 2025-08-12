@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .rosa { color: #e84393; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .hide-values-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        
+        .hide-values-btn:hover {
+            color: #03a252;
+        }
+        
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+        .trial-status .progress-bar {
+            display: none;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header-left h1 {
+            color: #04b45f;
+            margin-bottom: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        
+        .header-left p {
+            color: #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .header-left.no-description {
+            flex-direction: row;
+            align-items: center;
+        }
+        .header-left.no-description h1 {
+            margin-bottom: 0;
+        }
+
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        .plan-info::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* === Botão de Ação `Novo` === */
+        .action-button-novo {
+            position: relative;
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-button-novo:hover {
+            background-color: #03a252;
+        }
+        .action-button-novo .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 1;
+            min-width: 160px;
+            top: 100%;
+            left: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .action-button-novo:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .action-button-novo .dropdown-content a {
+            color: #fff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .action-button-novo .dropdown-content a:hover {
+            background-color: #04b45f;
+        }
+        
+        /* === Contadores Rápidos === */
+        .quick-counters {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            flex-wrap: wrap;
+        }
+
+        .counter-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .counter-item:hover {
+            transform: translateY(-3px);
+            background-color: #2b2b2b;
+        }
+
+        .counter-item .counter-icon {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        .counter-item.blue .counter-icon { color: #3498db; }
+        .counter-item.green .counter-icon { color: #2ecc71; }
+        .counter-item.yellow .counter-icon { color: #f1c40f; }
+        .counter-item.red .counter-icon { color: #e74c3c; }
+        .counter-item.rosa .counter-icon { color: #e84393; }
+
+
+        .counter-item h4 {
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .counter-item p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #04b45f;
+        }
+        
+        /* Estilos para ocultar/mostrar valores nos cards */
+        .card .valor {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .card .valor.hidden {
+            visibility: hidden;
+            position: relative;
+        }
+        
+        .card .valor.hidden::after {
+            content: '****';
+            visibility: visible;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        /* === Cards === */
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 250px;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(4, 180, 95, 0.3);
+        }
+
+        .card h3 {
+            color: #04b45f;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        /* Indicador de Tendência nos Cards */
+        .card .trend {
+            font-size: 16px;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+        }
+
+        .card .trend.up {
+            color: #2ecc71;
+        }
+
+        .card .trend.down {
+            color: #e74c3c;
+        }
+
+        /* === Área de Relatórios Otimizada === */
+        .reports-area {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .reports-area h2 {
+            color: #04b45f;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .report-card {
+            background-color: #121212;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(4, 180, 95, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .report-card h3 {
+            color: #ccc;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .report-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        .report-card .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: #2b2b2b;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .report-card .progress-fill {
+            height: 100%;
+            background-color: #2ecc71;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .report-card .progress-warning {
+            background-color: #f1c40f;
+        }
+
+        .report-card .stats-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+        .report-card .stats-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-card .stats-list li span {
+            font-weight: bold;
+            color: #04b45f;
+        }
+
+        .inadimplencia-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .inadimplencia-list li {
+            padding: 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .inadimplencia-list li:last-child {
+            border-bottom: none;
+        }
+        .inadimplencia-list .info-cliente {
+            display: flex;
+            flex-direction: column;
+        }
+        .inadimplencia-list .info-cliente strong {
+            color: #fff;
+        }
+        .inadimplencia-list .info-cliente small {
+            color: #ccc;
+        }
+        .inadimplencia-list .valor-atraso {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .inadimplencia-list li .action-button {
+            background-color: #25D366;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        .inadimplencia-list li .action-button:hover {
+            background-color: #1EBE53;
+        }
+        
+        .trend-icon {
+            font-size: 14px;
+            margin-left: 5px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .trend-up { color: #2ecc71; }
+        .trend-down { color: #e74c3c; }
+
+
+        /* === Seção de Atividade Recente/Próximos Vencimentos === */
+        .recent-activity {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 30px;
+        }
+
+        .recent-activity h2 {
+            color: #04b45f;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .activity-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(4, 180, 95, 0.1);
+            color: #ccc;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .activity-list .activity-icon {
+            font-size: 1.2em;
+            color: #04b45f;
+        }
+        
+        .activity-list li.atraso .activity-icon { color: #e74c3c; }
+        .activity-list li.pagamento .activity-icon { color: #2ecc71; }
+        .activity-list li.novo-cliente .activity-icon { color: #f1c40f; }
+
+
+        /* === Botões, Formulários, Tabelas e Janela de Sugestão === */
+        button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        form label {
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        form input,
+        form select,
+        form textarea {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        form input:focus,
+        form select:focus,
+        form textarea:focus {
+            border-color: #03a252;
+        }
+
+        .filtro-box {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-box select,
+        .filtro-box input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-icon {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-icon span {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #04b45f;
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+
+        table th,
+        table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+        }
+
+        table th {
+            background-color: #2b2b2b;
+            color: #04b45f;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-close {
+            color: #ccc;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content p {
+            text-align: center;
+        }
+        .modal-content button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .modal-content button:hover {
+            background-color: #03a252;
+        }
+
+
+        /* ========================================= */
+        /* === MEDIA QUERIES para Responsividade === */
+        /* ========================================= */
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+            
+            .header-left {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+            }
+
+            header h1 {
+                font-size: 24px;
+                margin-bottom: 0;
+            }
+
+            header p {
+                font-size: 14px;
+            }
+
+            .quick-counters,
+            .cards {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .counter-item,
+            .card {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .janela-sugestao {
+                bottom: 15px;
+                right: 15px;
+                max-width: calc(100% - 30px);
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            table tr {
+                border: 1px solid rgba(4, 180, 95, 0.3);
+                border-radius: 8px;
+                margin-bottom: 15px;
+                background-color: #1e1e1e;
+                display: flex;
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            table td {
+                border-bottom: 1px dashed rgba(4, 180, 95, 0.1);
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                font-size: 14px;
+            }
+
+            table td:last-child {
+                border-bottom: none;
+            }
+
+            table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #04b45f;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .plan-info {
+                margin-top: 10px;
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 70px;
+            }
+            .hamburger-menu {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            header p {
+                font-size: 14px;
+            }
+            .card p {
+                font-size: 24px;
+            }
+            .hide-values-btn {
+                font-size: 18px;
+            }
+        }
+    </style>
+    <script>
+        // Variável que simula o status do usuário
+        // userRole: 'ADMIN', 'USER' ou 'EDITOR'
+        const userRole = localStorage.getItem('userRole') || 'USER';
+        
+        // Dados fictícios para os contadores
+        const mockData = {
+            clientesAtivos: 125,
+            contratosVigentes: 80,
+            novosNoMes: 10,
+            pendencias: 2,
+            totalEmprestado: 30000,
+            totalEmAtraso: 8000,
+            lucroGerado: 5000,
+            inadimplencia: [
+                { cliente: 'João da Silva', telefone: '11987654321', valor: 250.00, dias: 20 },
+                { cliente: 'Ana Costa', telefone: '11966660004', valor: 80.00, dias: 5 },
+            ],
+            inadimplenciaMesAnterior: [
+                { cliente: 'João da Silva', valor: 250.00, dias: 15 },
+                { cliente: 'Pedro Santos', valor: 100.00, dias: 8 }
+            ],
+            statusClientes: {
+                emDia: 80,
+                atrasados: 15,
+                quitados: 5
+            }
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso!');
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.querySelector('.hamburger-menu');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !isClickInsideSidebar && !isClickOnHamburger) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Funções de redirecionamento para os contadores
+        function redirectToClientes() {
+            window.location.href = 'clientes.html';
+        }
+
+        function redirectToContratos() {
+            window.location.href = 'contratos.html';
+        }
+
+        function redirectToNovosDoMes() {
+            window.location.href = 'novos-mes.html';
+        }
+
+        function redirectToCadastro() {
+            window.location.href = 'cadastro.html';
+        }
+
+        function redirectToAgenda() {
+            window.location.href = 'agenda.html';
+        }
+
+        function redirectToPlanos() {
+            window.location.href = 'planos.html';
+        }
+        
+        function redirectToControleDeGastos() {
+            window.location.href = 'controle-de-gastos.html';
+        }
+        
+        // NOVA FUNÇÃO para ocultar/mostrar valores
+        function toggleValuesVisibility() {
+            const valores = document.querySelectorAll('.card .valor');
+            const btn = document.getElementById('hide-values-btn');
+
+            valores.forEach(valor => {
+                valor.classList.toggle('hidden');
+            });
+
+            // Troca o ícone do olho
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('fa-eye')) {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function showActionDropdown() {
+            const dropdown = document.getElementById('new-action-dropdown');
+            dropdown.style.display = 'flex';
+        }
+
+        function hideActionDropdown() {
+            setTimeout(() => {
+                const dropdown = document.getElementById('new-action-dropdown');
+                if (!dropdown.matches(':hover') && !document.getElementById('new-action-button').matches(':hover')) {
+                    dropdown.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const planInfo = document.querySelector('.plan-info');
+            if (planInfo && userRole === 'USER' ) {
+                planInfo.style.display = 'none';
+            }
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html" class="active"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="controle-de-gastos.html"><span class="icon limao">💰</span> Controle de Gastos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="trial-status" id="trial-status">
+            <span>Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></span>
+        </div>
+
+        <header>
+            <div class="header-left no-description">
+                <h1>Olá, Romario! 👋</h1>
+                <button id="hide-values-btn" class="hide-values-btn" onclick="toggleValuesVisibility()">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <a href="planos.html" class="plan-info" onclick="redirectToPlanos()">
+                <span class="rocket-emoji">🚀</span>
+                <span>Seu Plano: Gratuito - Clique para <strong>ser Premium</strong></span>
+            </a>
+        </header>
+        
+        <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
+            <div class="action-button-novo" id="new-action-button" onmouseover="showActionDropdown()" onmouseout="hideActionDropdown()">
+                <span>+ Novo</span>
+                <i class="fas fa-caret-down"></i>
+                <div class="dropdown-content" id="new-action-dropdown">
+                    <a href="cadastro.html">
+                        <i class="fas fa-user-plus" style="margin-right: 5px;"></i> Novo Cliente
+                    </a>
+                    <a href="novo_contrato.html">
+                        <i class="fas fa-file-signature" style="margin-right: 5px;"></i> Novo Contrato
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <section class="quick-counters">
+            <div class="counter-item blue" onclick="redirectToClientes()">
+                <i class="fas fa-users counter-icon"></i>
+                <h4>Clientes Ativos</h4>
+                <p>125</p>
+            </div>
+            <div class="counter-item green" onclick="redirectToContratos()">
+                <i class="fas fa-file-contract counter-icon"></i>
+                <h4>Contratos Vigentes</h4>
+                <p>80</p>
+            </div>
+            <div class="counter-item yellow" onclick="redirectToNovosDoMes()">
+                <i class="fas fa-user-plus counter-icon"></i>
+                <h4>Novos no Mês</h4>
+                <p>10</p>
+            </div>
+            <div class="counter-item red" onclick="redirectToAgenda()">
+                <i class="fas fa-money-bill-wave counter-icon"></i>
+                <h4>Pendências</h4> <p>2</p>
+            </div>
+            <div class="counter-item rosa" onclick="redirectToControleDeGastos()">
+                <i class="fas fa-chart-pie counter-icon"></i>
+                <h4>Controle de Gastos</h4> <p>Ver</p>
+            </div>
+        </section>
+
+        <section class="cards">
+            <div class="card">
+                <h3><span class="icon roxo-claro">💰</span> Total Emprestado</h3>
+                <p class="valor">R$ 30.000 <span class="trend up">▲ 2%</span></p>
+            </div>
+            <div class="card">
+                <h3><span class="icon laranja">⚠️</span> Total em Atraso</h3>
+                <p class="valor">R$ 8.000 <span class="trend down">▼ 5%</span></p>
+            </div>
+            <div class="card">
+                <h3><span class="icon verde">✅</span> Lucro Gerado</h3>
+                <p class="valor">R$ 5.000 <span class="trend up">▲ 10%</span></p>
+            </div>
+        </section>
+
+        <section class="recent-activity">
+            <h2>🔔 Central de Ações & Atividade Recente</h2>
+            <div class="activity-list">
+                <ul>
+                    <li class="atraso"><span class="activity-icon">❗</span> <strong>25/07/2025:</strong> Parcela de João da Silva vence - R$ 250,00</li>
+                    <li class="pagamento"><span class="activity-icon">✔️</span> <strong>20/07/2025:</strong> Maria Souza pagou parcela - R$ 300,00</li>
+                    <li class="novo-cliente"><span class="activity-icon">🆕</span> <strong>18/07/2025:</strong> Novo cliente cadastrado: Carlos Pereira</li>
+                    <li class="atraso"><span class="activity-icon">❗</span> <strong>15/07/2025:</strong> Lembrete de cobrança enviado para Ana Costa</li>
+                    <li class="atraso"><span class="activity-icon">📅</span> <strong>01/08/2025:</strong> Parcela de Pedro Santos vence - R$ 400,00</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="reports-area">
+            <h2>📈 Relatórios de Gestão</h2>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3><i class="fas fa-chart-line"></i> Meta de Receita Mensal</h3>
+                    <p>Receita Projetada: <span id="meta-receita" style="font-weight: bold; color: #04b45f;"></span></p>
+                    <p>Receita Recebida: <span id="receita-recebida" style="font-weight: bold; color: #2ecc71;"></span></p>
+                    <div class="progress-bar-container">
+                        <div id="receita-progresso" class="progress-fill"></div>
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic;" id="alerta-progresso"></p>
+                </div>
+                
+                <div class="report-card">
+                    <h3><i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i> Análise de Inadimplência</h3>
+                    <ul class="inadimplencia-list" id="inadimplencia-list">
+                        <!-- Conteúdo dinâmico -->
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="reports-grid" style="margin-top: 20px;">
+                <div class="report-card">
+                    <h3><i class="fas fa-chart-pie" style="color: #3498db;"></i> Análise de Tendência de Inadimplência</h3>
+                    <p>Uma comparação do desempenho deste mês com o anterior.</p>
+                    <ul class="stats-list" id="inadimplencia-trend-list">
+                        <!-- Conteúdo dinâmico -->
+                    </ul>
+                </div>
+
+                <div class="report-card">
+                    <h3><i class="fas fa-users" style="color: #3498db;"></i> Resumo do Portfólio de Clientes</h3>
+                    <p>Distribuição atual da sua base de clientes.</p>
+                    <ul class="stats-list" id="status-clientes-list">
+                        <!-- Conteúdo dinâmico -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Layout e cores padrão PixFactory */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+        }
+        /* Menu lateral padrão */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 1100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active { transform: translateX(0); }
+        .sidebar.hidden { transform: translateX(-100%); }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul            { color: #3498db; }
+        .verde           { color: #2ecc71; }
+        .amarelo         { color: #f1c40f; }
+        .vermelho        { color: #e74c3c; }
+        .roxo            { color: #9b59b6; }
+        .azul-claro      { color: #5dade2; }
+        .vermelho-claro  { color: #f1948a; }
+        .cinza           { color: #bdc3c7; }
+        .limao           { color: #a3e635; }
+        .roxo-claro      { color: #c084fc; }
+        .laranja         { color: #e67e22; }
+        .azul-escuro     { color: #2c3e50; }
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* Conteúdo principal padrão */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+        .main-content header {
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: space-between;
+        }
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header p {
+            color: #ccc;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+
+        /* Seção do calendário */
+        .calendar-section {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 12px;
+            padding: 30px 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(4,180,95,0.12);
+            width: 100%;
+            max-width: 720px;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .calendar-header button {
+            background-color: #2b2b2b;
+            color: #fff;
+            border: 1px solid #04b45f;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .calendar-header button:hover {
+            background-color: #03a252;
+        }
+        .calendar-header h2 {
+            font-size: 22px;
+            color: #04b45f;
+            margin: 0;
+            font-weight: 600;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        /* Grade do calendário */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            text-align: center;
+            user-select: none;
+        }
+        .calendar-grid .day-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #04b45f;
+        }
+        .calendar-grid .day {
+            padding: 15px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ccc;
+            background-color: #121212;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* para bolinha */
+        }
+        .calendar-grid .day.empty {
+            background-color: transparent;
+            cursor: default;
+            pointer-events: none;
+        }
+        .calendar-grid .day.today {
+            border: 2px solid #04b45f;
+            background-color: rgba(4, 180, 95, 0.1);
+            color: #04b45f;
+        }
+        .calendar-grid .day.active {
+            background-color: #04b45f;
+            color: #121212;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(4,180,95,0.6);
+        }
+        /* Bolinha de cobrança */
+        .calendar-grid .day .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #04b45f;
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+        }
+
+        /* Clientes do dia */
+        .clientes-dia-section {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 12px;
+            padding: 30px 35px;
+            width: 100%;
+            max-width: 720px;
+            box-shadow: 0 0 15px rgba(4,180,95,0.12);
+        }
+        .clientes-dia-section h2 {
+            font-size: 22px;
+            color: #04b45f;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .clientes-dia-list p {
+            font-size: 14px;
+            color: #ccc;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        .clientes-dia-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .clientes-dia-list li {
+            background-color: #121212;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+        }
+        .clientes-dia-list li .client-info strong {
+            font-weight: 700;
+            color: #04b45f;
+            margin-right: 12px;
+        }
+        .clientes-dia-list li .client-info span {
+            color: #ccc;
+            font-size: 14px;
+        }
+        .clientes-dia-list li .actions button {
+            background-color: #04b45f;
+            border: none;
+            color: #121212;
+            padding: 8px 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .clientes-dia-list li .actions button:hover {
+            background-color: #03a252;
+        }
+
+        /* Janela de sugestão */
+        .janela-sugestao {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+        /* Modal de alerta customizado (substitui o alert() padrão) */
+        .custom-modal-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 300px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .custom-modal-alert p {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        .custom-modal-alert button {
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .menu-toggle { display: block; }
+            .main-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+                max-width: 100%;
+                padding-top: 70px;
+            }
+            .calendar-section, .clientes-dia-section {
+                padding: 15px;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                font-size: 14px;
+            }
+            .calendar-grid .day {
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html" class="active"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="trial-status">Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></div>
+        <header>
+            <h1>Agenda</h1>
+            <span class="header-icon">📆</span>
+        </header>
+
+        <section class="calendar-section">
+            <div class="calendar-header">
+                <button onclick="prevMonth()">← Mês Anterior</button>
+                <h2 id="month-year-display"></h2>
+                <button onclick="nextMonth()">Próximo Mês →</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+        </section>
+
+        <section class="clientes-dia-section">
+            <h2>Clientes do Dia Selecionado</h2>
+            <div id="clientes-do-dia" class="clientes-dia-list">
+                <p>Selecione um dia para ver as cobranças.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display:none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+    
+    <!-- Modal de alerta customizado (substitui o alert() padrão) -->
+    <div id="custom-alert" class="custom-modal-alert">
+        <p id="alert-text"></p>
+        <button onclick="closeCustomAlert()">OK</button>
+    </div>
+
+    <script>
+        // Cliente e cobrança fictícios para teste
+        const mockCobrancas = [
+            { clienteNome: "João da Silva", clienteTelefone: "11987654321", valor: 250.00, dataVencimento: "2025-08-10" },
+            { clienteNome: "Maria Oliveira", clienteTelefone: "11998877665", valor: 350.00, dataVencimento: "2025-08-15" },
+            { clienteNome: "Pedro Souza", clienteTelefone: "11912345678", valor: 400.00, dataVencimento: "2025-08-01" },
+            { clienteNome: "Cliente de Teste", clienteTelefone: "11999999999", valor: 120.00, dataVencimento: "2025-08-11" },
+            { clienteNome: "Cliente de Fim de Semana", clienteTelefone: "11987654321", valor: 50.00, dataVencimento: "2025-08-16" },
+            { clienteNome: "Cliente de Feriado", clienteTelefone: "11998877665", valor: 100.00, dataVencimento: "2025-08-25" }
+        ];
+
+        // Funções para Modais
+        function showCustomAlert(message) {
+            const customAlert = document.getElementById('custom-alert');
+            const alertText = customAlert.querySelector('p');
+            alertText.textContent = message;
+            customAlert.style.display = 'flex';
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+        }
+        
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showCustomAlert('✅ Sugestão enviada com sucesso: ' + sugestao);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showCustomAlert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        // Lógica do Calendário
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        const monthYearDisplay = document.getElementById('month-year-display');
+        const calendarGrid = document.getElementById('calendar-grid');
+
+        function formatDateAPI(date) {
+            const yyyy = date.getFullYear();
+            const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+            const dd = date.getDate().toString().padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function formatDateDisplay(date) {
+            const d = date.getDate().toString().padStart(2, '0');
+            const m = (date.getMonth() + 1).toString().padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        async function carregarCobrancasPorData(dataISO) {
+            const cobrancasDoDia = mockCobrancas.filter(c => c.dataVencimento === dataISO);
+
+            if (cobrancasDoDia.length === 0) {
+                return `<p>✅ Nenhuma cobrança prevista para ${formatDateDisplay(new Date(dataISO))}.</p>`;
+            }
+
+            let html = '<ul>';
+            cobrancasDoDia.forEach(cobranca => {
+                html += `
+                <li>
+                    <div class="client-info">
+                        <strong>${cobranca.clienteNome}</strong>
+                        <span>Vencimento: R$ ${cobranca.valor.toFixed(2)}</span>
+                    </div>
+                    <div class="actions">
+                        <button onclick="enviarCobrancaWhatsApp('${cobranca.clienteTelefone}', '${cobranca.clienteNome}')">Cobrar</button>
+                    </div>
+                </li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        function enviarCobrancaWhatsApp(telefone, nome) {
+            if (!telefone) {
+                showCustomAlert("Cliente sem telefone cadastrado.");
+                return;
+            }
+            const telefoneLimpo = telefone.replace(/\D/g, "");
+            const mensagem = `Olá ${nome}, tudo bem? Aqui é do PixFactory. Estamos lembrando sobre sua cobrança. Qualquer dúvida, estamos à disposição!`;
+            const url = `https://wa.me/55${telefoneLimpo}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+
+        function generateCalendar(month, year) {
+            if (!calendarGrid || !monthYearDisplay) return;
+
+            calendarGrid.innerHTML = '';
+            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const numDays = new Date(year, month + 1, 0).getDate();
+
+            const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            dayNames.forEach(day => {
+                const dayNameDiv = document.createElement('div');
+                dayNameDiv.classList.add('day-name');
+                dayNameDiv.textContent = day;
+                calendarGrid.appendChild(dayNameDiv);
+            });
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.classList.add('day', 'empty');
+                calendarGrid.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= numDays; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day');
+                dayDiv.textContent = day;
+
+                const dateObj = new Date(year, month, day);
+                const formattedDateISO = formatDateAPI(dateObj);
+                const hasCobranca = mockCobrancas.some(c => c.dataVencimento === formattedDateISO);
+                if (hasCobranca) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    dayDiv.appendChild(dot);
+                }
+                
+                const today = new Date();
+                if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
+                    dayDiv.classList.add('today');
+                }
+
+                dayDiv.addEventListener('click', () => showClientesDoDia(formattedDateISO, dayDiv));
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        async function showClientesDoDia(dataISO, clickedDayElement = null) {
+            const clientesDiaDiv = document.getElementById('clientes-do-dia');
+            const allDays = document.querySelectorAll('.day');
+
+            allDays.forEach(day => day.classList.remove('active'));
+            if (clickedDayElement) clickedDayElement.classList.add('active');
+
+            clientesDiaDiv.innerHTML = `<p>Carregando cobranças para ${formatDateDisplay(new Date(dataISO))}...</p>`;
+            const html = await carregarCobrancasPorData(dataISO);
+            clientesDiaDiv.innerHTML = html;
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+            document.getElementById('clientes-do-dia').innerHTML = `<p>Selecione um dia para ver as cobranças.</p>`;
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+            document.getElementById('clientes-do-dia').innerHTML = `<p>Selecione um dia para ver as cobranças.</p>`;
+        }
+
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            generateCalendar(currentMonth, currentYear);
+
+            const todayFormatted = formatDateAPI(today);
+            const todayElement = [...document.querySelectorAll('.day')].find(day => {
+                const dateParts = day.dataset.date.split('/');
+                if (dateParts.length === 3) {
+                    return `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}` === todayFormatted;
+                }
+                return false;
+            });
+            if (todayElement) {
+                todayElement.click();
+            }
+        });
+    </script>
+</body>
+</html>

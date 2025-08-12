@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Gastos | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos globais e de layout */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .rosa { color: #e84393; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .hide-values-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        
+        .hide-values-btn:hover {
+            color: #03a252;
+        }
+        
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status .progress-bar {
+            display: none;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header-left h1 {
+            color: #04b45f;
+            margin-bottom: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        
+        .header-left p {
+            color: #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .header-left.no-description {
+            flex-direction: row;
+            align-items: center;
+        }
+        .header-left.no-description h1 {
+            margin-bottom: 0;
+        }
+
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        /* === Menu de navegação superior === */
+        .top-nav {
+            background-color: #1e1e1e;
+            padding: 10px 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            border: 1px solid #04b45f;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: color 0.3s, background-color 0.3s;
+            font-size: 16px;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+
+        /* === Bloco de Conteúdo === */
+        .content-block {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 30px;
+        }
+        .content-block h2 {
+            color: #04b45f;
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .content-block h4 {
+            text-align: center;
+        }
+        .content-block .item-list ul {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
+        .content-block .item-list li {
+            color: #ccc;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(4, 180, 95, 0.1);
+        }
+        .content-block .item-list li:last-child {
+            border-bottom: none;
+        }
+        .content-block .item-list a {
+            color: #04b45f;
+            text-decoration: none;
+        }
+        .content-block .item-list a:hover {
+            text-decoration: underline;
+        }
+        .content-block .placeholder {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-style: italic;
+            border: 1px dashed #444;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .content-block .valor {
+            text-align: center;
+        }
+
+        .content-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .content-container > div {
+            flex: 1;
+            min-width: 300px;
+        }
+        .content-container .card {
+            border: 1px solid #04b45f;
+        }
+
+        /* === Estilos para o bloco de Acesso Rápido === */
+        .quick-access {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .quick-access .quick-btn {
+            background-color: #2b2b2b;
+            color: #ccc;
+            border: 1px solid #04b45f;
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .quick-access .quick-btn:hover {
+            background-color: #04b45f;
+            color: #fff;
+        }
+        .quick-access .quick-btn .icon {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+        .quick-access .quick-btn.red .icon { color: #e74c3c; }
+        .quick-access .quick-btn.green .icon { color: #2ecc71; }
+        .quick-access .quick-btn.azul .icon { color: #3498db; }
+        .quick-access .quick-btn.cinza .icon { color: #bdc3c7; }
+
+        /* Estilos do banner de teste grátis */
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .trial-status .progress-bar {
+            display: none;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+
+        .counter-info {
+            display: flex;
+            gap: 20px;
+        }
+        .counter-info h4 {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+        .counter-info p {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .counter-info .green-text { color: #2ecc71; }
+        .counter-info .red-text { color: #e74c3c; }
+        .header-left .boas-vindas {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+        .header-left .email {
+            font-size: 16px;
+            color: #ccc;
+        }
+        .saldo-info .valor {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .saldo-info .valor.hidden {
+            visibility: hidden;
+            position: relative;
+        }
+        .saldo-info .valor.hidden::after {
+            content: '****';
+            visibility: visible;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+        .balance-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .manage-btn {
+            background-color: #2b2b2b;
+            color: #04b45f;
+            border: 1px solid #04b45f;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .manage-btn:hover {
+            background-color: #04b45f;
+            color: #fff;
+        }
+
+        /* Estilos do Modal de Lançamentos */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-close {
+            color: #ccc;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content h2 {
+            text-align: center;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #2b2b2b;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        .modal-content .save-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .modal-content .save-btn:hover {
+            background-color: #03a252;
+        }
+        .modal-form-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .modal-form-tabs button {
+            background-color: #2b2b2b;
+            color: #ccc;
+            border: 1px solid #04b45f;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: background-color 0.3s;
+        }
+        .modal-form-tabs button.active {
+            background-color: #04b45f;
+            color: #fff;
+        }
+
+        /* Estilos para a lista de contas a pagar/receber */
+        .contas-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .conta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #2b2b2b;
+            border-radius: 8px;
+            border: 1px solid #04b45f;
+        }
+        .conta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .conta-info h5 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .conta-info small {
+            font-size: 12px;
+            color: #ccc;
+        }
+        .conta-valor {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .conta-valor.paga {
+            color: #2ecc71;
+        }
+        .conta-valor.pendente {
+            color: #e74c3c;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pago {
+            background-color: #2ecc71;
+            color: #1e1e1e;
+        }
+        .status-pendente {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+        }
+        .add-btn-small {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            align-self: center;
+        }
+        .add-btn-small:hover {
+            background-color: #03a252;
+        }
+        .add-conta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Estilos para o card de maiores gastos */
+        .gastos-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .gasto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #444;
+        }
+        .gasto-item:last-child {
+            border-bottom: none;
+        }
+        .gasto-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .gasto-icon {
+            font-size: 20px;
+            color: #e74c3c;
+        }
+        .gasto-value {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        /* Estilos para lista de Contas & Cartões */
+        .accounts-list {
+            list-style: none;
+            padding: 0;
+        }
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #2b2b2b;
+            border-radius: 8px;
+            border: 1px solid #04b45f;
+            margin-bottom: 10px;
+        }
+        .account-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .account-icon {
+            font-size: 24px;
+        }
+        .account-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .account-balance {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .card-limit {
+            color: #f1c40f;
+            font-size: 14px;
+        }
+        .account-actions button {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 10px;
+        }
+        .account-actions button:hover {
+            color: #c0392b;
+        }
+        .add-account-btn-modal {
+            width: 100%;
+            padding: 12px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+            .top-nav {
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .top-nav a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+    <script>
+        const userStatus = {
+            plano: 'manual',
+            isTrial: true,
+            trialEnds: '2025-08-08'
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleValuesVisibility() {
+            const valores = document.querySelectorAll('.valor');
+            const btn = document.getElementById('hide-values-btn');
+            valores.forEach(valor => {
+                valor.classList.toggle('hidden');
+            });
+            const icon = btn.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+
+        // Função para abrir o modal de lançamento
+        function openLancamentoModal(tipo) {
+            const modal = document.getElementById('lancamento-modal');
+            const titulo = document.getElementById('lancamento-titulo');
+            
+            if (tipo === 'despesa') {
+                titulo.textContent = 'Adicionar Despesa';
+            } else if (tipo === 'receita') {
+                titulo.textContent = 'Adicionar Receita';
+            } else if (tipo === 'transferencia') {
+                // Para a próxima etapa, criaremos um modal específico para transferência
+                alert('A funcionalidade de Transferência será implementada em breve!');
+                return;
+            }
+            modal.style.display = 'flex';
+        }
+
+        // Função para fechar o modal
+        function closeLancamentoModal() {
+            const modal = document.getElementById('lancamento-modal');
+            modal.style.display = 'none';
+        }
+        
+        // Função para simular o envio do formulário de lançamento
+        function salvarLancamento() {
+            // Aqui você pode adicionar a lógica para enviar os dados para o seu backend
+            const valor = document.getElementById('valor').value;
+            const descricao = document.getElementById('descricao').value;
+            const data = document.getElementById('data').value;
+            const conta = document.getElementById('conta').value;
+
+            if (valor && descricao && data && conta) {
+                alert(`Lançamento salvo! Valor: ${valor}, Descrição: ${descricao}`);
+                closeLancamentoModal();
+            } else {
+                alert('Por favor, preencha todos os campos!');
+            }
+        }
+
+        // Funções para os novos modais de contas a pagar/receber
+        function openContaPagarModal() {
+            const modal = document.getElementById('conta-pagar-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeContaPagarModal() {
+            const modal = document.getElementById('conta-pagar-modal');
+            modal.style.display = 'none';
+        }
+        
+        function salvarContaPagar() {
+            alert('Conta a Pagar salva!');
+            closeContaPagarModal();
+        }
+        
+        function openContaReceberModal() {
+            const modal = document.getElementById('conta-receber-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeContaReceberModal() {
+            const modal = document.getElementById('conta-receber-modal');
+            modal.style.display = 'none';
+        }
+        
+        function salvarContaReceber() {
+            alert('Conta a Receber salva!');
+            closeContaReceberModal();
+        }
+
+        // Funções para o modal de contas e cartões
+        function openGerenciarContasModal() {
+            const modal = document.getElementById('gerenciar-contas-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeGerenciarContasModal() {
+            const modal = document.getElementById('gerenciar-contas-modal');
+            modal.style.display = 'none';
+        }
+        
+        function openAddContaModal(type) {
+            document.getElementById('gerenciar-contas-modal').style.display = 'none';
+            const modal = document.getElementById('add-account-modal');
+            const title = document.getElementById('add-account-title');
+            document.getElementById('account-type-input').value = type;
+            title.textContent = type === 'conta' ? 'Adicionar Nova Conta' : 'Adicionar Novo Cartão';
+            modal.style.display = 'flex';
+        }
+        
+        function closeAddAccountModal() {
+            document.getElementById('add-account-modal').style.display = 'none';
+        }
+
+        function salvarNovaConta() {
+            const type = document.getElementById('account-type-input').value;
+            const name = document.getElementById('account-name').value;
+            const balance = document.getElementById('account-balance').value;
+            alert(`Nova ${type} salva! Nome: ${name}, Saldo: ${balance}`);
+            closeAddAccountModal();
+            openGerenciarContasModal();
+        }
+        
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const trialStatus = document.getElementById('trial-status');
+            if (userStatus.isTrial) {
+                const today = new Date();
+                const trialEnd = new Date(userStatus.trialEnds + 'T00:00:00');
+                const diffTime = trialEnd.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let message;
+                if (diffDays <= 0) {
+                    message = `
+                        <span>Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></span>
+                    `;
+                } else {
+                    message = `
+                        <span><strong>Plano manual</strong> - ${diffDays} dias restantes</span>
+                        <a href="planos.html">Ver planos</a>
+                    `;
+                }
+                trialStatus.innerHTML = message;
+            }
+            
+            // Simulação de dados de contas a pagar
+            const contasPagar = [
+                { id: 1, descricao: 'Aluguel', valor: 1200, vencimento: '2025-08-10', status: 'pendente' },
+                { id: 2, descricao: 'Internet', valor: 150, vencimento: '2025-08-15', status: 'pendente' },
+                { id: 3, descricao: 'Mercado', valor: 450, vencimento: '2025-08-05', status: 'pago' },
+            ];
+
+            const contasReceber = [
+                { id: 1, descricao: 'Salário', valor: 2500, vencimento: '2025-08-05', status: 'recebido' },
+                { id: 2, descricao: 'Freelance', valor: 800, vencimento: '2025-08-20', status: 'pendente' },
+            ];
+            
+            const contasPagarPlaceholder = document.querySelector('#contas-a-pagar .placeholder');
+            const contasReceberPlaceholder = document.querySelector('#contas-a-receber .placeholder');
+            
+            const contasPagarList = document.querySelector('#contas-a-pagar .contas-list');
+            const contasReceberList = document.querySelector('#contas-a-receber .contas-list');
+            
+            if (contasPagar.length > 0) {
+                contasPagarPlaceholder.style.display = 'none';
+                contasPagar.forEach(conta => {
+                    const item = document.createElement('div');
+                    item.className = 'conta-item';
+                    item.innerHTML = `
+                        <div class="conta-info">
+                            <h5>${conta.descricao}</h5>
+                            <small>Vencimento: ${conta.vencimento}</small>
+                        </div>
+                        <div class="conta-info">
+                             <div class="conta-valor ${conta.status === 'pago' ? 'paga' : 'pendente'}">R$ ${conta.valor.toFixed(2).replace('.', ',')}</div>
+                             <div class="status-badge status-${conta.status}">${conta.status === 'pago' ? 'Pago' : 'Pendente'}</div>
+                        </div>
+                    `;
+                    contasPagarList.appendChild(item);
+                });
+            }
+            
+            if (contasReceber.length > 0) {
+                contasReceberPlaceholder.style.display = 'none';
+                contasReceber.forEach(conta => {
+                    const item = document.createElement('div');
+                    item.className = 'conta-item';
+                    item.innerHTML = `
+                        <div class="conta-info">
+                            <h5>${conta.descricao}</h5>
+                            <small>Vencimento: ${conta.vencimento}</small>
+                        </div>
+                        <div class="conta-info">
+                             <div class="conta-valor ${conta.status === 'recebido' ? 'paga' : 'pendente'}">R$ ${conta.valor.toFixed(2).replace('.', ',')}</div>
+                             <div class="status-badge status-${conta.status === 'recebido' ? 'pago' : 'pendente'}">${conta.status === 'recebido' ? 'Recebido' : 'Pendente'}</div>
+                        </div>
+                    `;
+                    contasReceberList.appendChild(item);
+                });
+            }
+
+            // Simulação de dados de maiores gastos
+            const maioresGastos = [
+                { categoria: 'Alimentação', valor: 750, icon: 'fas fa-hamburger' },
+                { categoria: 'Moradia', valor: 1200, icon: 'fas fa-home' },
+                { categoria: 'Transporte', valor: 210, icon: 'fas fa-car' },
+            ];
+
+            const maioresGastosPlaceholder = document.querySelector('#maiores-gastos-do-mes .placeholder');
+            const maioresGastosList = document.querySelector('#maiores-gastos-do-mes .gastos-list');
+
+            if (maioresGastos.length > 0) {
+                maioresGastosPlaceholder.style.display = 'none';
+                maioresGastos.forEach(gasto => {
+                    const item = document.createElement('li');
+                    item.className = 'gasto-item';
+                    item.innerHTML = `
+                        <div class="gasto-info">
+                            <i class="${gasto.icon}"></i>
+                            <span>${gasto.categoria}</span>
+                        </div>
+                        <div class="gasto-value">R$ ${gasto.valor.toFixed(2).replace('.', ',')}</div>
+                    `;
+                    maioresGastosList.appendChild(item);
+                });
+            }
+            
+            // Simulação de contas e cartões
+            const contasEcartoes = {
+                contas: [
+                    { name: 'Conta Corrente', balance: 3500.00, icon: 'fas fa-money-bill-wave', color: 'verde' },
+                    { name: 'Conta Poupança', balance: 15000.00, icon: 'fas fa-piggy-bank', color: 'azul' },
+                ],
+                cartoes: [
+                    { name: 'Cartão Nubank', limit: 2000.00, icon: 'fas fa-credit-card', color: 'roxo' },
+                ]
+            };
+
+            function renderAccountsAndCards() {
+                const contasList = document.getElementById('minhas-contas-lista');
+                const cartoesList = document.getElementById('meus-cartoes-lista');
+                const contasPlaceholder = document.querySelector('#minhas-contas-card .placeholder');
+                const cartoesPlaceholder = document.querySelector('#meus-cartoes-card .placeholder');
+                
+                contasList.innerHTML = '';
+                cartoesList.innerHTML = '';
+
+                if (contasEcartoes.contas.length > 0) {
+                    contasEcartoes.contas.forEach(conta => {
+                        const item = document.createElement('li');
+                        item.className = 'account-item';
+                        item.innerHTML = `
+                            <div class="account-details">
+                                <i class="account-icon ${conta.icon} ${conta.color}"></i>
+                                <div class="account-info">
+                                    <div class="account-name">${conta.name}</div>
+                                    <div class="account-balance">R$ ${conta.balance.toFixed(2).replace('.', ',')}</div>
+                                </div>
+                            </div>
+                            <div class="account-actions">
+                                <button onclick="removerConta('${conta.name}')"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        `;
+                        contasList.appendChild(item);
+                    });
+                    if (contasPlaceholder) contasPlaceholder.style.display = 'none';
+                }
+
+                if (contasEcartoes.cartoes.length > 0) {
+                     contasEcartoes.cartoes.forEach(cartao => {
+                        const item = document.createElement('li');
+                        item.className = 'account-item';
+                        item.innerHTML = `
+                            <div class="account-details">
+                                <i class="account-icon ${cartao.icon} ${cartao.color}"></i>
+                                <div class="account-info">
+                                    <div class="account-name">${cartao.name}</div>
+                                    <div class="card-limit">Limite: R$ ${cartao.limit.toFixed(2).replace('.', ',')}</div>
+                                </div>
+                            </div>
+                            <div class="account-actions">
+                                <button onclick="removerCartao('${cartao.name}')"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        `;
+                        cartoesList.appendChild(item);
+                    });
+                    if (cartoesPlaceholder) cartoesPlaceholder.style.display = 'none';
+                }
+            }
+            
+            function removerConta(nome) {
+                alert(`Removendo conta: ${nome}`);
+            }
+
+            function removerCartao(nome) {
+                alert(`Removendo cartão: ${nome}`);
+            }
+
+            renderAccountsAndCards();
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="controle-de-gastos.html" class="active"><span class="icon limao">💰</span> Controle de Gastos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="trial-status" id="trial-status">
+            </div>
+
+        <header>
+            <div class="header-left">
+                <h1 class="boas-vindas">Olá, romarinhoshows@gmail.com! 👋</h1>
+            </div>
+            <a href="#" class="hide-values-btn" id="hide-values-btn" onclick="toggleValuesVisibility()">
+                <i class="fas fa-eye"></i>
+            </a>
+        </header>
+
+        <div class="top-nav">
+            <a href="controle-de-gastos.html" class="active">visão geral</a>
+            <a href="lancamentos.html">lançamentos</a>
+            <a href="controle-relatorios.html">relatórios</a>
+            <a href="limites-gastos.html">limite de gastos</a>
+            <a href="conexao-bancaria.html">conexão bancária</a>
+        </div>
+
+        <section class="content-container">
+            <div>
+                <div class="content-block">
+                    <div class="balance-summary">
+                        <div>
+                            <h4>Receitas no mês atual</h4>
+                            <p class="valor green-text">R$ 0,00</p>
+                        </div>
+                        <div>
+                            <h4>Despesas no mês atual</h4>
+                            <p class="valor red-text">R$ 0,00</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-chart-line" style="font-size: 2em; color: #04b45f;"></i>
+                        </div>
+                    </div>
+
+                    <div class="quick-access">
+                        <a href="#" class="quick-btn red" onclick="openLancamentoModal('despesa')">
+                            <span class="icon fas fa-minus-circle"></span>
+                            DESPESA
+                        </a>
+                        <a href="#" class="quick-btn green" onclick="openLancamentoModal('receita')">
+                            <span class="icon fas fa-plus-circle"></span>
+                            RECEITA
+                        </a>
+                        <a href="#" class="quick-btn azul" onclick="openLancamentoModal('transferencia')">
+                            <span class="icon fas fa-exchange-alt"></span>
+                            TRANSF.
+                        </a>
+                        <a href="#" class="quick-btn cinza">
+                            <span class="icon fas fa-download"></span>
+                            IMPORTAR
+                        </a>
+                    </div>
+                </div>
+
+                <div class="content-block" id="minhas-contas-card">
+                    <h2>Minhas contas</h2>
+                    <div class="placeholder">Adicione sua primeira conta</div>
+                    <ul class="accounts-list" id="minhas-contas-lista">
+                         <!-- Contas serão injetadas aqui -->
+                    </ul>
+                    <a href="#" class="manage-btn" style="margin-top: 20px;" onclick="openGerenciarContasModal()">Gerenciar contas</a>
+                </div>
+
+                <div class="content-block" id="contas-a-pagar">
+                    <div class="add-conta-header">
+                        <h2>Contas a pagar</h2>
+                        <button class="add-btn-small" onclick="openContaPagarModal()">Adicionar</button>
+                    </div>
+                    <div class="placeholder">No momento você não possui contas a pagar</div>
+                    <div class="contas-list"></div>
+                </div>
+
+                <div class="content-block" id="contas-a-receber">
+                    <div class="add-conta-header">
+                         <h2>Contas a receber</h2>
+                         <button class="add-btn-small" onclick="openContaReceberModal()">Adicionar</button>
+                    </div>
+                    <div class="placeholder">Você não possui contas a receber pendentes</div>
+                    <div class="contas-list"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="content-block" id="meus-cartoes-card">
+                    <h2>Todas as faturas</h2>
+                    <p class="valor" style="font-size: 2em; color: #f1c40f;">R$ 0,00</p>
+                    <hr style="border-color: #444; margin: 20px 0;">
+                    <h2>Meus cartões</h2>
+                    <div class="placeholder">Adicione seu primeiro cartão</div>
+                    <ul class="accounts-list" id="meus-cartoes-lista">
+                        <!-- Cartões serão injetados aqui -->
+                    </ul>
+                    <a href="#" class="manage-btn" style="margin-top: 20px;" onclick="openGerenciarContasModal()">Gerenciar cartões</a>
+                </div>
+
+                <div class="content-block" id="maiores-gastos-do-mes">
+                    <h2>Maiores gastos do mês atual</h2>
+                    <div class="placeholder">Sem gastos no período</div>
+                    <ul class="gastos-list">
+                        <!-- Itens de maiores gastos serão injetados aqui -->
+                    </ul>
+                </div>
+
+                <div class="content-block">
+                    <h2>Limite de gastos de Agosto</h2>
+                    <div class="placeholder">Nenhum Limite de Gasto definido para o período</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Registro de Lançamentos -->
+    <div id="lancamento-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeLancamentoModal()">&times;</span>
+            <h2 id="lancamento-titulo"></h2>
+            <form id="lancamento-form">
+                <div class="form-group">
+                    <label for="valor">Valor</label>
+                    <input type="number" id="valor" placeholder="R$ 0,00" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição</label>
+                    <input type="text" id="descricao" placeholder="Ex: Conta de luz" required>
+                </div>
+                <div class="form-group">
+                    <label for="data">Data</label>
+                    <input type="date" id="data" required>
+                </div>
+                <div class="form-group">
+                    <label for="conta">Conta</label>
+                    <select id="conta" required>
+                        <option value="">Selecione uma conta</option>
+                        <!-- Opções de contas serão adicionadas aqui -->
+                        <option value="conta-corrente">Conta Corrente</option>
+                        <option value="cartao-nubank">Cartão Nubank</option>
+                    </select>
+                </div>
+                <button type="button" class="save-btn" onclick="salvarLancamento()">Salvar Lançamento</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de Contas a Pagar -->
+    <div id="conta-pagar-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeContaPagarModal()">&times;</span>
+            <h2>Adicionar Conta a Pagar</h2>
+            <form id="conta-pagar-form">
+                <div class="form-group">
+                    <label for="pagar-descricao">Descrição</label>
+                    <input type="text" id="pagar-descricao" placeholder="Ex: Aluguel" required>
+                </div>
+                <div class="form-group">
+                    <label for="pagar-valor">Valor</label>
+                    <input type="number" id="pagar-valor" placeholder="R$ 0,00" required>
+                </div>
+                <div class="form-group">
+                    <label for="pagar-vencimento">Data de Vencimento</label>
+                    <input type="date" id="pagar-vencimento" required>
+                </div>
+                <button type="button" class="save-btn" onclick="salvarContaPagar()">Adicionar</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de Contas a Receber -->
+    <div id="conta-receber-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeContaReceberModal()">&times;</span>
+            <h2>Adicionar Conta a Receber</h2>
+            <form id="conta-receber-form">
+                <div class="form-group">
+                    <label for="receber-descricao">Descrição</label>
+                    <input type="text" id="receber-descricao" placeholder="Ex: Salário" required>
+                </div>
+                <div class="form-group">
+                    <label for="receber-valor">Valor</label>
+                    <input type="number" id="receber-valor" placeholder="R$ 0,00" required>
+                </div>
+                <div class="form-group">
+                    <label for="receber-vencimento">Data de Vencimento</label>
+                    <input type="date" id="receber-vencimento" required>
+                </div>
+                <button type="button" class="save-btn" onclick="salvarContaReceber()">Adicionar</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal para Gerenciar Contas e Cartões -->
+    <div id="gerenciar-contas-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeGerenciarContasModal()">&times;</span>
+            <h2>Gerenciar Contas & Cartões</h2>
+            
+            <div class="modal-form-tabs">
+                <button class="active" id="tab-contas" onclick="showAccountForm('contas')">Contas</button>
+                <button id="tab-cartoes" onclick="showAccountForm('cartoes')">Cartões</button>
+            </div>
+            
+            <div id="contas-form" class="form-container">
+                <button class="add-account-btn-modal" onclick="openAddContaModal('conta')">
+                    Adicionar Nova Conta
+                </button>
+                <h3>Contas Ativas</h3>
+                <ul class="accounts-list" id="minhas-contas-lista">
+                     <!-- Contas serão renderizadas aqui -->
+                </ul>
+            </div>
+            
+             <div id="cartoes-form" class="form-container" style="display: none;">
+                <button class="add-account-btn-modal" onclick="openAddContaModal('cartao')">
+                    Adicionar Novo Cartão
+                </button>
+                <h3>Cartões Ativos</h3>
+                <ul class="accounts-list" id="meus-cartoes-lista">
+                    <!-- Cartões serão renderizados aqui -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Adicionar Conta/Cartão -->
+    <div id="add-account-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAddAccountModal()">&times;</span>
+            <h2 id="add-account-title"></h2>
+            <form>
+                <input type="hidden" id="account-type-input">
+                <div class="form-group">
+                    <label for="account-name">Nome</label>
+                    <input type="text" id="account-name" placeholder="Ex: Conta do Banco do Brasil" required>
+                </div>
+                <div class="form-group">
+                    <label for="account-balance">Saldo Inicial</label>
+                    <input type="number" id="account-balance" placeholder="R$ 0,00" required>
+                </div>
+                <button type="button" class="save-btn" onclick="salvarNovaConta()">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display: none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+</body>
+</html>

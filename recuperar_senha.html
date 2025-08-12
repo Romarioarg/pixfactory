@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recuperar Senha | PixFactory</title>
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .recovery-container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box;
+            border: 1px solid #04b45f;
+            transition: all 0.5s ease-in-out;
+        }
+        .recovery-container h1 {
+            color: #04b45f;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .recovery-container p {
+            color: #ccc;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .form-step.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #03a252;
+            box-shadow: 0 0 5px rgba(4, 180, 95, 0.4);
+        }
+        .form-group .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        .form-group .success-message {
+            color: #2ecc71;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        .action-button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .action-button:hover {
+            background-color: #03a252;
+        }
+        .action-button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        .link-options {
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .link-options a {
+            color: #04b45f;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .link-options a:hover {
+            color: #03a252;
+            text-decoration: underline;
+        }
+        
+        .password-field {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            cursor: pointer;
+        }
+        .resend-code-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .resend-code-btn:hover {
+            text-decoration: underline;
+        }
+        
+        /* Modal de Feedback */
+        .modal-feedback {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-feedback-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: popUp 0.3s ease-out;
+        }
+        .modal-feedback-content h3 {
+            color: #04b45f;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        .modal-feedback-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .modal-feedback-content .icon-feedback {
+            font-size: 60px;
+            color: #04b45f;
+            margin-bottom: 15px;
+        }
+        .modal-feedback-content button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-feedback-content button:hover {
+            background-color: #03a252;
+        }
+        .error-title { color: #e74c3c; }
+
+        .method-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .method-selector button {
+            background: none;
+            border: 1px solid #04b45f;
+            color: #ccc;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .method-selector button.active {
+            background-color: #04b45f;
+            color: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="recovery-container">
+        <h1>💵 Recuperar Senha</h1>
+        
+        <div id="step-1" class="form-step active">
+            <p>Por favor, informe seu e-mail ou telefone para continuar.</p>
+            <div class="method-selector">
+                <button id="select-email" class="active" onclick="showInput('email')">E-mail</button>
+                <button id="select-phone" onclick="showInput('phone')">Telefone</button>
+            </div>
+            <form id="step-1-form">
+                <div id="email-group" class="form-group active">
+                    <label for="email-step-1">E-mail:</label>
+                    <input type="email" id="email-step-1" placeholder="email@exemplo.com" required />
+                    <p id="email-error-message" class="error-message"></p>
+                </div>
+                <div id="phone-group" class="form-group">
+                    <label for="phone-step-1">Telefone:</label>
+                    <input type="tel" id="phone-step-1" placeholder="(99) 99999-9999" />
+                    <p id="phone-error-message" class="error-message"></p>
+                </div>
+                <button type="submit" class="action-button">Continuar</button>
+            </form>
+        </div>
+        
+        <div id="step-2" class="form-step">
+            <p id="code-instruction">Enviamos um código de verificação para o seu e-mail.</p>
+            <form id="step-2-form">
+                <div class="form-group">
+                    <label for="code">Código de Verificação:</label>
+                    <input type="text" id="code" required maxlength="6" />
+                    <p id="code-error-message" class="error-message"></p>
+                </div>
+                <button type="submit" class="action-button">Verificar Código</button>
+                <div class="link-options">
+                    <a href="#" class="resend-code-btn" id="resend-code-btn">Não recebeu o código? Reenviar.</a>
+                </div>
+            </form>
+        </div>
+        
+        <div id="step-3" class="form-step">
+            <p>Seu código foi verificado. Agora, crie sua nova senha.</p>
+            <form id="step-3-form">
+                <div class="form-group password-field">
+                    <label for="new-password">Nova Senha:</label>
+                    <input type="password" id="new-password" required />
+                    <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('new-password')"></i>
+                </div>
+                <div class="form-group password-field">
+                    <label for="confirm-new-password">Confirmar Nova Senha:</label>
+                    <input type="password" id="confirm-new-password" required />
+                    <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('confirm-new-password')"></i>
+                    <p id="new-password-error-message" class="error-message"></p>
+                </div>
+                <button type="submit" class="action-button">Salvar Nova Senha</button>
+            </form>
+        </div>
+        
+        <div class="link-options" style="margin-top: 30px;">
+            <a href="index.html">Voltar para o Login</a>
+        </div>
+    </div>
+    
+    <!-- Modal de Feedback -->
+    <div id="modal-feedback" class="modal-feedback">
+      <div class="modal-feedback-content">
+        <i id="feedback-icon" class="icon-feedback"></i>
+        <h3 id="feedback-title"></h3>
+        <p id="feedback-message"></p>
+        <button onclick="closeModalFeedback()">OK</button>
+      </div>
+    </div>
+
+    <script>
+        const ADMIN_EMAIL = 'arg.dev.java@gmail.com';
+        const ADMIN_PHONE = '11987654321';
+        const MOCK_CODE = '123456'; 
+
+        function showInput(method) {
+            document.getElementById('email-group').style.display = 'none';
+            document.getElementById('phone-group').style.display = 'none';
+            document.getElementById('select-email').classList.remove('active');
+            document.getElementById('select-phone').classList.remove('active');
+            
+            if (method === 'email') {
+                document.getElementById('email-group').style.display = 'block';
+                document.getElementById('select-email').classList.add('active');
+            } else {
+                document.getElementById('phone-group').style.display = 'block';
+                document.getElementById('select-phone').classList.add('active');
+            }
+        }
+
+        document.getElementById('step-1-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email-step-1').value;
+            const phone = document.getElementById('phone-step-1').value;
+            const emailErrorMessage = document.getElementById('email-error-message');
+            const phoneErrorMessage = document.getElementById('phone-error-message');
+
+            emailErrorMessage.style.display = 'none';
+            phoneErrorMessage.style.display = 'none';
+
+            if (email && email === ADMIN_EMAIL) {
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+                document.getElementById('code-instruction').textContent = `Enviamos um código de verificação para o seu e-mail: ${email}`;
+            } else if (phone && phone === ADMIN_PHONE) {
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+                document.getElementById('code-instruction').textContent = `Enviamos um código de verificação para o seu telefone: ${phone}`;
+            } else {
+                if (email) {
+                    emailErrorMessage.textContent = 'E-mail não encontrado. Por favor, tente novamente.';
+                    emailErrorMessage.style.display = 'block';
+                } else if (phone) {
+                    phoneErrorMessage.textContent = 'Telefone não encontrado. Por favor, tente novamente.';
+                    phoneErrorMessage.style.display = 'block';
+                }
+            }
+        });
+        
+        document.getElementById('step-2-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = document.getElementById('code').value;
+            const codeErrorMessage = document.getElementById('code-error-message');
+            
+            if (code === MOCK_CODE) {
+                codeErrorMessage.style.display = 'none';
+                document.getElementById('step-2').classList.remove('active');
+                document.getElementById('step-3').classList.add('active');
+            } else {
+                codeErrorMessage.textContent = 'Código incorreto. Tente novamente.';
+                codeErrorMessage.style.display = 'block';
+            }
+        });
+
+        document.getElementById('resend-code-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showModalFeedback('✅ Sucesso!', 'Novo código de verificação enviado!', false);
+        });
+        
+        document.getElementById('step-3-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPassword = document.getElementById('new-password').value;
+            const confirmNewPassword = document.getElementById('confirm-new-password').value;
+            const newPasswordErrorMessage = document.getElementById('new-password-error-message');
+            
+            if (newPassword !== confirmNewPassword) {
+                newPasswordErrorMessage.textContent = 'As senhas não coincidem!';
+                newPasswordErrorMessage.style.display = 'block';
+                return;
+            }
+            
+            showModalFeedback('✅ Sucesso!', 'Senha alterada com sucesso! Você pode fazer login agora.', false);
+            setTimeout(() => {
+                 window.location.href = 'index.html';
+            }, 2000);
+        });
+        
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Funções do Modal de Feedback
+        function showModalFeedback(title, message, isError = false) {
+            const modal = document.getElementById('modal-feedback');
+            const icon = document.getElementById('feedback-icon');
+            const titleElement = document.getElementById('feedback-title');
+            const messageElement = document.getElementById('feedback-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            if (isError) {
+                icon.className = 'fas fa-times-circle icon-feedback vermelho';
+                titleElement.className = 'error-title';
+            } else {
+                icon.className = 'fas fa-check-circle icon-feedback verde';
+                titleElement.className = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModalFeedback() {
+            document.getElementById('modal-feedback').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

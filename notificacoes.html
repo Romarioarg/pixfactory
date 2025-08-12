@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificações | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        /* Ajuste para os ícones no menu lateral */
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul           { color: #3498db; }
+        .verde          { color: #2ecc71; }
+        .amarelo        { color: #f1c40f; }
+        .vermelho       { color: #e74c3c; }
+        .roxo           { color: #9b59b6; }
+        .azul-claro     { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza          { color: #bdc3c7; }
+        .limao          { color: #a3e635; }
+        .roxo-claro     { color: #c084fc; }
+        .laranja        { color: #e67e22; }
+        .azul-escuro    { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header do Conteúdo Principal */
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        /* Ajuste para o ícone no header */
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        /* Seções de Conteúdo (Cards) */
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon {
+            font-size: 24px;
+            color: #e74c3c;
+        }
+
+        .section-container p {
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        /* Controles de Filtro e Pesquisa */
+        .notification-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .notification-controls input,
+        .notification-controls select {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .notification-controls input:focus,
+        .notification-controls select:focus {
+            border-color: #03a252;
+        }
+        .notification-controls input {
+            flex-grow: 1;
+        }
+        .notification-controls select {
+            flex-shrink: 0;
+        }
+
+
+        /* Lista de Notificações */
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notification-item {
+            background-color: #121212;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 5px solid transparent;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            flex-wrap: wrap;
+        }
+
+        .notification-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .notification-item.unread { border-left-color: #04b45f; }
+        .notification-item.info { border-left-color: #3498db; }
+        .notification-item.warning { border-left-color: #f1c40f; }
+        .notification-item.alert { border-left-color: #e74c3c; }
+        .notification-item.success { border-left-color: #2ecc71; }
+
+
+        .notification-icon {
+            font-size: 22px;
+            color: #ccc;
+        }
+        .notification-item.unread .notification-icon { color: #04b45f; }
+        .notification-item.info .notification-icon { color: #3498db; }
+        .notification-item.warning .notification-icon { color: #f1c40f; }
+        .notification-item.alert .notification-icon { color: #e74c3c; }
+        .notification-item.success .notification-icon { color: #2ecc71; }
+
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-content strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 3px;
+            color: #fff;
+        }
+
+        .notification-content span {
+            font-size: 13px;
+            color: #bbb;
+        }
+
+        .notification-timestamp {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+        }
+        
+        /* Botões de Ação Dinâmicos */
+        .notification-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto; /* Empurra os botões para a direita */
+            flex-wrap: wrap;
+        }
+
+        .notification-item-actions button {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .notification-item-actions button:hover {
+            background-color: #2c3e50;
+            transform: translateY(-1px);
+        }
+        .notification-item-actions .read-btn { background-color: #2ecc71; }
+        .notification-item-actions .read-btn:hover { background-color: #27ae60; }
+        .notification-item-actions .delete-btn { background-color: #e74c3c; }
+        .notification-item-actions .delete-btn:hover { background-color: #c0392b; }
+
+
+        /* Botões de Ação para Notificações */
+        .notification-actions {
+            margin-top: 25px;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notification-actions button {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-actions button:hover {
+            background-color: #2c3e50;
+            transform: translateY(-2px);
+        }
+        .notification-actions .mark-all-read-btn { background-color: #04b45f; }
+        .notification-actions .mark-all-read-btn:hover { background-color: #03a252; }
+        .notification-actions .clear-all-btn { background-color: #e74c3c; }
+        .notification-actions .clear-all-btn:hover { background-color: #c0392b; }
+
+
+        /* Configurações de Notificação (Similar à página de Configurações) */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #04b45f;
+            font-weight: bold;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2304b45f%22%20d%3D%22M287%2069.1l-11.4-11.4c-4.6-4.6-11.8-4.6-16.4%200L146.2%20202.7%2033.4%2069.1c-4.6-4.6-11.8-4.6-16.4%200L5%2080.5c-4.6%204.6-4.6%2011.8%200%2016.4l132.8%20132.8c4.6%204.6%2011.8%204.6%2016.4%200L287%2085.5c4.6-4.6%204.6-11.8%200-16.4z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+            padding-right: 30px;
+        }
+        .form-group select:focus {
+            border-color: #03a252;
+        }
+        .form-group select::-ms-expand {
+            display: none;
+        }
+
+        /* Toggle Switch (para opções on/off) */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 45px;
+            height: 25px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 25px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #04b45f;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #04b45f;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Botão Salvar Configurações */
+        .save-config-button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            width: fit-content;
+        }
+
+        .save-config-button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        
+        /* Mensagem de sucesso */
+        #status-message {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 15px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            width: auto;
+            max-width: 90%;
+        }
+        #status-message.error {
+            background-color: #e74c3c;
+        }
+
+
+        /* === Janela de Sugestão (do dashboard) === */
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* === Menu Hamburguer e Adaptações para Celular === */
+        .hamburger-menu {
+            display: none;
+            font-size: 28px;
+            color: #04b45f;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background-color: #1e1e1e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Media Queries para Telas Menores */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+                left: -260px;
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .notification-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+                gap: 8px;
+            }
+            
+            .notification-item-actions {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            .notification-item-actions button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .notification-content strong {
+                font-size: 14px;
+            }
+            .notification-content span {
+                font-size: 12px;
+            }
+
+            .notification-timestamp {
+                align-self: flex-end;
+            }
+
+            .notification-actions {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .notification-actions button {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .janela-sugestao {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+            .notification-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html" class="active"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Notificações</h1>
+            <span class="header-icon">🔔</span>
+        </header>
+        
+        <button onclick="requestNotificationPermission()" style="margin-bottom: 20px; background-color: #04b45f; color: #1e1e1e; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold;">
+            <i class="fas fa-bell"></i> Ativar Notificações do Navegador
+        </button>
+
+        <section class="section-container">
+            <h2><span class="section-icon">⏰</span> Recentes</h2>
+            
+            <div class="notification-controls">
+                <input type="text" id="search-notifications" placeholder="Pesquisar notificações..." onkeyup="filterNotifications()">
+                <select id="notification-filter" onchange="filterNotifications()">
+                    <option value="all">Todas</option>
+                    <option value="unread">Não Lidas</option>
+                    <option value="alert">Alertas</option>
+                    <option value="warning">Avisos</option>
+                    <option value="success">Sucesso</option>
+                </select>
+            </div>
+            
+            <ul class="notification-list" id="notification-list">
+                </ul>
+
+            <div class="notification-actions">
+                <button class="mark-all-read-btn" onclick="markAllAsRead()"><span class="button-icon">✔️</span> Marcar Todas como Lidas</button>
+                <button class="clear-all-btn" onclick="clearAllNotifications()"><span class="button-icon">🗑️</span> Limpar Todas</button>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <h2><span class="section-icon">⚙️</span> Preferências de Notificação</h2>
+            <p style="font-size: 13px; color: #888; margin-bottom: 20px;">
+                Gerencie como e quais notificações você gostaria de receber.
+            </p>
+            <form id="notification-settings-form">
+                <h3>Alertas de Contratos e Pagamentos</h3>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="contractDueToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="contractDueToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Contratos Próximos do Vencimento</label>
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="overdueToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="overdueToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Contratos em Atraso</label>
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="paymentReceivedToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="paymentReceivedToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Pagamentos Recebidos</label>
+                </div>
+
+                <h3>Outros Alertas</h3>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="newClientToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="newClientToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Novo Cliente Cadastrado</label>
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="backupStatusToggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="backupStatusToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Status de Backup do Sistema</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="notificationFrequency">Frequência das Notificações:</label>
+                    <select id="notificationFrequency">
+                        <option value="instant">Instantâneo</option>
+                        <option value="daily" selected>Diário (Resumo)</option>
+                        <option value="weekly">Semanal (Resumo)</option>
+                    </select>
+                </div>
+
+                <h3>Canais de Notificação</h3>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="appPushToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="appPushToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Notificações Push (App)</label>
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="emailNotificationsToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="emailNotificationsToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Notificações por E-mail</label>
+                </div>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="smsNotificationsToggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="smsNotificationsToggle" style="color: #ccc; margin-bottom: 0; font-weight: normal;">Notificações por SMS (em breve)</label>
+                </div>
+
+                <button type="submit" class="save-config-button"><span class="button-icon">💾</span> Salvar Preferências</button>
+            </form>
+        </section>
+
+        <div id="status-message" class="section-container" style="display:none;">
+            <span class="button-icon"></span> <span id="message-text"></span>
+        </div>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Dados de Notificações de exemplo
+        const mockNotifications = [
+            { id: 1, type: 'alert', title: 'Contrato vencendo amanhã!', text: 'Cliente João da Silva - Contrato #12345.', timestamp: '21/07/2025 09:00', read: false },
+            { id: 2, type: 'success', title: 'Pagamento Recebido!', text: 'Você recebeu R$ 500,00 de Maria Souza.', timestamp: '21/07/2025 10:30', read: false },
+            { id: 3, type: 'alert', title: 'Cliente em Atraso Crítico!', text: 'Carlos Mendes está há 10 dias em atraso.', timestamp: '20/07/2025 18:00', read: false },
+            { id: 4, type: 'info', title: 'Novo Cliente Cadastrado!', text: 'Bem-vindo(a) Ana Costa à sua base de clientes.', timestamp: '19/07/2025 11:45', read: true },
+            { id: 5, type: 'info', title: 'Backup Completo Realizado.', text: 'Seus dados foram salvos com segurança na nuvem.', timestamp: '18/07/2025 03:00', read: true },
+            { id: 6, type: 'warning', title: 'Contrato Próximo do Vencimento', text: 'O contrato de Pedro Santos vence em 3 dias.', timestamp: '18/07/2025 10:00', read: false },
+            { id: 7, type: 'success', title: 'Exportação Concluída', text: 'Seu relatório de contratos foi exportado com sucesso.', timestamp: '17/07/2025 14:00', read: true },
+        ];
+
+        // Mapeamento de ícones
+        const iconMap = {
+            alert: 'fas fa-exclamation-triangle',
+            warning: 'fas fa-bell',
+            info: 'fas fa-info-circle',
+            success: 'fas fa-check-circle'
+        };
+
+        // --- Lógica Principal de Notificações ---
+        
+        // Carrega e renderiza as notificações na lista
+        function renderNotifications(notifications) {
+            const notificationList = document.getElementById('notification-list');
+            notificationList.innerHTML = '';
+            
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<li style="color:#888; font-size:14px; text-align:center; padding:20px;">Nenhuma notificação encontrada.</li>';
+                return;
+            }
+
+            notifications.forEach(notif => {
+                const li = document.createElement('li');
+                li.className = `notification-item ${notif.read ? '' : 'unread'} ${notif.type}`;
+                li.setAttribute('data-id', notif.id);
+
+                const iconClass = iconMap[notif.type] || 'fas fa-info-circle';
+                const buttonIconRead = notif.read ? 'fas fa-eye' : 'fas fa-check-circle';
+                const buttonTextRead = notif.read ? 'Lida' : 'Marcar como Lida';
+
+                li.innerHTML = `
+                    <span class="notification-icon ${iconClass}"></span>
+                    <div class="notification-content">
+                        <strong>${notif.title}</strong>
+                        <span>${notif.text}</span>
+                    </div>
+                    <span class="notification-timestamp">${notif.timestamp}</span>
+                    <div class="notification-item-actions">
+                        <button class="read-btn" onclick="toggleReadStatus(event, ${notif.id})">
+                            <i class="${buttonIconRead}"></i> ${buttonTextRead}
+                        </button>
+                        <button class="delete-btn" onclick="deleteNotification(event, ${notif.id})">
+                            <i class="fas fa-trash-alt"></i> Excluir
+                        </button>
+                    </div>
+                `;
+                notificationList.appendChild(li);
+            });
+        }
+        
+        // Filtra as notificações com base na pesquisa e no filtro
+        function filterNotifications() {
+            const searchText = document.getElementById('search-notifications').value.toLowerCase();
+            const filterType = document.getElementById('notification-filter').value;
+
+            const filtered = mockNotifications.filter(notif => {
+                const matchesSearch = notif.title.toLowerCase().includes(searchText) || notif.text.toLowerCase().includes(searchText);
+                
+                const matchesFilter = (filterType === 'all') || 
+                                      (filterType === 'unread' && !notif.read) ||
+                                      (filterType === 'read' && notif.read) || 
+                                      (filterType === notif.type);
+                
+                return matchesSearch && matchesFilter;
+            });
+
+            renderNotifications(filtered);
+        }
+
+        // Marca uma notificação como lida ou não lida
+        function toggleReadStatus(event, id) {
+            event.stopPropagation();
+            const notif = mockNotifications.find(n => n.id === id);
+            if (notif) {
+                notif.read = !notif.read;
+                renderNotifications(mockNotifications);
+                showStatusMessage(notif.read ? 'Notificação marcada como lida.' : 'Notificação marcada como não lida.');
+            }
+        }
+        
+        // Deleta uma notificação
+        function deleteNotification(event, id) {
+            event.stopPropagation();
+            const index = mockNotifications.findIndex(n => n.id === id);
+            if (index !== -1) {
+                mockNotifications.splice(index, 1);
+                renderNotifications(mockNotifications);
+                showStatusMessage('Notificação excluída com sucesso.');
+            }
+        }
+
+        // Marca todas como lidas
+        function markAllAsRead() {
+            mockNotifications.forEach(notif => notif.read = true);
+            renderNotifications(mockNotifications);
+            showStatusMessage("Todas as notificações foram marcadas como lidas.");
+        }
+
+        // Limpa todas as notificações
+        function clearAllNotifications() {
+            mockNotifications.length = 0; // Limpa o array
+            renderNotifications(mockNotifications);
+            showStatusMessage("Todas as notificações foram limpas.");
+        }
+
+
+        // --- Lógica de Notificações "Push" do Navegador ---
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                showStatusMessage("Este navegador não suporta notificações de desktop.", true);
+            } else if (Notification.permission === "granted") {
+                showStatusMessage("As permissões de notificação já estão ativas.");
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        showStatusMessage("Permissão para notificações concedida!");
+                        // Opcional: Enviar uma notificação de boas-vindas
+                        new Notification("PixFactory", {
+                            body: "Você ativou as notificações! Fique por dentro dos seus contratos.",
+                            icon: "https://cdn.icon-icons.com/icons2/236/PNG/512/Coin_Moneta_26344.png"
+                        });
+                    } else {
+                        showStatusMessage("Permissão para notificações negada. Você não receberá alertas push.", true);
+                    }
+                });
+            } else {
+                showStatusMessage("As notificações estão bloqueadas. Por favor, habilite-as nas configurações do seu navegador.", true);
+            }
+        }
+
+        // --- Simulação de uma nova notificação push
+        function simularNotificacao() {
+            if (Notification.permission === "granted") {
+                 const novaNotificacao = {
+                    id: mockNotifications.length + 1,
+                    type: 'success',
+                    title: 'Parabéns!',
+                    text: 'Você recebeu um novo pagamento!',
+                    timestamp: new Date().toLocaleString('pt-BR'),
+                    read: false
+                 };
+                 mockNotifications.unshift(novaNotificacao); // Adiciona no início da lista
+                 renderNotifications(mockNotifications);
+                 triggerPushNotification(novaNotificacao);
+                 showStatusMessage("✅ Simulação de nova notificação enviada com sucesso.");
+            } else {
+                 showStatusMessage("⚠️ As notificações do navegador não estão ativas. Por favor, ative a permissão.", true);
+            }
+        }
+        
+        // Exemplo de como uma notificação seria disparada (pode ser chamada de outras páginas)
+        function triggerPushNotification(notif) {
+            if (Notification.permission === "granted") {
+                new Notification(notif.title, {
+                    body: notif.text,
+                    icon: "https://cdn.icon-icons.com/icons2/236/PNG/512/Coin_Moneta_26344.png"
+                });
+            }
+        }
+
+        // Função genérica para exibir mensagens de status
+        function showStatusMessage(message, isError = false) {
+            const statusMessageDiv = document.getElementById('status-message');
+            const messageTextSpan = document.getElementById('message-text');
+            const iconSpan = statusMessageDiv.querySelector('.button-icon');
+
+            messageTextSpan.textContent = message;
+            statusMessageDiv.style.display = 'flex';
+            statusMessageDiv.classList.toggle('error', isError);
+
+            if (isError) {
+                iconSpan.innerHTML = '❌';
+            } else {
+                iconSpan.innerHTML = '✅';
+            }
+
+            setTimeout(() => {
+                statusMessageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showStatusMessage('✅ Sugestão enviada com sucesso!');
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showStatusMessage('Por favor, digite sua sugestão antes de enviar.', true);
+            }
+        }
+        
+        // Inicia a renderização na carga da página
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNotifications(mockNotifications);
+        });
+
+    </script>
+
+</body>
+</html>

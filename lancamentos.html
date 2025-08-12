@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lançamentos | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos globais e de layout */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .rosa { color: #e84393; }
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 40px;
+            max-width: calc(100% - 80px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .hide-values-btn {
+            background: none;
+            border: none;
+            color: #04b45f;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        
+        .hide-values-btn:hover {
+            color: #03a252;
+        }
+        
+        .trial-status {
+            background-color: #f1c40f;
+            color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Alinha o conteúdo ao centro */
+            gap: 15px;
+        }
+        .trial-status a {
+            color: #1e1e1e;
+            text-decoration: underline;
+        }
+        .trial-status .progress-bar {
+            display: none; /* Esconde a barra de progresso para um visual mais limpo */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header-left h1 {
+            color: #04b45f;
+            margin-bottom: 0;
+            font-size: 28px;
+            line-height: 1.2;
+        }
+        
+        .header-left p {
+            color: #ccc;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .header-left.no-description {
+            flex-direction: row;
+            align-items: center;
+        }
+        .header-left.no-description h1 {
+            margin-bottom: 0;
+        }
+
+        .plan-info {
+            background-color: #E74C3C;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            margin-left: 20px;
+            position: relative;
+            font-size: 1.2em;
+            overflow: hidden;
+        }
+
+        .plan-info:hover {
+            background-color: #C0392B;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 30%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .plan-info:hover::before {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .plan-info strong {
+            color: #FFFFFF;
+            font-weight: 900;
+            text-shadow: 0 0 7px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .plan-info::after {
+            content: "Mais relatórios, mais clientes, mais lucros!";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            white-space: nowrap;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+        }
+
+        .plan-info:hover::after + ::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0px);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+
+        .plan-info:hover::after + ::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .top-nav {
+            background-color: #1e1e1e;
+            padding: 10px 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            border: 1px solid #04b45f;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: color 0.3s, background-color 0.3s;
+            font-size: 16px;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+
+        .lancamentos-main-content {
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+        }
+        
+        .lancamentos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .lancamentos-header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+            text-align: left; /* Título alinhado à esquerda */
+        }
+        
+        /* Estilo melhorado do botão de adicionar (+) */
+        .lancamentos-header .add-btn {
+            background: linear-gradient(45deg, #04b45f, #03a252);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(4, 180, 95, 0.4);
+            transition: all 0.3s ease;
+        }
+        .lancamentos-header .add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(4, 180, 95, 0.6);
+        }
+
+        .lancamentos-header .period-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #ccc;
+        }
+        .lancamentos-header .period-nav button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Estilos do calendário */
+        .calendar-container {
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .calendar-nav button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .calendar-nav button:hover {
+            color: #04b45f;
+        }
+
+        .calendar-weekdays,
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-weekdays span {
+            color: #888;
+            font-weight: bold;
+        }
+
+        .calendar-day {
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .calendar-day:hover {
+            background-color: #333;
+        }
+
+        .calendar-day.selected {
+            background-color: #04b45f;
+            color: #1e1e1e;
+            font-weight: bold;
+        }
+        .calendar-day.today {
+            border: 2px solid #f1c40f;
+        }
+        
+        .filters-bar {
+            background-color: #2b2b2b;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .filters-bar .filter-dropdown {
+            position: relative;
+        }
+        .filters-bar .filter-dropdown > a {
+            background-color: #333;
+            color: #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .filters-bar .filter-dropdown > a:hover {
+            background-color: #444;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            margin-top: 10px;
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            list-style: none;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 200;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            position: relative;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu a:hover {
+            background-color: #2b2b2b;
+            color: #fff;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu a.active {
+            color: #04b45f;
+            background-color: #2b2b2b;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu a.active::before {
+            content: "\f00c";
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: #04b45f;
+            margin-right: 8px;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu h4 {
+            color: #04b45f;
+            margin: 10px 10px 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .filters-bar .filter-dropdown .dropdown-menu hr {
+            border-color: #444;
+            margin: 5px 0;
+        }
+        
+        .filters-bar .search-icon {
+            color: #ccc;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .lancamentos-content {
+            min-height: 400px;
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .lancamentos-content .empty-state {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        .transacoes-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+        .transacao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px dashed #444;
+            transition: background-color 0.3s;
+        }
+        .transacao-item:hover {
+            background-color: #2b2b2b;
+        }
+        .transacao-item:last-child {
+            border-bottom: none;
+        }
+        .transacao-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .transacao-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #333;
+            transition: transform 0.3s ease;
+        }
+        .transacao-item:hover .transacao-icon {
+            transform: rotate(10deg);
+        }
+        .transacao-icon.despesa { color: #e74c3c; }
+        .transacao-icon.receita { color: #2ecc71; }
+        .transacao-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .transacao-details h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .transacao-details small {
+            font-size: 12px;
+            color: #ccc;
+        }
+        .transacao-right {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+        .transacao-valor {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .transacao-valor.despesa { color: #e74c3c; }
+        .transacao-valor.receita { color: #2ecc71; }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-close {
+            color: #ccc;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content h2 {
+            text-align: center;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #2b2b2b;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        .modal-content .save-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .modal-content .save-btn:hover {
+            background-color: #03a252;
+        }
+
+        /* Modal para alertas customizados */
+        #custom-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2b2b2b;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 300px;
+        }
+        #custom-alert .alert-text {
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        #custom-alert button {
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+                box-shadow: none;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                width: 100%;
+            }
+            .top-nav {
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .top-nav a {
+                width: 100%;
+                text-align: center;
+            }
+            .lancamentos-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .lancamentos-header h1 {
+                width: 100%;
+                text-align: center;
+            }
+            .lancamentos-header .period-nav {
+                justify-content: center;
+                width: 100%;
+            }
+            .transacao-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+    </style>
+    <script>
+        const userStatus = {
+            plano: 'manual',
+            isTrial: true,
+            trialEnds: '2025-08-08'
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleDropdown(event, id) {
+            event.preventDefault();
+            const dropdown = document.getElementById(id);
+            const isVisible = dropdown.style.display === 'flex';
+            
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+
+            if (!isVisible) {
+                dropdown.style.display = 'flex';
+            }
+        }
+        
+        // Modal de Lançamentos, reutilizado da página de Controle de Gastos
+        function openLancamentoModal(tipo) {
+            const modal = document.getElementById('lancamento-modal');
+            const titulo = document.getElementById('lancamento-titulo');
+            
+            if (tipo === 'despesa') {
+                titulo.textContent = 'Adicionar Despesa';
+            } else if (tipo === 'receita') {
+                titulo.textContent = 'Adicionar Receita';
+            } else if (tipo === 'transferencia') {
+                 showCustomAlert('A funcionalidade de Transferência será implementada em breve!');
+                return;
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeLancamentoModal() {
+            const modal = document.getElementById('lancamento-modal');
+            modal.style.display = 'none';
+        }
+        
+        function showCustomAlert(message) {
+            const customAlert = document.getElementById('custom-alert');
+            const alertText = customAlert.querySelector('.alert-text');
+            alertText.textContent = message;
+            customAlert.style.display = 'flex';
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+        }
+
+        function salvarLancamento() {
+            const valor = document.getElementById('valor').value;
+            const descricao = document.getElementById('descricao').value;
+            const data = document.getElementById('data').value;
+            const conta = document.getElementById('conta').value;
+
+            if (valor && descricao && data && conta) {
+                showCustomAlert(`Lançamento salvo! Valor: ${valor}, Descrição: ${descricao}`);
+                closeLancamentoModal();
+            } else {
+                showCustomAlert('Por favor, preencha todos os campos!');
+            }
+        }
+        
+        // --- Lógica do Calendário ---
+        let calendarContainer;
+        let monthYearText;
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            if (!calendarContainer || !monthYearText) return;
+            
+            calendarContainer.innerHTML = '';
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            monthYearText.textContent = `${monthNames[month]} ${year}`;
+            
+            // Adiciona espaços vazios para os dias da semana antes do primeiro dia do mês
+            for (let i = 0; i < startingDay; i++) {
+                const emptyDay = document.createElement('div');
+                calendarContainer.appendChild(emptyDay);
+            }
+            
+            // Adiciona os dias do mês
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                
+                // Marca o dia de hoje
+                if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === i) {
+                    day.classList.add('today');
+                }
+                
+                day.addEventListener('click', () => {
+                    document.querySelectorAll('.calendar-day.selected').forEach(d => d.classList.remove('selected'));
+                    day.classList.add('selected');
+                    // Aqui você chamaria a função para filtrar os lançamentos para este dia
+                    console.log(`Dia selecionado: ${year}-${month + 1}-${i}`);
+                });
+                
+                calendarContainer.appendChild(day);
+            }
+        }
+        
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa as variáveis após o DOM ser carregado
+            calendarContainer = document.getElementById('calendar-days');
+            monthYearText = document.getElementById('month-year');
+
+            const trialStatus = document.getElementById('trial-status');
+            if (userStatus.isTrial) {
+                const today = new Date();
+                const trialEnd = new Date(userStatus.trialEnds + 'T00:00:00');
+                const diffTime = trialEnd.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let message;
+                if (diffDays <= 0) {
+                    message = `
+                        <span>Seu teste gratuito do Plano Manual expirou. <a href="planos.html" style="color: #1e1e1e;">Assinar agora</a></span>
+                    `;
+                } else {
+                    message = `
+                        <span><strong>Plano manual</strong> - ${diffDays} dias restantes</span>
+                        <a href="planos.html">Ver planos</a>
+                    `;
+                }
+                if (trialStatus) {
+                    trialStatus.innerHTML = message;
+                }
+            }
+
+            // Simulação de lista de lançamentos
+            const lancamentos = [
+                { id: 1, tipo: 'despesa', descricao: 'Restaurante', valor: 85.50, categoria: 'Alimentação', conta: 'Conta Corrente', data: '2025-08-09' },
+                { id: 2, tipo: 'receita', descricao: 'Salário', valor: 3000.00, categoria: 'Salário', conta: 'Conta Corrente', data: '2025-08-05' },
+                { id: 3, tipo: 'despesa', descricao: 'Uber', valor: 25.00, categoria: 'Transporte', conta: 'Cartão Nubank', data: '2025-08-08' },
+                { id: 4, tipo: 'despesa', descricao: 'Netflix', valor: 55.90, categoria: 'Assinaturas e serviços', conta: 'Cartão Nubank', data: '2025-08-07' },
+                { id: 5, tipo: 'despesa', descricao: 'Mercado', valor: 150.00, categoria: 'Mercado', conta: 'Carteira', data: '2025-08-06' },
+            ];
+
+            const lancamentosList = document.querySelector('.transacoes-list');
+            const emptyState = document.querySelector('.lancamentos-content .empty-state');
+
+            if (lancamentos.length > 0) {
+                if (emptyState) {
+                    emptyState.style.display = 'none';
+                }
+                lancamentos.forEach(lancamento => {
+                    const item = document.createElement('li');
+                    item.className = 'transacao-item';
+                    item.innerHTML = `
+                        <div class="transacao-left">
+                            <div class="transacao-icon ${lancamento.tipo}">
+                                <i class="fas ${lancamento.tipo === 'despesa' ? 'fa-minus' : 'fa-plus'}"></i>
+                            </div>
+                            <div class="transacao-details">
+                                <h4>${lancamento.descricao}</h4>
+                                <small>${lancamento.categoria} - ${lancamento.conta}</small>
+                            </div>
+                        </div>
+                        <div class="transacao-right">
+                            <div class="transacao-valor ${lancamento.tipo}">${lancamento.tipo === 'despesa' ? '-' : '+'} R$ ${lancamento.valor.toFixed(2).replace('.', ',')}</div>
+                            <small>${lancamento.data}</small>
+                        </div>
+                    `;
+                    lancamentosList.appendChild(item);
+                });
+            } else {
+                if (emptyState) {
+                    emptyState.style.display = 'flex';
+                }
+            }
+            
+            renderCalendar();
+        });
+    </script>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html" class="active"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="controle-de-gastos.html"><span class="icon limao">💰</span> Controle de Gastos</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev · PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="trial-status" id="trial-status">
+            </div>
+
+        <header>
+            <div class="header-left">
+                <h1 style="color: #fff;">Lançamentos</h1>
+            </div>
+            <div class="period-nav">
+                <button><i class="fas fa-chevron-left"></i></button>
+                <span>Agosto 2025</span>
+                <button><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </header>
+
+        <div class="top-nav">
+            <a href="controle-de-gastos.html">visão geral</a>
+            <a href="lancamentos.html" class="active">lançamentos</a>
+            <a href="controle-relatorios.html">relatórios</a>
+            <a href="limites-gastos.html">limite de gastos</a>
+            <a href="conexao-bancaria.html">conexão bancária</a>
+        </div>
+
+        <section class="lancamentos-main-content">
+             <div class="lancamentos-header">
+                <h1 style="color: #04b45f;">Lançamentos</h1>
+                <div class="period-nav">
+                    <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <span id="month-year"></span>
+                    <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                 <button class="add-btn" onclick="openLancamentoModal('despesa')">+</button>
+            </div>
+            
+            <!-- Novo calendário integrado aqui -->
+            <div class="calendar-container">
+                <div class="calendar-weekdays">
+                    <span>Dom</span>
+                    <span>Seg</span>
+                    <span>Ter</span>
+                    <span>Qua</span>
+                    <span>Qui</span>
+                    <span>Sex</span>
+                    <span>Sáb</span>
+                </div>
+                <div class="calendar-days" id="calendar-days">
+                    <!-- Dias do mês serão injetados aqui -->
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-tipo')">
+                        <span>Tipo</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-tipo">
+                        <li><a href="#" class="active">todos os lançamentos</a></li>
+                        <hr>
+                        <li><a href="#">receitas</a></li>
+                        <li><a href="#">receitas recebidas</a></li>
+                        <li><a href="#">receitas não recebidas</a></li>
+                        <hr>
+                        <li><a href="#">despesas</a></li>
+                        <li><a href="#">despesas pagas</a></li>
+                        <li><a href="#">despesas não pagas</a></li>
+                        <hr>
+                        <li><a href="#">transferências</a></li>
+                        <li><a href="#">transferências pagas</a></li>
+                        <li><a href="#">transferências não pagas</a></li>
+                        <hr>
+                        <li><a href="#">lançamentos fixos</a></li>
+                        <li><a href="#">lançamentos parcelados</a></li>
+                        <hr>
+                        <li><a href="#">comprovantes anexados</a></li>
+                        <li><a href="#">lançamentos pendentes</a></li>
+                        <li><a href="#">lançamentos concluídos</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-contas')">
+                        <span>Contas & Cartões</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-contas">
+                        <li><a href="#">Conta Corrente</a></li>
+                        <li><a href="#">Carteira</a></li>
+                        <li><a href="#">Cartão de Crédito Nubank</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-categorias')">
+                        <span>Categorias</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-categorias">
+                        <h4>Categorias de despesa</h4>
+                        <li><a href="#">Alimentação</a></li>
+                        <li><a href="#">Assinaturas e serviços</a></li>
+                        <li><a href="#">Bares e restaurantes</a></li>
+                        <li><a href="#">Casa</a></li>
+                        <li><a href="#">Compras</a></li>
+                        <li><a href="#">Cuidados pessoais</a></li>
+                        <li><a href="#">Dívidas e empréstimos</a></li>
+                        <li><a href="#">Educação</a></li>
+                        <li><a href="#">Família e filhos</a></li>
+                        <li><a href="#">Impostos e Taxas</a></li>
+                        <li><a href="#">Investimentos</a></li>
+                        <li><a href="#">Lazer e hobbies</a></li>
+                        <li><a href="#">Mercado</a></li>
+                        <li><a href="#">Outros</a></li>
+                        <li><a href="#">Pets</a></li>
+                        <li><a href="#">Presentes e doações</a></li>
+                        <li><a href="#">Roupas</a></li>
+                        <li><a href="#">Saúde</a></li>
+                        <li><a href="#">Trabalho</a></li>
+                        <li><a href="#">Transporte</a></li>
+                        <li><a href="#">Viagem</a></li>
+                        <hr>
+                        <h4>Categorias de receita</h4>
+                        <li><a href="#">Empréstimos</a></li>
+                        <li><a href="#">Investimentos</a></li>
+                        <li><a href="#">Outras receitas</a></li>
+                        <li><a href="#">Salário</a></li>
+                    </ul>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <a href="#" onclick="toggleDropdown(event, 'filtro-tags')">
+                        <span>Tags</span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="filtro-tags">
+                        <li><a href="#">Viagem</a></li>
+                        <li><a href="#">Uber</a></li>
+                        <li><a href="#">Cliente X</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="lancamentos-content">
+                <div class="empty-state" style="display: none;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 3em; color: #888; margin-bottom: 20px;"></i>
+                    <p>Nenhuma movimentação no período.</p>
+                </div>
+                <ul class="transacoes-list">
+                    <!-- A lista de lançamentos será injetada aqui pelo JavaScript -->
+                </ul>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Modal de Lançamentos, reutilizado da página de Controle de Gastos -->
+    <div id="lancamento-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeLancamentoModal()">&times;</span>
+            <h2 id="lancamento-titulo"></h2>
+            <form id="lancamento-form">
+                <div class="form-group">
+                    <label for="valor">Valor</label>
+                    <input type="number" id="valor" placeholder="R$ 0,00" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição</label>
+                    <input type="text" id="descricao" placeholder="Ex: Conta de luz" required>
+                </div>
+                <div class="form-group">
+                    <label for="data">Data</label>
+                    <input type="date" id="data" required>
+                </div>
+                <div class="form-group">
+                    <label for="conta">Conta</label>
+                    <select id="conta" required>
+                        <option value="">Selecione uma conta</option>
+                        <!-- Opções de contas serão adicionadas aqui -->
+                        <option value="conta-corrente">Conta Corrente</option>
+                        <option value="cartao-nubank">Cartão Nubank</option>
+                    </select>
+                </div>
+                <button type="button" class="save-btn" onclick="salvarLancamento()">Salvar Lançamento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para alertas customizados -->
+    <div id="custom-alert" style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #2b2b2b;
+        border: 1px solid #04b45f;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 2000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        text-align: center;
+        max-width: 300px;
+    ">
+        <p class="alert-text"></p>
+        <button onclick="closeCustomAlert()" style="
+            padding: 8px 15px;
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        ">OK</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul           { color: #3498db; }
+        .verde          { color: #2ecc71; }
+        .amarelo        { color: #f1c40f; }
+        .vermelho       { color: #e74c3c; }
+        .roxo           { color: #9b59b6; }
+        .azul-claro     { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza          { color: #bdc3c7; }
+        .limao          { color: #a3e635; }
+        .roxo-claro     { color: #c084fc; }
+        .laranja        { color: #e67e22; }
+        .azul-escuro    { color: #2c3e50; }
+
+
+        .sidebar footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding: 0;
+            border-top: none;
+            margin-top: auto;
+        }
+
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            margin-right: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            margin-bottom: 20px;
+        }
+        .section-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        
+        .form-edit-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-edit-profile .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-edit-profile .form-field label {
+            font-weight: bold;
+            color: #ccc;
+            font-size: 15px;
+        }
+        .form-edit-profile .form-field input {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-edit-profile .form-field input:focus {
+            border-color: #03a252;
+        }
+
+        /* Estilo para a seção de foto de perfil */
+        .profile-photo-edit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .profile-photo-edit img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #04b45f;
+            box-shadow: 0 0 10px rgba(4, 180, 95, 0.5);
+        }
+        .profile-photo-edit a.btn {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-photo-edit a.btn:hover {
+            background-color: #2c3e50;
+            transform: translateY(-2px);
+        }
+
+
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .form-buttons button {
+            background-color: #34495e;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-buttons button:hover {
+            background-color: #2c3e50;
+            transform: translateY(-2px);
+        }
+        .form-buttons .save-btn { background-color: #04b45f; }
+        .form-buttons .save-btn:hover { background-color: #03a252; }
+        .form-buttons .cancel-btn { background-color: #e74c3c; }
+        .form-buttons .cancel-btn:hover { background-color: #c0392b; }
+        
+
+        /* === Menu Hamburguer e Adaptações para Celular === */
+        .hamburger-menu {
+            display: none;
+            font-size: 28px;
+            color: #04b45f;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background-color: #1e1e1e;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+                left: -260px;
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+                max-width: 100%;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .form-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-buttons button {
+                width: 100%;
+                justify-content: center;
+            }
+            .janela-sugestao {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html" class="active"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Editar Perfil</h1>
+            <span class="header-icon fas fa-user-edit"></span>
+        </header>
+
+        <section class="section-container">
+            <h2>Dados Pessoais</h2>
+            <form id="edit-profile-form" class="form-edit-profile">
+                <div class="profile-photo-edit">
+                    <img id="profile-photo-preview" src="https://cdn.icon-icons.com/icons2/1736/PNG/512/4043232-avatar-male-man-person_113269.png" alt="Foto de Perfil">
+                    <a href="javascript:void(0)" class="btn" onclick="document.getElementById('foto-input').click();">
+                        <i class="fas fa-camera"></i> Alterar Foto de Perfil
+                    </a>
+                    <input type="file" id="foto-input" accept="image/*" style="display:none;">
+                </div>
+                
+                <div class="form-field">
+                    <label for="nome">Nome de Usuário</label>
+                    <input type="text" id="nome" value="RomarioDev" required>
+                </div>
+                <div class="form-field">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" value="romariodev@pixfactory.com" required>
+                </div>
+                <div class="form-field">
+                    <label for="telefone">Telefone</label>
+                    <input type="tel" id="telefone" value="(11) 99540-0311">
+                </div>
+                <div class="form-field">
+                    <label for="endereco">Endereço</label>
+                    <input type="text" id="endereco" value="Rua Exemplo, 123 - Centro, São Paulo - SP">
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="save-btn" onclick="saveProfileChanges()"><i class="fas fa-save"></i> Salvar Alterações</button>
+                    <button type="button" class="cancel-btn" onclick="window.location.href='perfil.html'"><i class="fas fa-times-circle"></i> Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <script>
+        // Função para mostrar/esconder a sidebar em telas menores
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Funções da Janela de Sugestão
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                alert('✅ Sugestão enviada com sucesso!');
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                alert('Por favor, digite sua sugestão antes de enviar.');
+            }
+        }
+
+        // Script para fechar o menu em mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger-menu');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isClickOnHamburger = hamburger.contains(event.target);
+
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active') && !isClickInsideSidebar && !isClickOnHamburger) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // --- Lógica de Pré-visualização da Foto ---
+        document.getElementById('foto-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-photo-preview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Funções de redirecionamento para os novos botões
+        function saveProfileChanges() {
+            // Lógica para salvar as alterações do perfil
+            alert('✅ Alterações do perfil salvas com sucesso!');
+            window.location.href = 'perfil.html'; // Redireciona de volta para a página de perfil
+        }
+    </script>
+</body>
+</html>

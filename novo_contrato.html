@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Novo Contrato/Transação | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            background-color: #03a252;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active { transform: translateX(0); }
+        .sidebar.hidden { transform: translateX(-100%); }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav {
+            flex-grow: 1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 15px;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            color: #04b45f;
+            background-color: transparent;
+            border-left-color: transparent;
+        }
+        .sidebar .icon {
+            font-size: 1em;
+        }
+        .sidebar .fa-solid, .sidebar .fa-brands {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        .azul { color: #3498db; }
+        .verde { color: #2ecc71; }
+        .amarelo { color: #f1c40f; }
+        .vermelho { color: #e74c3c; }
+        .roxo { color: #9b59b6; }
+        .azul-claro { color: #5dade2; }
+        .vermelho-claro { color: #f1948a; }
+        .cinza { color: #bdc3c7; }
+        .limao { color: #a3e635; }
+        .roxo-claro { color: #c084fc; }
+        .laranja { color: #e67e22; }
+        .azul-escuro { color: #2c3e50; }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out;
+        }
+        .main-content header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .main-content header h1 {
+            color: #04b45f;
+            font-size: 28px;
+            margin: 0;
+        }
+        .main-content header .header-icon {
+            font-size: 28px;
+            color: #04b45f;
+        }
+        .main-content-wrapper {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .form-section, .pdf-preview-section {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4, 180, 95, 0.15);
+            flex: 1;
+            min-width: 300px;
+        }
+        .form-section h2, .pdf-preview-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .form-section form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label {
+            font-weight: bold;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #03a252;
+        }
+        .form-group.checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .form-buttons button {
+            flex: 1;
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .form-buttons button:hover {
+            background-color: #03a252;
+            transform: translateY(-2px);
+        }
+        .form-buttons .cancelar { background-color: #e74c3c; color: #fff; }
+        .form-buttons .cancelar:hover { background-color: #c0392b; }
+
+        .pdf-preview {
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .pdf-preview h1 {
+            color: #04b45f;
+            text-align: center;
+        }
+        .pdf-preview h3 {
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+        .pdf-preview p {
+            margin: 5px 0;
+        }
+        .pdf-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .pdf-preview th, .pdf-preview td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .pdf-preview th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .pdf-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pdf-actions button {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            flex: 1;
+        }
+        .pdf-actions button.csv-btn { background-color: #2ecc71; }
+        .pdf-actions button:hover { background-color: #c0392b; }
+        .pdf-actions button.csv-btn:hover { background-color: #27ae60; }
+        
+        .janela-sugestao {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover {
+            background-color: #03a252;
+        }
+
+        /* Modal de Feedback */
+        .modal-feedback {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-feedback-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: popUp 0.3s ease-out;
+        }
+        .modal-feedback-content h3 {
+            color: #04b45f;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        .modal-feedback-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .modal-feedback-content .icon-feedback {
+            font-size: 60px;
+            color: #04b45f;
+            margin-bottom: 15px;
+        }
+        .modal-feedback-content button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-feedback-content button:hover {
+            background-color: #03a252;
+        }
+        .error-title { color: #e74c3c; }
+
+        .actions-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .actions-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #1e1e1e;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            right: 0;
+            top: 100%;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .actions-dropdown-content a {
+            color: #ccc;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+        .actions-dropdown-content a:hover {
+            background-color: #2a2a2a;
+            color: #04b45f;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+                left: 0;
+                box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .hamburger-menu { display: block; }
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+                margin-right: 0;
+                padding-top: 80px;
+            }
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .main-content-wrapper {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" id="hamburger-menu" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html" class="active"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span class="icon">💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <header>
+            <h1>Novo Contrato</h1>
+            <span class="header-icon">📄</span>
+        </header>
+
+        <div class="main-content-wrapper">
+            <div class="form-section">
+                <h2><i class="fas fa-file-contract"></i> Gerador de Contratos Inteligente</h2>
+                <form id="contract-form">
+                    <div class="form-group">
+                        <label for="cliente-nome">Cliente:</label>
+                        <select id="cliente-nome" required onchange="updatePreview()">
+                            <option value="">Selecione um cliente</option>
+                            <option value="João da Silva">João da Silva</option>
+                            <option value="Maria Oliveira">Maria Oliveira</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo-contrato">Tipo de Contrato:</label>
+                        <select id="tipo-contrato" required onchange="toggleFormFields(); updatePreview();">
+                            <option value="Empréstimo">Empréstimo</option>
+                            <option value="Aluguel">Aluguel</option>
+                            <option value="Venda">Venda</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div id="outros-contrato-field" class="form-group" style="display:none;">
+                         <label for="outros-contrato">Nome do Contrato:</label>
+                         <input type="text" id="outros-contrato" placeholder="Ex: Contrato de Carro" oninput="updatePreview()">
+                    </div>
+                    <div id="contrato-em-andamento-field" class="form-group checkbox-group">
+                        <input type="checkbox" id="contrato-em-andamento" onchange="toggleFormFields(); updatePreview();">
+                        <label for="contrato-em-andamento">Contrato já está em andamento?</label>
+                    </div>
+                    <div id="valor-emprestimo-field" class="form-group">
+                        <label for="valor-total">Valor Total (R$):</label>
+                        <input type="number" id="valor-total" step="0.01" value="1000.00" required oninput="updatePreview()">
+                    </div>
+                    <div id="juros-field" class="form-group">
+                        <label for="taxa-juros">Taxa de Juros Mensal (%):</label>
+                        <input type="number" id="taxa-juros" value="2.5" step="0.01" required oninput="updatePreview()">
+                    </div>
+                    <div id="parcelas-field" class="form-group">
+                        <label for="num-parcelas">Número de Parcelas:</label>
+                        <input type="number" id="num-parcelas" value="10" min="1" required oninput="updatePreview()">
+                    </div>
+                    <div id="parcelas-pagas-field" class="form-group" style="display:none;">
+                        <label for="parcelas-pagas">Parcelas já pagas:</label>
+                        <input type="number" id="parcelas-pagas" value="0" min="0" oninput="updatePreview()">
+                    </div>
+                    <div id="frequencia-field" class="form-group">
+                        <label for="frequencia-pagamento">Frequência de Pagamento:</label>
+                        <select id="frequencia-pagamento" onchange="toggleFrequenciaFields(); updatePreview();">
+                            <option value="mensal">Mensal</option>
+                            <option value="quinzenal">Quinzenal</option>
+                            <option value="diario">Diário</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="anual">Anual</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <div id="frequencia-outros-field" class="form-group" style="display:none;">
+                        <label for="frequencia-outros">Frequência Personalizada:</label>
+                        <input type="text" id="frequencia-outros" placeholder="Ex: A cada 45 dias" oninput="updatePreview()">
+                    </div>
+                    <div id="juros-unicos-field" class="form-group checkbox-group">
+                        <input type="checkbox" id="juros-unicos" onchange="updatePreview()">
+                        <label for="juros-unicos">Cobrar apenas juros e valor principal ao final</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="data-vencimento">Data de Vencimento da Primeira Parcela:</label>
+                        <input type="date" id="data-vencimento" required onchange="updatePreview()">
+                    </div>
+                     <div class="form-group">
+                        <label for="clausulas">Cláusulas Adicionais:</label>
+                        <textarea id="clausulas" placeholder="Adicione cláusulas personalizadas aqui..." oninput="updatePreview()"></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" onclick="salvarContrato()">
+                            <i class="fas fa-save"></i> Salvar Contrato
+                        </button>
+                        <button type="button" class="cancelar" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="pdf-preview-section">
+                <h2><i class="fas fa-eye"></i> Pré-visualização do Contrato</h2>
+                <div class="pdf-preview" id="preview-content">
+                     </div>
+                <div class="pdf-actions">
+                    <button class="pdf-btn" onclick="exportToPdf()"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                    <button class="csv-btn" onclick="showModalFeedback('A funcionalidade de exportar para CSV não está disponível nesta versão.', false, true)">
+                        <i class="fas fa-file-csv"></i> Exportar CSV
+                    </button>
+                    <div class="actions-dropdown">
+                        <button class="pdf-btn" onclick="toggleActionsDropdown()"><i class="fas fa-tools"></i> Ações do Contrato</button>
+                        <div id="actions-dropdown-content" class="actions-dropdown-content">
+                            <a href="#" onclick="showModalFeedback('Ação: Contrato em Hold. Esta funcionalidade irá pausar as cobranças automáticas.', false)">
+                                <i class="fas fa-pause"></i> Colocar Contrato em Hold
+                            </a>
+                            <a href="#" onclick="showModalFeedback('Ação: Anexar Documentos. Você será redirecionado para a página de anexos.', false)">
+                                <i class="fas fa-paperclip"></i> Anexar Documentos
+                            </a>
+                            <a href="#" onclick="showModalFeedback('Ação: Registrar Pagamento Parcial. Abra o contrato para registrar um pagamento parcial.', false)">
+                                <i class="fas fa-money-bill-wave"></i> Registrar Pagamento Parcial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display: none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <div id="modal-feedback" class="modal-feedback">
+      <div class="modal-feedback-content">
+        <i id="feedback-icon" class="icon-feedback"></i>
+        <h3 id="feedback-title"></h3>
+        <p id="feedback-message"></p>
+        <button onclick="closeModalFeedback()">OK</button>
+      </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clienteId = new URLSearchParams(window.location.search).get('clienteId');
+            if (clienteId) {
+                document.getElementById('cliente-nome').value = 'João da Silva';
+            }
+            toggleFormFields();
+            updatePreview();
+        });
+
+        // Funções para a usabilidade
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showModalFeedback('✅ Sucesso!', 'Sugestão enviada com sucesso!', false);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showModalFeedback('⚠️ Atenção!', 'Por favor, digite sua sugestão antes de enviar.', true);
+            }
+        }
+        
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const body = document.body;
+            sidebar.classList.toggle('active');
+            body.classList.toggle('sidebar-open');
+        }
+
+        function toggleActionsDropdown() {
+            document.getElementById("actions-dropdown-content").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.actions-dropdown button')) {
+                const dropdowns = document.getElementsByClassName("actions-dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        // Lógica de formulário dinâmico
+        function toggleFormFields() {
+            const tipoContrato = document.getElementById('tipo-contrato').value;
+            const contratoEmAndamento = document.getElementById('contrato-em-andamento').checked;
+            const outrosContratoField = document.getElementById('outros-contrato-field');
+            const parcelasPagasField = document.getElementById('parcelas-pagas-field');
+            const valorTotalLabel = document.querySelector('#valor-total').labels[0];
+
+            const valorEmprestimoField = document.getElementById('valor-emprestimo-field');
+            const jurosField = document.getElementById('juros-field');
+            const parcelasField = document.getElementById('parcelas-field');
+            const frequenciaField = document.getElementById('frequencia-field');
+            const jurosUnicosField = document.getElementById('juros-unicos-field');
+            
+            valorEmprestimoField.style.display = 'flex';
+            jurosField.style.display = 'flex';
+            parcelasField.style.display = 'flex';
+            frequenciaField.style.display = 'flex';
+            jurosUnicosField.style.display = 'none';
+            outrosContratoField.style.display = 'none';
+            parcelasPagasField.style.display = 'none';
+
+            if (tipoContrato === 'Aluguel' || tipoContrato === 'Venda') {
+                jurosField.style.display = 'none';
+                parcelasField.style.display = 'none';
+                frequenciaField.style.display = 'none';
+            } else if (tipoContrato === 'Empréstimo') {
+                 jurosUnicosField.style.display = 'flex';
+                 if (contratoEmAndamento) {
+                     parcelasPagasField.style.display = 'flex';
+                 }
+            } else if (tipoContrato === 'Outros') {
+                 outrosContratoField.style.display = 'flex';
+                 jurosField.style.display = 'none';
+                 parcelasField.style.display = 'none';
+                 frequenciaField.style.display = 'none';
+                 jurosUnicosField.style.display = 'none';
+            }
+
+            if (contratoEmAndamento) {
+                 valorTotalLabel.textContent = 'Saldo Devedor Atual (R$):';
+            } else {
+                 valorTotalLabel.textContent = 'Valor Total (R$):';
+            }
+
+            updatePreview();
+        }
+
+        function toggleFrequenciaFields() {
+            const frequencia = document.getElementById('frequencia-pagamento').value;
+            const outrosFrequenciaField = document.getElementById('frequencia-outros-field');
+            
+            if (frequencia === 'outros') {
+                 outrosFrequenciaField.style.display = 'flex';
+            } else {
+                 outrosFrequenciaField.style.display = 'none';
+            }
+            updatePreview();
+        }
+
+        // Funções para o Gerador de Contrato
+        document.getElementById('contract-form').addEventListener('input', updatePreview);
+
+        function updatePreview() {
+            const clienteNome = document.getElementById('cliente-nome').value || 'Cliente de Exemplo';
+            let tipoContrato = document.getElementById('tipo-contrato').value || 'Empréstimo';
+            if (tipoContrato === 'Outros') {
+                 tipoContrato = document.getElementById('outros-contrato').value || 'Contrato Personalizado';
+            }
+            const valorTotal = parseFloat(document.getElementById('valor-total').value) || 0;
+            const numParcelas = parseInt(document.getElementById('num-parcelas').value) || 0;
+            const parcelasPagas = parseInt(document.getElementById('parcelas-pagas').value) || 0;
+            const taxaJuros = parseFloat(document.getElementById('taxa-juros').value) || 0;
+            const dataVencimento = document.getElementById('data-vencimento').value || '00/00/0000';
+            const clausulas = document.getElementById('clausulas').value || 'Nenhuma cláusula adicional.';
+            const jurosUnicos = document.getElementById('juros-unicos') ? document.getElementById('juros-unicos').checked : false;
+            const frequenciaPagamento = document.getElementById('frequencia-pagamento').value;
+            const frequenciaOutros = document.getElementById('frequencia-outros').value || '';
+            const contratoEmAndamento = document.getElementById('contrato-em-andamento').checked;
+
+            let previewHTML = `
+                <div style="text-align: center; font-size: 16px; margin-bottom: 20px;">
+                    <h1>CONTRATO DE ${tipoContrato.toUpperCase()}</h1>
+                </div>
+                <h3>Detalhes do Contrato</h3>
+                <p><strong>Cliente:</strong> ${clienteNome}</p>
+                <p><strong>Tipo de Contrato:</strong> ${tipoContrato}</p>
+            `;
+
+            if (tipoContrato === 'Empréstimo' && !jurosUnicos) {
+                 const [valorParcela, totalJuros, totalPagar, saldoDevedorFinal, parcelasRestantes] = calcularAmortizacao(valorTotal, taxaJuros, numParcelas, parcelasPagas, contratoEmAndamento);
+                 
+                 previewHTML += `
+                    <p><strong>${contratoEmAndamento ? 'Saldo Devedor Inicial' : 'Valor Total'}:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Número de Parcelas Totais:</strong> ${numParcelas}</p>
+                    ${contratoEmAndamento ? `<p><strong>Parcelas já pagas:</strong> ${parcelasPagas}</p>` : ''}
+                    <p><strong>Parcelas Restantes:</strong> ${parcelasRestantes}</p>
+                    <p><strong>Frequência:</strong> ${frequenciaPagamento === 'outros' ? frequenciaOutros : frequenciaPagamento.charAt(0).toUpperCase() + frequenciaPagamento.slice(1)}</p>
+                    <p><strong>Taxa de Juros Mensal:</strong> ${taxaJuros.toFixed(2)}%</p>
+                    <p><strong>Vencimento da 1ª Parcela:</strong> ${dataVencimento.split('-').reverse().join('/')}</p>
+                    
+                    <h3>Resumo Financeiro</h3>
+                    <p><strong>Valor da Parcela:</strong> R$ ${valorParcela.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Total de Juros:</strong> R$ ${totalJuros.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Valor Total a Pagar:</strong> R$ ${totalPagar.toFixed(2).replace('.', ',')}</p>
+                    
+                    <h3>Tabela de Amortização</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parcela</th>
+                                <th>Amortização</th>
+                                <th>Juros</th>
+                                <th>Valor</th>
+                                <th>Saldo Devedor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${gerarTabelaAmortizacao(valorTotal, taxaJuros, numParcelas, parcelasPagas)}
+                        </tbody>
+                    </table>
+                 `;
+            } else if (tipoContrato === 'Empréstimo' && jurosUnicos) {
+                 const jurosMensal = valorTotal * (taxaJuros / 100);
+                 previewHTML += `
+                    <p><strong>Valor Principal:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Juros Mensal:</strong> R$ ${jurosMensal.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Observação:</strong> O cliente pagará apenas os juros mensais, e o valor principal ao final do contrato.</p>
+                 `;
+            } else if (tipoContrato === 'Aluguel') {
+                previewHTML += `
+                    <p><strong>Valor Mensal:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Vencimento:</strong> ${dataVencimento.split('-').reverse().join('/')}</p>
+                    <p><strong>Observação:</strong> Este é um contrato de aluguel. O valor é cobrado mensalmente na data de vencimento.</p>
+                `;
+            } else if (tipoContrato === 'Venda') {
+                 previewHTML += `
+                    <p><strong>Valor da Venda:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Data da Venda:</strong> ${dataVencimento.split('-').reverse().join('/')}</p>
+                    <p><strong>Observação:</strong> Este é um contrato de venda única. A cobrança será realizada na data especificada.</p>
+                 `;
+            } else if (tipoContrato === 'Outros' || document.getElementById('outros-contrato').value) {
+                 previewHTML += `
+                    <p><strong>Descrição:</strong> ${document.getElementById('outros-contrato').value || 'Contrato Personalizado'}</p>
+                    <p><strong>Valor:</strong> R$ ${valorTotal.toFixed(2).replace('.', ',')}</p>
+                    <p><strong>Vencimento:</strong> ${dataVencimento.split('-').reverse().join('/')}</p>
+                 `;
+            }
+
+            previewHTML += `
+                <h3>Cláusulas Adicionais</h3>
+                <p>${clausulas}</p>
+            `;
+
+            document.getElementById('preview-content').innerHTML = previewHTML;
+        }
+
+        function calcularAmortizacao(valorTotal, taxaJuros, numParcelas, parcelasPagas, contratoEmAndamento) {
+            const i = taxaJuros / 100;
+            const n = numParcelas;
+            const m = parcelasPagas;
+            const parcelasRestantes = n - m;
+
+            if (i === 0) {
+                 const parcela = valorTotal / n;
+                 return [parcela, 0, valorTotal, valorTotal, parcelasRestantes];
+            }
+
+            const parcela = valorTotal * (i / (1 - Math.pow(1 + i, -n)));
+            const totalPagar = parcela * n;
+            const totalJuros = totalPagar - valorTotal;
+
+            let saldoDevedor = valorTotal;
+            for (let j = 1; j <= m; j++) {
+                const jurosDoPeriodo = saldoDevedor * i;
+                const amortizacao = parcela - jurosDoPeriodo;
+                saldoDevedor -= amortizacao;
+            }
+
+            return [parcela, totalJuros, totalPagar, saldoDevedor, parcelasRestantes];
+        }
+
+        function gerarTabelaAmortizacao(valorTotal, taxaJuros, numParcelas, parcelasPagas) {
+            let tableHTML = '';
+            let saldoDevedor = valorTotal;
+            const i = taxaJuros / 100;
+            const n = numParcelas;
+            const m = parcelasPagas;
+
+            if (numParcelas === 0 || isNaN(valorTotal) || isNaN(taxaJuros) || isNaN(numParcelas)) {
+                 return `<tr><td colspan="5" style="text-align:center;">Insira valores válidos para gerar a tabela.</td></tr>`;
+            }
+
+            const parcela = valorTotal * (i / (1 - Math.pow(1 + i, -n)));
+            let saldoDevedorAposPagos = valorTotal;
+
+            for (let j = 1; j <= m; j++) {
+                const jurosDoPeriodo = saldoDevedorAposPagos * i;
+                const amortizacao = parcela - jurosDoPeriodo;
+                saldoDevedorAposPagos -= amortizacao;
+            }
+
+            saldoDevedor = saldoDevedorAposPagos;
+
+            for (let j = m + 1; j <= n; j++) {
+                const jurosDoPeriodo = saldoDevedor * i;
+                const amortizacao = parcela - jurosDoPeriodo;
+                saldoDevedor -= amortizacao;
+                
+                tableHTML += `
+                    <tr>
+                        <td>${j}</td>
+                        <td>R$ ${amortizacao.toFixed(2).replace('.', ',')}</td>
+                        <td>R$ ${jurosDoPeriodo.toFixed(2).replace('.', ',')}</td>
+                        <td>R$ ${parcela.toFixed(2).replace('.', ',')}</td>
+                        <td>R$ ${saldoDevedor > 0 ? saldoDevedor.toFixed(2).replace('.', ',') : '0,00'}</td>
+                    </tr>
+                `;
+            }
+
+            if (m > 0) {
+                 tableHTML = `<tr><td colspan="5" style="text-align:center; font-weight: bold; background-color: #f2f2f2;">Parcelas a partir da ${m+1}ª</td></tr>` + tableHTML;
+            }
+
+            return tableHTML;
+        }
+
+        function salvarContrato() {
+            showModalFeedback('✅ Sucesso!', 'Contrato salvo com sucesso! Você será redirecionado.', false);
+            setTimeout(() => {
+                window.location.href = 'contratos.html';
+            }, 2000);
+        }
+
+        function exportToPdf() {
+            const content = document.getElementById('preview-content');
+            const clienteNome = document.getElementById('cliente-nome').value || 'Cliente de Exemplo';
+            
+            const options = {
+                margin: 15,
+                filename: `contrato_${clienteNome.replace(/\s/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(content).set(options).save();
+            showModalFeedback('✅ Exportação Concluída!', 'O arquivo PDF foi gerado e baixado com sucesso.', false);
+        }
+
+        function showModalFeedback(title, message, isError = false) {
+            const modal = document.getElementById('modal-feedback');
+            const icon = document.getElementById('feedback-icon');
+            const titleElement = document.getElementById('feedback-title');
+            const messageElement = document.getElementById('feedback-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            if (isError) {
+                icon.className = 'fas fa-times-circle icon-feedback vermelho';
+                titleElement.className = 'error-title';
+            } else {
+                icon.className = 'fas fa-check-circle icon-feedback verde';
+                titleElement.className = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModalFeedback() {
+            document.getElementById('modal-feedback').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

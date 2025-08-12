@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novos do Mês | PixFactory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* === Sidebar Lateral - PADRÃO CONSOLIDADO === */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+        .hamburger-menu:hover { background-color: #03a252; }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #04b45f;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0;
+        }
+        .sidebar nav { flex-grow: 1; }
+        .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar nav ul li { margin-bottom: 15px; }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s;
+            padding: 0;
+            border-left: none;
+            font-size: 16px;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active { color: #04b45f; background-color: transparent; border-left-color: transparent; }
+        .sidebar .icon { font-size: 1em; }
+        .sidebar .fa-solid, .sidebar .fa-brands { font-size: 18px; width: 20px; text-align: center; }
+        .azul             { color: #3498db; }
+        .verde            { color: #2ecc71; }
+        .amarelo          { color: #f1c40f; }
+        .vermelho         { color: #e74c3c; }
+        .roxo             { color: #9b59b6; }
+        .azul-claro       { color: #5dade2; }
+        .vermelho-claro   { color: #f1948a; }
+        .cinza            { color: #bdc3c7; }
+        .limao            { color: #a3e635; }
+        .roxo-claro       { color: #c084fc; }
+        .laranja          { color: #e67e22; }
+        .azul-escuro      { color: #2c3e50; }
+        .sidebar footer { text-align: center; font-size: 12px; color: #888; padding: 0; border-top: none; margin-top: auto; }
+
+        /* === Conteúdo Principal === */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100% - 320px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        header h1 { color: #04b45f; font-size: 28px; margin: 0; }
+        header .header-icon { font-size: 28px; color: #04b45f; }
+        header p { color: #ccc; font-size: 16px; margin: 0; }
+        
+        .section-container {
+            background-color: #1e1e1e;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 15px rgba(4,180,95,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #04b45f;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.2);
+            padding-bottom: 8px;
+        }
+        .section-container h2 .section-icon { font-size: 24px; color: #5dade2; }
+
+        .search-and-filter {
+            display: flex;
+            gap: 10px;
+        }
+        .search-and-filter input {
+            flex: 1;
+            padding: 10px;
+            background-color: #121212;
+            border: 1px solid #04b45f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .search-and-filter button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .clients-table-container { overflow-x: auto; }
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .clients-table th, .clients-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(4, 180, 95, 0.3);
+            white-space: nowrap;
+        }
+        .clients-table th { background-color: #2b2b2b; color: #04b45f; }
+        .clients-table td img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #121212;
+            display: inline-block;
+        }
+        .status-ativo { background-color: #2ecc71; }
+        .status-pendente { background-color: #f1c40f; }
+        .status-atrasado { background-color: #e74c3c; }
+        .action-buttons button {
+            background-color: #04b45f;
+            color: #121212;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .action-buttons button:hover { background-color: #03a252; }
+        .btn-add-contract { background-color: #3498db; color: #fff; }
+        .btn-add-contract:hover { background-color: #2980b9; }
+
+        .janela-sugestao {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #04b45f;
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 8px;
+            display: none;
+            max-width: 300px;
+        }
+        .janela-sugestao textarea {
+            width: 100%;
+            height: 100px;
+            background: #121212;
+            border: 1px solid #04b45f;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .janela-sugestao button {
+            background-color: #04b45f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            align-self: flex-end;
+            transition: background-color 0.3s;
+        }
+        .janela-sugestao button:hover { background-color: #03a252; }
+
+        /* Modal customizado para mensagens */
+        .modal-feedback {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-feedback-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #04b45f;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .modal-feedback-content h3 { color: #04b45f; font-size: 24px; margin-top: 0; }
+        .modal-feedback-content p { color: #ccc; margin-bottom: 20px; }
+        .modal-feedback-content .icon-feedback { font-size: 60px; color: #04b45f; margin-bottom: 15px; }
+        .modal-feedback-content button { background-color: #04b45f; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .modal-feedback-content button:hover { background-color: #03a252; }
+        .error-title { color: #e74c3c; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; align-items: center; }
+            .sidebar { width: 280px; transform: translateX(-100%); left: 0; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+            .sidebar.active { transform: translateX(0); }
+            .hamburger-menu { display: block; }
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+                padding-top: 80px;
+            }
+            .clients-table-container { overflow-x: auto; }
+            .clients-table { font-size: 14px; }
+            .clients-table th, .clients-table td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger-menu" onclick="toggleSidebar()">
+        ☰
+    </button>
+    <aside class="sidebar">
+        <div class="logo">💵 PixFactory</div>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html"><span class="icon azul">🏠</span> Dashboard</a></li>
+                <li><a href="clientes.html"><span class="icon verde">👤</span> Clientes</a></li>
+                <li><a href="cadastro.html"><span class="icon amarelo">➕</span> Novo Cliente</a></li>
+                <li><a href="contratos.html"><span class="icon vermelho">📄</span> Contratos</a></li>
+                <li><a href="agenda.html"><span class="icon roxo">📆</span> Agenda</a></li>
+                <li><a href="simulador.html"><span class="icon azul-claro">📊</span> Simulador</a></li>
+                <li><a href="exportacao.html"><span class="icon vermelho-claro">📥</span> Exportação</a></li>
+                <li><a href="configuracoes.html"><span class="icon cinza">⚙️</span> Configurações</a></li>
+                <li><a href="perfil.html"><span class="icon limao">🧑‍💼</span> Perfil</a></li>
+                <li><a href="notificacoes.html"><span class="icon vermelho">🔔</span> Notificações</a></li>
+                <li><a href="https://wa.me/5511995400311?text=Olá! Preciso de ajuda com o PixFactory." target="_blank"><span class="icon azul-escuro">🆘</span> Suporte</a></li>
+                <li><a href="#" onclick="abrirSugestao()"><span>💡</span> Enviar Sugestão</a></li>
+            </ul>
+        </nav>
+        <footer>Desenvolvido por RomarioDev • PixFactory © 2025</footer>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>Clientes Novos do Mês</h1>
+            <p>Lista de todos os clientes cadastrados no mês de Julho</p>
+        </header>
+
+        <section class="section-container">
+            <h2><i class="fas fa-search"></i> Filtrar Clientes</h2>
+            <div class="search-and-filter">
+                <input type="text" id="client-search" placeholder="Buscar por nome, CPF ou status...">
+                <button onclick="filterClients()">Pesquisar</button>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <h2><i class="fas fa-users"></i> Lista de Clientes</h2>
+            <div class="clients-table-container">
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Nome do Cliente</th>
+                            <th>CPF</th>
+                            <th>Data de Cadastro</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-table-body">
+                        <!-- Clientes serão inseridos aqui dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="janela-sugestao" class="janela-sugestao" style="display:none;">
+        <textarea placeholder="Digite sua sugestão aqui..."></textarea>
+        <button onclick="enviarSugestao()">Enviar</button>
+    </div>
+
+    <!-- Modal de Feedback -->
+    <div id="modal-feedback" class="modal-feedback">
+      <div class="modal-feedback-content">
+        <i id="feedback-icon" class="icon-feedback"></i>
+        <h3 id="feedback-title"></h3>
+        <p id="feedback-message"></p>
+        <button onclick="closeModalFeedback()">OK</button>
+      </div>
+    </div>
+
+    <script>
+        // Dados fictícios de clientes
+        const mockClients = [
+            { id: 1, nome: "João da Silva", cpf: "123.456.789-00", dataCadastro: "2025-07-18", status: "ativo" },
+            { id: 2, nome: "Maria Oliveira", cpf: "987.654.321-00", dataCadastro: "2025-07-20", status: "ativo" },
+            { id: 3, nome: "Carlos Pereira", cpf: "111.222.333-44", dataCadastro: "2025-07-22", status: "pendente" },
+            { id: 4, nome: "Ana Costa", cpf: "555.666.777-88", dataCadastro: "2025-07-25", status: "atrasado" },
+            { id: 5, nome: "Pedro Santos", cpf: "999.888.777-66", dataCadastro: "2025-07-28", status: "ativo" },
+        ];
+        
+        function renderClientTable(clients) {
+            const tableBody = document.getElementById('clients-table-body');
+            tableBody.innerHTML = '';
+
+            if (clients.length === 0) {
+                 tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Nenhum cliente encontrado.</td></tr>`;
+                 return;
+            }
+
+            clients.forEach(client => {
+                const row = document.createElement('tr');
+                let statusTag = '';
+                let statusText = '';
+                switch (client.status) {
+                    case 'ativo':
+                        statusTag = `<span class="status-tag status-ativo">Ativo</span>`;
+                        statusText = 'Ativo';
+                        break;
+                    case 'pendente':
+                        statusTag = `<span class="status-tag status-pendente">Pendente</span>`;
+                        statusText = 'Pendente';
+                        break;
+                    case 'atrasado':
+                        statusTag = `<span class="status-tag status-atrasado">Em Atraso</span>`;
+                        statusText = 'Em Atraso';
+                        break;
+                    default:
+                        statusTag = ``;
+                        statusText = '';
+                }
+
+                row.innerHTML = `
+                    <td>
+                        <i class="fas fa-user-circle" style="font-size: 24px; color: #ccc;"></i>
+                    </td>
+                    <td>${client.nome}</td>
+                    <td>${client.cpf}</td>
+                    <td>${client.dataCadastro}</td>
+                    <td>${statusTag}</td>
+                    <td class="action-buttons">
+                        <button onclick="verDetalhes(${client.id})"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                        <button class="btn-add-contract" onclick="adicionarContrato(${client.id})">
+                            <i class="fas fa-file-contract"></i> Contrato
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function filterClients() {
+            const searchTerm = document.getElementById('client-search').value.toLowerCase();
+            const filteredClients = mockClients.filter(client =>
+                client.nome.toLowerCase().includes(searchTerm) ||
+                client.cpf.toLowerCase().includes(searchTerm) ||
+                client.status.toLowerCase().includes(searchTerm)
+            );
+            renderClientTable(filteredClients);
+        }
+
+        function verDetalhes(clientId) {
+            // Lógica para abrir a página de detalhes do cliente
+            showModalFeedback('Funcionalidade em desenvolvimento!', `Você clicou para ver os detalhes do cliente #${clientId}.`);
+        }
+
+        function adicionarContrato(clientId) {
+            // Lógica para redirecionar para a página de novo contrato com o cliente pré-selecionado
+            window.location.href = `novo_contrato.html?clienteId=${clientId}`;
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const body = document.body;
+            sidebar.classList.toggle('active');
+            body.classList.toggle('sidebar-open');
+        }
+
+        function abrirSugestao() {
+            const janelaSugestao = document.getElementById('janela-sugestao');
+            janelaSugestao.style.display = janelaSugestao.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function enviarSugestao() {
+            const textarea = document.querySelector('#janela-sugestao textarea');
+            const sugestao = textarea.value.trim();
+            if (sugestao) {
+                showModalFeedback('✅ Sucesso!', 'Sugestão enviada com sucesso!', false);
+                textarea.value = '';
+                abrirSugestao();
+            } else {
+                showModalFeedback('⚠️ Atenção!', 'Por favor, digite sua sugestão antes de enviar.', true);
+            }
+        }
+
+        function showModalFeedback(title, message, isError = false) {
+            const modal = document.getElementById('modal-feedback');
+            const icon = document.getElementById('feedback-icon');
+            const titleElement = document.getElementById('feedback-title');
+            const messageElement = document.getElementById('feedback-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            if (isError) {
+                icon.className = 'fas fa-times-circle icon-feedback vermelho';
+                titleElement.className = 'error-title';
+            } else {
+                icon.className = 'fas fa-check-circle icon-feedback verde';
+                titleElement.className = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeModalFeedback() {
+            document.getElementById('modal-feedback').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderClientTable(mockClients);
+            document.getElementById('client-search').addEventListener('input', filterClients);
+        });
+
+    </script>
+</body>
+</html>
