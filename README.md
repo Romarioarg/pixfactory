@@ -14,18 +14,7 @@ Uma pessoa deve conseguir clonar, subir o Docker, fazer login DEMO e usar o sist
 
 ## Preview
 
-Há dois jeitos de ver o projeto:
-
-1. **Vitrine no GitHub Pages** (link de currículo): [https://romarioarg.github.io/pixfactory/](https://romarioarg.github.io/pixfactory/)  
-   Também funciona o endereço antigo [https://romarioarg.github.io/pixfactory/dashboard.html](https://romarioarg.github.io/pixfactory/dashboard.html).
-2. **Sistema completo** (login, dashboard, CRUD, Pix Demo): clone o repositório e rode `docker compose up --build`, depois abra `http://localhost:8080`.
-
-O GitHub Pages **não** executa Spring Boot nem MySQL. Por isso o dashboard real não abre nesse endereço — só a vitrine com o link do repositório.
-
-No currículo, o ideal é colocar os dois:
-
-- Repositório: [https://github.com/Romarioarg/pixfactory](https://github.com/Romarioarg/pixfactory)
-- Vitrine: [https://romarioarg.github.io/pixfactory/](https://romarioarg.github.io/pixfactory/)
+[https://romarioarg.github.io/pixfactory/](https://romarioarg.github.io/pixfactory/)
 
 ## Funcionalidades
 
