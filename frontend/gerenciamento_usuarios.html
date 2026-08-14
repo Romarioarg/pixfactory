@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuários | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <div id="users-root">
+      <header class="page-header"><h1>Gerenciamento de usuários</h1></header>
+      <form id="add-user-form" class="card grid grid-2" style="margin-bottom:16px">
+        <div class="field"><label for="new-name">Nome</label><input id="new-name" required></div>
+        <div class="field"><label for="new-email">E-mail</label><input id="new-email" type="email" required></div>
+        <div class="field"><label for="new-pass">Senha</label><input id="new-pass" type="password" required></div>
+        <div class="field"><label for="new-role">Papel</label><select id="new-role"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select></div>
+        <button type="submit">Adicionar usuário</button>
+      </form>
+      <input class="search-input" id="user-search" type="search" placeholder="Buscar usuário">
+      <table>
+        <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Plano</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="users-body"></tbody>
+      </table>
+    </div>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/usuarios.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar senha | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="auth">
+  <main class="auth-card">
+    <h1>Recuperar senha</h1>
+    <form id="recover-form">
+      <div data-step="1">
+        <div class="field"><label for="email">E-mail da conta</label><input id="email" type="email" required><p class="field-error" data-error-for="email"></p></div>
+        <button type="submit" style="width:100%">Enviar código</button>
+      </div>
+      <div data-step="2" hidden>
+        <p id="code-hint" class="hint"></p>
+        <div class="field"><label for="code">Código</label><input id="code" required><p class="field-error" data-error-for="code"></p></div>
+        <button type="submit" style="width:100%">Validar</button>
+      </div>
+      <div data-step="3" hidden>
+        <div class="field"><label for="new-password">Nova senha</label><input id="new-password" type="password" required><p class="field-error" data-error-for="password"></p></div>
+        <div class="field"><label for="confirm-new-password">Confirmar</label><input id="confirm-new-password" type="password" required><p class="field-error" data-error-for="confirm"></p></div>
+        <button type="submit" style="width:100%">Salvar senha</button>
+      </div>
+    </form>
+    <p><a href="index.html">Voltar ao login</a></p>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/recover.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planos | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header"><h1>Planos</h1></header>
+    <p class="hint">A troca de plano é simulada neste navegador. Não há cobrança real.</p>
+    <section class="pricing">
+      <article class="card">
+        <h2>Gratuito</h2>
+        <p>Até 20 clientes e backup manual.</p>
+        <button type="button" data-plan="gratuito">Usar gratuito</button>
+      </article>
+      <article class="card price-card featured">
+        <h2>Pro</h2>
+        <p>Clientes ilimitados, relatórios e exportação.</p>
+        <button type="button" data-plan="pro">Assinar Pro</button>
+      </article>
+      <article class="card">
+        <h2>Premium</h2>
+        <p>Tudo do Pro + suporte prioritário.</p>
+        <button type="button" data-plan="premium">Assinar Premium</button>
+      </article>
+    </section>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/planos.js"></script>
+</body>
+</html>

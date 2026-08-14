@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header"><h1>Simulador financeiro</h1></header>
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="tabs" id="tabs">
+          <button type="button" data-tab="emprestimo" class="active">Empréstimo</button>
+          <button type="button" data-tab="juros" class="btn-ghost">Apenas juros</button>
+        </div>
+        <form id="emprestimo-form" class="tab-panel active stack">
+          <div class="field"><label for="nome-cliente">Nome</label><input id="nome-cliente" required></div>
+          <div class="field"><label for="telefone-cliente">Telefone</label><input id="telefone-cliente"></div>
+          <div class="field"><label for="valor-emprestimo">Valor</label><input id="valor-emprestimo" type="number" value="1000" step="0.01" required></div>
+          <div class="field"><label for="taxa-juros">Taxa mensal (%)</label><input id="taxa-juros" type="number" value="2.5" step="0.01" required></div>
+          <div class="field"><label for="num-parcelas">Parcelas</label><input id="num-parcelas" type="number" value="12" min="1" required></div>
+          <div class="field"><label for="frequencia-pagamento">Frequência</label>
+            <select id="frequencia-pagamento"><option value="mensal">Mensal</option><option value="semanal">Semanal</option><option value="diario">Diário</option><option value="anual">Anual</option></select>
+          </div>
+          <button type="submit">Calcular</button>
+        </form>
+        <form id="juros-form" class="tab-panel stack">
+          <div class="field"><label for="juros-nome">Nome</label><input id="juros-nome" required></div>
+          <div class="field"><label for="juros-telefone">Telefone</label><input id="juros-telefone"></div>
+          <div class="field"><label for="juros-saldo">Saldo devedor</label><input id="juros-saldo" type="number" value="1000" step="0.01" required></div>
+          <div class="field"><label for="juros-taxa">Taxa mensal (%)</label><input id="juros-taxa" type="number" value="2.5" step="0.01" required></div>
+          <button type="submit">Calcular juros</button>
+        </form>
+      </section>
+      <section class="card">
+        <h2>Resultado</h2>
+        <p>Cliente: <strong id="res-nome">—</strong></p>
+        <p>Parcela: <strong id="res-parcela">R$ 0,00</strong></p>
+        <p>Juros: <strong id="res-juros">R$ 0,00</strong></p>
+        <p>Total: <strong id="res-total">R$ 0,00</strong></p>
+        <div id="amort-wrap" hidden>
+          <table><thead><tr><th>Parcela</th><th>Amortização</th><th>Juros</th><th>Valor</th><th>Saldo</th></tr></thead><tbody id="amort-body"></tbody></table>
+        </div>
+        <div id="wa-box" hidden style="margin-top:12px"><button type="button" id="send-wa">Enviar no WhatsApp</button></div>
+      </section>
+    </div>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/simulador.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de gastos | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main"><div id="gastos-root"></div></main>
+  <div id="pagar-modal" class="modal"><div class="modal-content">
+    <button class="modal-close" type="button" data-close-modal="pagar-modal" aria-label="Fechar">&times;</button>
+    <h3>Nova conta a pagar</h3>
+    <form id="pagar-form" class="stack">
+      <div class="field"><label for="pagar-desc">Descrição</label><input id="pagar-desc" required></div>
+      <div class="field"><label for="pagar-valor">Valor</label><input id="pagar-valor" type="number" min="0.01" step="0.01" required></div>
+      <div class="field"><label for="pagar-data">Vencimento</label><input id="pagar-data" type="date" required></div>
+      <button type="submit">Salvar</button>
+    </form>
+  </div></div>
+  <div id="receber-modal" class="modal"><div class="modal-content">
+    <button class="modal-close" type="button" data-close-modal="receber-modal" aria-label="Fechar">&times;</button>
+    <h3>Novo recebível</h3>
+    <form id="receber-form" class="stack">
+      <div class="field"><label for="rec-desc">Descrição</label><input id="rec-desc" required></div>
+      <div class="field"><label for="rec-valor">Valor</label><input id="rec-valor" type="number" min="0.01" step="0.01" required></div>
+      <div class="field"><label for="rec-data">Vencimento</label><input id="rec-data" type="date" required></div>
+      <button type="submit">Salvar</button>
+    </form>
+  </div></div>
+  <div id="conta-modal" class="modal"><div class="modal-content">
+    <button class="modal-close" type="button" data-close-modal="conta-modal" aria-label="Fechar">&times;</button>
+    <h3>Nova conta</h3>
+    <form id="conta-form" class="stack">
+      <div class="field"><label for="acc-nome">Nome</label><input id="acc-nome" required></div>
+      <div class="field"><label for="acc-saldo">Saldo inicial</label><input id="acc-saldo" type="number" step="0.01"></div>
+      <button type="submit">Salvar</button>
+    </form>
+  </div></div>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/gastos.js"></script>
+</body>
+</html>

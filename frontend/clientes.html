@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header">
+      <h1>Clientes</h1>
+      <a class="btn" href="cadastro.html">Novo cliente</a>
+    </header>
+    <input class="search-input" id="clientSearch" type="search" placeholder="Buscar por nome, cidade, telefone ou e-mail">
+    <div id="clientes-lista"></div>
+  </main>
+  <div id="cliente-modal" class="modal"><div class="modal-content"><button class="modal-close" type="button" data-close-modal="cliente-modal" aria-label="Fechar">&times;</button><div id="modal-body"></div></div></div>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/clientes.js"></script>
+</body>
+</html>

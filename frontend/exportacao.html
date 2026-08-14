@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exportação | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header"><h1>Exportação e backup</h1></header>
+    <section class="grid grid-2">
+      <article class="card stack">
+        <h2>Exportar dados</h2>
+        <p>Gera arquivos reais a partir dos dados salvos neste navegador.</p>
+        <button type="button" id="export-clients">CSV de clientes</button>
+        <button type="button" id="export-contracts" class="btn-ghost">CSV de contratos</button>
+      </article>
+      <article class="card stack">
+        <h2>Backup</h2>
+        <button type="button" id="backup-now">Baixar backup JSON</button>
+        <label for="restore-file">Restaurar backup</label>
+        <input id="restore-file" type="file" accept="application/json">
+      </article>
+    </section>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/exportacao.js"></script>
+</body>
+</html>

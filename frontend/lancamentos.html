@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lançamentos | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <div id="banner"></div>
+    <div id="fin-nav"></div>
+    <header class="page-header"><h1>Lançamentos</h1><button type="button" id="open-launch">Novo lançamento</button></header>
+    <div id="launch-list"></div>
+  </main>
+  <div id="launch-modal" class="modal"><div class="modal-content">
+    <button class="modal-close" type="button" data-close-modal="launch-modal" aria-label="Fechar">&times;</button>
+    <h3>Novo lançamento</h3>
+    <form id="launch-form" class="stack">
+      <div class="field"><label for="tipo">Tipo</label><select id="tipo"><option value="despesa">Despesa</option><option value="receita">Receita</option></select></div>
+      <div class="field"><label for="descricao">Descrição</label><input id="descricao" required></div>
+      <div class="field"><label for="valor">Valor</label><input id="valor" type="number" min="0.01" step="0.01" required></div>
+      <div class="field"><label for="data">Data</label><input id="data" type="date" required></div>
+      <div class="field"><label for="conta">Conta</label><input id="conta" value="Caixa"></div>
+      <button type="submit">Salvar</button>
+    </form>
+  </div></div>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/lancamentos.js"></script>
+</body>
+</html>

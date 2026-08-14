@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novo cliente | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header"><h1>Cadastro de cliente</h1></header>
+    <form id="cadastro-form" class="stack">
+      <section class="card stack">
+        <h2>Informações pessoais</h2>
+        <div class="flex" style="align-items:center">
+          <img id="preview" class="avatar" alt="Prévia da foto" hidden>
+          <label class="btn" for="foto-cliente">Enviar foto</label>
+          <input id="foto-cliente" type="file" accept="image/*" hidden>
+        </div>
+        <div class="field"><label for="nome">Nome completo</label><input id="nome" required><p class="field-error" data-error-for="nome"></p></div>
+        <div class="field"><label for="cpf">CPF</label><input id="cpf" inputmode="numeric" required><p class="field-error" data-error-for="cpf"></p></div>
+        <div class="field"><label for="telefone">Telefone</label><input id="telefone" required><p class="field-error" data-error-for="telefone"></p></div>
+        <div class="field"><label for="email">E-mail</label><input id="email" type="email" required><p class="field-error" data-error-for="email"></p></div>
+        <div class="field"><label for="dataNascimento">Data de nascimento</label><input id="dataNascimento" type="date"></div>
+        <div class="field"><label for="endereco">Endereço</label><textarea id="endereco" required></textarea><p class="field-error" data-error-for="endereco"></p></div>
+      </section>
+      <section class="card stack">
+        <h2>Financeiro</h2>
+        <div class="field"><label for="profissao">Profissão</label><input id="profissao"></div>
+        <div class="field"><label for="rendaMensal">Renda mensal</label><input id="rendaMensal" type="number" min="0" step="0.01"></div>
+        <div class="field"><label for="banco">Banco</label><input id="banco"></div>
+        <div class="field"><label for="classificacao">Classificação</label>
+          <select id="classificacao" required>
+            <option value="">Selecione</option>
+            <option>Bom pagador</option>
+            <option>Médio</option>
+            <option>Ruim</option>
+          </select>
+          <p class="field-error" data-error-for="classificacao"></p>
+        </div>
+      </section>
+      <div class="actions-row">
+        <button type="submit">Salvar cliente</button>
+        <a class="btn btn-danger" href="clientes.html">Cancelar</a>
+      </div>
+    </form>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/cadastro.js"></script>
+</body>
+</html>

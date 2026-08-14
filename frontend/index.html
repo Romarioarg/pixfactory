@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="auth">
+  <main class="auth-card">
+    <h1>PixFactory</h1>
+    <p class="hint">Gestão de clientes, contratos e cobranças</p>
+    <form id="login-form">
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="username" required>
+        <p class="field-error" data-error-for="email"></p>
+      </div>
+      <div class="field">
+        <label for="password">Senha</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <p class="field-error" data-error-for="password"></p>
+      </div>
+      <button type="submit" class="btn" style="width:100%;margin-top:8px">Entrar</button>
+    </form>
+    <p class="flex" style="justify-content:space-between;margin-top:16px">
+      <a href="recuperar_senha.html">Esqueceu a senha?</a>
+      <a href="cadastro-login.html">Cadastrar</a>
+    </p>
+    <p class="hint">Demo: demo@pixfactory.app / Demo@123<br>Admin: admin@pixfactory.app / Admin@123</p>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contratos | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header">
+      <h1>Contratos</h1>
+      <a class="btn" href="novo_contrato.html">Novo contrato</a>
+    </header>
+    <div class="actions-row" id="filters">
+      <button type="button" data-filter="todos">Todos</button>
+      <button type="button" class="btn-ghost" data-filter="ativo">Ativos</button>
+      <button type="button" class="btn-ghost" data-filter="atrasado">Atrasados</button>
+      <button type="button" class="btn-ghost" data-filter="pendente">Pendentes</button>
+      <button type="button" class="btn-ghost" data-filter="encerrado">Encerrados</button>
+    </div>
+    <input class="search-input" id="contract-search" type="search" placeholder="Buscar contrato ou cliente">
+    <table>
+      <thead><tr><th>Cliente</th><th>Tipo</th><th>Valor</th><th>Saldo</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody id="contracts-body"></tbody>
+    </table>
+  </main>
+  <div id="manage-modal" class="modal"><div class="modal-content"><button class="modal-close" type="button" data-close-modal="manage-modal" aria-label="Fechar">&times;</button><div id="manage-body"></div></div></div>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/contratos.js"></script>
+</body>
+</html>
