@@ -232,4 +232,4 @@ Troque `JWT_SECRET` se for além de um DEMO local.
 
 ## Autor
 
-Anderson (Romarioarg) — projeto de portfólio.
+Criado por Romariodev — projeto de portfólio.
