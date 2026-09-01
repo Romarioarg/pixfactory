@@ -1,0 +1,62 @@
+name: Smoke Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    name: Playwright smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/smoke/package-lock.json
+
+      - name: Start PixFactory
+        run: docker compose -p pixfactory up --build -d
+
+      - name: Wait for application
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/ >/dev/null; then
+              echo "Application is up"
+              exit 0
+            fi
+            echo "Waiting for http://localhost:8080 ($i)"
+            sleep 5
+          done
+          echo "Application did not become ready"
+          docker compose -p pixfactory logs
+          exit 1
+
+      - name: Install Playwright
+        working-directory: tests/smoke
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run smoke suite
+        working-directory: tests/smoke
+        env:
+          BASE_URL: http://localhost:8080
+        run: npx playwright test
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-report
+          path: tests/smoke/playwright-report/
+          if-no-files-found: ignore
+
+      - name: Stop stack
+        if: always()
+        run: docker compose -p pixfactory down
