@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cobertura de testes | PixFactory</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: "Segoe UI", sans-serif; background: #121212; color: #eee; }
+    header { background: #1E1E1E; padding: 24px; border-bottom: 1px solid #333; }
+    h1 { margin: 0 0 8px; color: #04B45F; }
+    main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card { background: #1E1E1E; border-radius: 12px; padding: 16px; }
+    .stat { font-size: 28px; margin: 8px 0 0; color: #04B45F; }
+    canvas { max-height: 280px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #333; }
+    .hint { color: #aaa; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PixFactory — cobertura de QA</h1>
+    <p class="hint">Inventário da pasta /tests. Percentuais de automação vs execução manual.</p>
+  </header>
+  <main>
+    <section class="grid">
+      <article class="card"><h2>Manuais</h2><p class="stat" id="n-manual">0</p></article>
+      <article class="card"><h2>Smoke</h2><p class="stat" id="n-smoke">0</p></article>
+      <article class="card"><h2>Regressão</h2><p class="stat" id="n-reg">0</p></article>
+      <article class="card"><h2>Unitários</h2><p class="stat" id="n-unit">0</p></article>
+      <article class="card"><h2>API</h2><p class="stat" id="n-api">0</p></article>
+      <article class="card"><h2>BDD</h2><p class="stat" id="n-bdd">0</p></article>
+      <article class="card"><h2>Automatizado</h2><p class="stat" id="pct-auto">0%</p></article>
+      <article class="card"><h2>Bugs abertos</h2><p class="stat">3</p></article>
+    </section>
+    <section class="card" style="margin-bottom:24px">
+      <h2>Cenários por tipo</h2>
+      <canvas id="chart-types"></canvas>
+    </section>
+    <section class="card" style="margin-bottom:24px">
+      <h2>Automatizado vs manual</h2>
+      <canvas id="chart-auto"></canvas>
+    </section>
+    <section class="card">
+      <h2>Detalhe</h2>
+      <table>
+        <thead><tr><th>Camada</th><th>Arquivos</th><th>Cenários</th><th>Runner</th></tr></thead>
+        <tbody>
+          <tr><td>Manual</td><td>TC-AUTH, CLIENTES, OPERACAO, NAVEGACAO, EXTENSAO</td><td>22</td><td>Markdown</td></tr>
+          <tr><td>Smoke</td><td>login, dashboard, clientes, navegação, simulador</td><td>8</td><td>Playwright</td></tr>
+          <tr><td>Regressão</td><td>auth, clientes, operação, layout</td><td>14</td><td>Playwright + POM</td></tr>
+          <tr><td>Unitário</td><td>status, enums, exceções, motor opcional</td><td>11</td><td>JUnit</td></tr>
+          <tr><td>API</td><td>Postman Auth, Clientes, Contratos, Autorização</td><td>16</td><td>Newman</td></tr>
+          <tr><td>BDD</td><td>5 features Gherkin</td><td>16</td><td>Especificação</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    const counts = { manual: 22, smoke: 8, regression: 14, unit: 11, api: 16, bdd: 16 };
+    const automated = counts.smoke + counts.regression + counts.unit + counts.api;
+    const total = automated + counts.manual;
+    document.getElementById("n-manual").textContent = counts.manual;
+    document.getElementById("n-smoke").textContent = counts.smoke;
+    document.getElementById("n-reg").textContent = counts.regression;
+    document.getElementById("n-unit").textContent = counts.unit;
+    document.getElementById("n-api").textContent = counts.api;
+    document.getElementById("n-bdd").textContent = counts.bdd;
+    document.getElementById("pct-auto").textContent = Math.round((automated / total) * 100) + "%";
+
+    new Chart(document.getElementById("chart-types"), {
+      type: "bar",
+      data: {
+        labels: ["Manual", "Smoke", "Regressão", "Unitário", "API", "BDD"],
+        datasets: [{
+          label: "Cenários",
+          data: [counts.manual, counts.smoke, counts.regression, counts.unit, counts.api, counts.bdd],
+          backgroundColor: "#04B45F"
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: "#ccc" }, grid: { color: "#333" } },
+          y: { ticks: { color: "#ccc" }, grid: { color: "#333" }, beginAtZero: true }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("chart-auto"), {
+      type: "doughnut",
+      data: {
+        labels: ["Automatizado", "Manual"],
+        datasets: [{ data: [automated, counts.manual], backgroundColor: ["#04B45F", "#444"] }]
+      },
+      options: { plugins: { legend: { labels: { color: "#eee" } } } }
+    });
+  </script>
+</body>
+</html>
