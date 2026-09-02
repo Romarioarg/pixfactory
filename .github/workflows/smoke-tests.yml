@@ -23,17 +23,21 @@ jobs:
       - name: Start PixFactory
         run: docker compose -p pixfactory up --build -d
 
-      - name: Wait for application
+      - name: Wait for API login
         run: |
           for i in $(seq 1 60); do
-            if curl -sf http://localhost:8080/ >/dev/null; then
-              echo "Application is up"
+            code=$(curl -s -o /tmp/pf-login.json -w "%{http_code}" \
+              -X POST "http://127.0.0.1:8080/api/auth/login" \
+              -H "Content-Type: application/json" \
+              -d '{"email":"demo@pixfactory.app","password":"Demo@123"}' || true)
+            if grep -q '"token"' /tmp/pf-login.json 2>/dev/null; then
+              echo "API login is ready (HTTP $code)"
               exit 0
             fi
-            echo "Waiting for http://localhost:8080 ($i)"
+            echo "Waiting for demo login ($i) HTTP ${code:-000}"
             sleep 5
           done
-          echo "Application did not become ready"
+          echo "Demo login did not become ready"
           docker compose -p pixfactory logs
           exit 1
 
@@ -46,7 +50,8 @@ jobs:
       - name: Run smoke suite
         working-directory: tests/smoke
         env:
-          BASE_URL: http://localhost:8080
+          BASE_URL: http://127.0.0.1:8080
+          CI: "true"
         run: npx playwright test
 
       - name: Upload report

@@ -8,14 +8,21 @@ async function clearSession(page) {
   });
 }
 
-async function loginAsDemo(page, email = "demo@pixfactory.app", password = "Demo@123") {
+async function openLogin(page) {
   await clearSession(page);
-  await page.goto("/");
+  await page.goto("/index.html", { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => window.PF && window.PF.auth && document.getElementById("login-form"));
+  await page.locator("#email").waitFor();
+}
+
+async function loginAsDemo(page, email = "demo@pixfactory.app", password = "Demo@123") {
+  await openLogin(page);
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
   await page.locator("#login-form button[type=submit]").click();
-  await page.waitForURL(/dashboard\.html/);
-  await page.locator("#dashboard-root h1").waitFor();
+  await page.waitForURL(/dashboard\.html/, { timeout: 20_000 });
+  await page.waitForFunction(() => window.PF && window.PF.layout);
+  await page.locator("#dashboard-root h1").waitFor({ timeout: 20_000 });
 }
 
 function uniqueCpf() {
@@ -32,4 +39,4 @@ function uniqueCpf() {
   return digits.join("");
 }
 
-module.exports = { clearSession, loginAsDemo, uniqueCpf };
+module.exports = { clearSession, openLogin, loginAsDemo, uniqueCpf };

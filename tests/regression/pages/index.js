@@ -25,7 +25,8 @@ class LoginPage {
     await this.page.addInitScript(() => {
       try { localStorage.removeItem("pixfactory.token"); } catch (err) { /* ignore */ }
     });
-    await this.page.goto("/");
+    await this.page.goto("/index.html", { waitUntil: "domcontentloaded" });
+    await this.page.waitForFunction(() => window.PF && window.PF.auth && document.getElementById("login-form"));
   }
 
   async login(email, password) {
@@ -33,6 +34,7 @@ class LoginPage {
     await this.email.fill(email);
     await this.password.fill(password);
     await this.submit.click();
+    await this.page.waitForURL(/dashboard\.html/, { timeout: 20_000 });
   }
 }
 

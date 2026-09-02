@@ -51,7 +51,7 @@ npx playwright install chromium
 npx playwright test
 ```
 
-`BASE_URL` padrão: `http://localhost:8080`.
+`BASE_URL` padrão: `http://127.0.0.1:8080`.
 
 ### Regressão
 
