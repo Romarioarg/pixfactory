@@ -3,30 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página não encontrada | PixFactory</title>
+  <title>Página não encontrada | Romario Dev</title>
   <meta http-equiv="refresh" content="3; url=./index.html">
   <link rel="icon" href="frontend/assets/favicon.svg" type="image/svg+xml">
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      background: #121212;
-      color: #fff;
-      text-align: center;
-      padding: 24px;
-    }
-    a { color: #04b45f; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <h1>Esta rota não existe mais neste site estático</h1>
-    <p>O PixFactory completo está no GitHub e roda com Spring Boot + MySQL.</p>
-    <p><a href="./index.html">Vitrine</a> · <a href="https://github.com/Romarioarg/pixfactory">Repositório</a></p>
+  <main class="page" style="min-height:100vh;display:flex;align-items:center">
+    <section class="panel" style="width:min(640px,100%);margin:40px auto;text-align:center">
+      <div class="section-kicker">404</div>
+      <h1 style="font-size:clamp(32px,5vw,48px);letter-spacing:-1px">Esta rota não existe neste site</h1>
+      <p>O portfólio público apresenta o Romario e o PixFactory. O dashboard real continua no projeto, com login e API.</p>
+      <div class="hero-actions" style="justify-content:center">
+        <a class="btn btn-primary" href="./index.html">Abrir o portfólio</a>
+        <a class="btn btn-secondary" href="https://github.com/Romarioarg/pixfactory" target="_blank" rel="noopener">Repositório</a>
+      </div>
+    </section>
   </main>
 </body>
 </html>
