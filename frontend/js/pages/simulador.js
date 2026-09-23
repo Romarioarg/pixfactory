@@ -29,53 +29,66 @@
     ).join("");
   }
 
-  document.getElementById("emprestimo-form").addEventListener("submit", (e) => {
+  document.getElementById("emprestimo-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const nome = document.getElementById("nome-cliente").value.trim();
     const telefone = document.getElementById("telefone-cliente").value;
     const P = Number(document.getElementById("valor-emprestimo").value);
-    const taxa = Number(document.getElementById("taxa-juros").value) / 100;
+    const taxa = Number(document.getElementById("taxa-juros").value);
     const n = Number(document.getElementById("num-parcelas").value);
-    const freq = document.getElementById("frequencia-pagamento").value;
     if (!nome || !(P > 0) || !(taxa >= 0) || !(n > 0)) {
       PF.ui.toast("Preencha os campos com valores válidos.", "error");
       return;
     }
-    let periods = n;
-    let i = taxa;
-    if (freq === "semanal") { periods = n; i = taxa / 4; }
-    if (freq === "diario") { periods = n; i = taxa / 30; }
-    if (freq === "anual") { periods = n; i = Math.pow(1 + taxa, 12) - 1; }
-    const parcela = i === 0 ? P / periods : P * (i / (1 - Math.pow(1 + i, -periods)));
-    const total = parcela * periods;
-    const rows = [];
-    let saldo = P;
-    for (let k = 1; k <= periods; k += 1) {
-      const juros = saldo * i;
-      const amort = parcela - juros;
-      saldo = Math.max(0, saldo - amort);
-      rows.push({ n: k, amort, juros, parcela, saldo });
+    const sistema = document.getElementById("sistema-emprestimo").value;
+    try {
+      const result = await PF.api.post("/api/simulacoes", {
+        valor: P,
+        juros: Number(document.getElementById("taxa-juros").value),
+        parcelas: n,
+        sistema: sistema,
+        modo: sistema === "so_juros" || sistema === "americano" ? "so_juros"
+          : (sistema === "so_juros_aberto" ? "juros_rotativo" : "parcela_cheia"),
+        baseCalculo: document.getElementById("base-emprestimo").value,
+        periodicidade: "mensal",
+        tipo: sistema === "aluguel" ? "aluguel" : (sistema === "so_juros_aberto" ? "emprestimo rotativo" : "emprestimo"),
+      });
+      const rows = (result.cronograma || []).map((r) => ({ n: r.numero, amort: r.principal, juros: r.juros, parcela: r.parcela, saldo: r.saldo }));
+      simulation = { nome, telefone, P, n, parcela: result.parcelaInicial, total: result.totalPagar, juros: result.totalJuros };
+      setResult(nome, result.parcelaInicial, result.totalJuros, result.totalPagar, rows);
+      document.getElementById("wa-box").hidden = false;
+      PF.ui.toast(result.explicacao);
+    } catch (err) {
+      PF.ui.toast(err.message || "Não foi possível simular.", "error");
     }
-    simulation = { nome, telefone, P, n, parcela, total, juros: total - P };
-    setResult(nome, parcela, total - P, total, rows);
-    document.getElementById("wa-box").hidden = false;
-    PF.ui.toast("Simulação calculada.");
   });
 
-  document.getElementById("juros-form").addEventListener("submit", (e) => {
+  document.getElementById("juros-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const nome = document.getElementById("juros-nome").value.trim();
     const telefone = document.getElementById("juros-telefone").value;
     const saldo = Number(document.getElementById("juros-saldo").value);
-    const taxa = Number(document.getElementById("juros-taxa").value) / 100;
+    const taxa = Number(document.getElementById("juros-taxa").value);
     if (!nome || !(saldo > 0) || !(taxa > 0)) {
       PF.ui.toast("Preencha os campos com valores válidos.", "error");
       return;
     }
-    const juros = saldo * taxa;
-    simulation = { nome, telefone, saldo, jurosMensal: juros };
-    setResult(nome, juros, juros, juros, null);
-    document.getElementById("wa-box").hidden = false;
+    try {
+      const result = await PF.api.post("/api/simulacoes", {
+        valor: saldo,
+        juros: taxa,
+        parcelas: 1,
+        sistema: "so_juros_aberto",
+        modo: "juros_rotativo",
+        baseCalculo: "saldo",
+        periodicidade: "mensal",
+      });
+      simulation = { nome, telefone, saldo, jurosMensal: result.parcelaInicial };
+      setResult(nome, result.parcelaInicial, result.parcelaInicial, result.parcelaInicial, null);
+      document.getElementById("wa-box").hidden = false;
+    } catch (err) {
+      PF.ui.toast(err.message || "Não foi possível simular.", "error");
+    }
   });
 
   document.getElementById("send-wa").addEventListener("click", () => {

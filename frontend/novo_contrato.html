@@ -9,18 +9,125 @@
 </head>
 <body>
   <main class="main-content" id="main">
-    <header class="page-header"><h1>Novo contrato</h1></header>
+    <header class="page-header">
+      <div>
+        <h1>Novo contrato</h1>
+        <p>Escolha como o dinheiro volta — parcela cheia, só juros ou aluguel.</p>
+      </div>
+      <a class="btn-ghost" href="contratos.html">Voltar</a>
+    </header>
     <div class="grid grid-2">
       <form id="novo-contrato-form" class="card stack">
         <div class="field"><label for="cliente">Cliente</label><select id="cliente" required></select></div>
-        <div class="field"><label for="tipo">Tipo</label>
-          <select id="tipo"><option>Empréstimo</option><option>Financiamento</option><option>Serviço</option></select>
+        <div class="field"><label for="tipo">Tipo da operação</label>
+          <select id="tipo">
+            <option value="Empréstimo">Empréstimo</option>
+            <option value="Empréstimo rotativo">Empréstimo rotativo (só juros)</option>
+            <option value="Capital de giro">Capital de giro</option>
+            <option value="Adiantamento">Adiantamento</option>
+            <option value="Consignado">Consignado</option>
+            <option value="Financiamento">Financiamento</option>
+            <option value="Refinanciamento">Refinanciamento</option>
+            <option value="Carnê">Carnê</option>
+            <option value="Consórcio">Consórcio</option>
+            <option value="Aluguel">Aluguel</option>
+          </select>
         </div>
-        <div class="field"><label for="valor">Valor</label><input id="valor" type="number" min="1" step="0.01" required></div>
-        <div class="field"><label for="juros">Juros mensal (%)</label><input id="juros" type="number" min="0" step="0.01" value="2.5"></div>
-        <div class="field"><label for="parcelas">Parcelas</label><input id="parcelas" type="number" min="1" value="6" required></div>
+        <fieldset class="stack" id="modo-box" style="border:0;padding:0;margin:0">
+          <legend style="font-weight:700;color:#ccc;margin-bottom:8px">Como o cliente vai pagar</legend>
+          <div class="choice-grid" id="modo-choices">
+            <button type="button" class="choice active" data-modo="parcela_cheia">
+              <strong>Parcela cheia</strong>
+              <span>Principal + juros juntos. Price, SAC ou juros simples.</span>
+            </button>
+            <button type="button" class="choice" data-modo="juros_rotativo">
+              <strong>Somente juros até quitação</strong>
+              <span>Sem prazo. Paga o juro do período até devolver o capital. 2 meses ou 2 anos — o contrato não trava.</span>
+            </button>
+            <button type="button" class="choice" data-modo="so_juros">
+              <strong>Só juros + balloon no final</strong>
+              <span>Paga só o juro nas parcelas e devolve o capital na última.</span>
+            </button>
+          </div>
+          <input type="hidden" id="modo" value="parcela_cheia">
+        </fieldset>
+        <p class="hero-example" id="modo-help">Exemplo: R$ 1.000 a 20% ao mês. Na parcela cheia o cliente amortiza. No só juros ele paga R$ 200 e o capital fica em aberto até quitar.</p>
+        <div class="field" id="sistema-wrap"><label for="sistema">Sistema de amortização</label>
+          <select id="sistema">
+            <option value="price">Price / composto (parcela fixa)</option>
+            <option value="sac">SAC (parcela decrescente)</option>
+            <option value="sacre">SACRE</option>
+            <option value="simples">Juros simples (parcela cheia)</option>
+            <option value="americano">Americano (só juros + balloon)</option>
+          </select>
+        </div>
+        <div class="field"><label for="valor">Valor emprestado / aluguel</label><input id="valor" type="number" min="1" step="0.01" value="1000" required></div>
+        <div class="field"><label for="juros">Juros ao período (%)</label><input id="juros" type="number" min="0" step="0.01" value="20"></div>
+        <div class="field" id="base-wrap"><label for="baseCalculo">Base de cálculo dos juros</label>
+          <select id="baseCalculo">
+            <option value="saldo">Sobre o saldo em aberto</option>
+            <option value="principal_original">Sobre o principal original</option>
+            <option value="valor_fixo">Valor fixo em reais</option>
+          </select>
+        </div>
+        <div class="field" id="fixo-wrap" hidden><label for="jurosFixo">Juro fixo (R$)</label><input id="jurosFixo" type="number" min="0" step="0.01" value="200"></div>
+        <div class="field"><label for="ordemPagamento">Ordem de aplicação do pagamento</label>
+          <select id="ordemPagamento">
+            <option value="juros,multa,encargos,principal">Juros → multa → encargos → principal</option>
+            <option value="multa,encargos,juros,principal">Multa → encargos → juros → principal</option>
+            <option value="principal,juros,multa,encargos">Principal → juros → multa → encargos</option>
+          </select>
+          <p class="hint">Quando o cliente paga menos que o total, o sistema aplica nessa ordem. A regra fica gravada no contrato.</p>
+        </div>
+        <div class="field" id="parcelas-wrap"><label for="parcelas">Quantidade de parcelas</label>
+          <select id="parcelas">
+            <option value="1">1 parcela</option>
+            <option value="2">2 parcelas</option>
+            <option value="3">3 parcelas</option>
+            <option value="4">4 parcelas</option>
+            <option value="5">5 parcelas</option>
+            <option value="6" selected>6 parcelas</option>
+            <option value="8">8 parcelas</option>
+            <option value="9">9 parcelas</option>
+            <option value="10">10 parcelas</option>
+            <option value="12">12 parcelas</option>
+            <option value="15">15 parcelas</option>
+            <option value="18">18 parcelas</option>
+            <option value="24">24 parcelas</option>
+            <option value="30">30 parcelas</option>
+            <option value="36">36 parcelas</option>
+            <option value="48">48 parcelas</option>
+            <option value="60">60 parcelas</option>
+            <option value="aberto" id="parcelas-aberto">Somente juros até quitação</option>
+          </select>
+          <p class="hint" id="parcelas-hint">Prazo fechado (Price, SAC, balloon) ou somente juros até o cliente quitar o capital.</p>
+        </div>
+        <div class="field"><label for="periodicidade">Periodicidade</label>
+          <select id="periodicidade">
+            <option value="mensal">Mensal</option>
+            <option value="quinzenal">Quinzenal</option>
+            <option value="semanal">Semanal</option>
+            <option value="diario">Diário</option>
+            <option value="personalizada">Outra (dias)</option>
+          </select>
+        </div>
+        <div class="field" id="dias-wrap" hidden><label for="periodicidadeDias">Dias da periodicidade</label><input id="periodicidadeDias" type="number" min="1" value="30"></div>
+        <div class="field"><label for="garantia-tipo">Garantia da operação</label>
+          <select id="garantia-tipo">
+            <option value="">Sem garantia</option>
+            <option value="imovel">Imóvel</option>
+            <option value="veiculo">Veículo</option>
+            <option value="equipamento">Equipamento</option>
+            <option value="outro">Outro bem</option>
+            <option value="pessoal">Garantia pessoal</option>
+          </select>
+        </div>
+        <div class="field"><label for="garantia-desc">Descrição / valor estimado da garantia</label><input id="garantia-desc" placeholder="Ex.: Fiat Uno 2012 · R$ 18.000"></div>
+        <div class="field"><label for="avalista-nome">Avalista / coobrigado</label><input id="avalista-nome" placeholder="Nome — separado do indicador"></div>
+        <div class="field"><label for="avalista-telefone">Telefone do avalista</label><input id="avalista-telefone"></div>
+        <div class="field" id="carencia-wrap"><label for="carencia">Carência (períodos só de juros no início)</label><input id="carencia" type="number" min="0" value="0"></div>
         <div class="field"><label for="vencimento">Primeiro vencimento</label><input id="vencimento" type="date"></div>
-        <div class="field"><label for="clausulas">Cláusulas</label><textarea id="clausulas" rows="4">Em caso de atraso, aplicam-se juros e multa conforme combinado.</textarea></div>
+        <div class="field"><label for="clausulas">Cláusulas</label><textarea id="clausulas" rows="4">Em caso de atraso, aplicam-se juros e multa conforme combinado. No modo só juros, o capital permanece em aberto até a quitação.</textarea></div>
         <div class="actions-row"><button type="submit">Salvar contrato</button><button type="button" id="print-contract" class="btn-ghost">Imprimir prévia</button></div>
       </form>
       <aside class="card" id="contrato-preview"></aside>

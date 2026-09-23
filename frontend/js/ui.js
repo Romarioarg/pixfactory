@@ -42,10 +42,22 @@
     empty(text) {
       return '<div class="empty">' + PF.escapeHtml(text) + "</div>";
     },
+    loading(text) {
+      return '<div class="empty"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> ' + PF.escapeHtml(text || "Carregando...") + "</div>";
+    },
   };
 
   document.addEventListener("click", (event) => {
     const closer = event.target.closest("[data-close-modal]");
     if (closer) PF.ui.closeModal(closer.getAttribute("data-close-modal"));
+
+    const toggle = event.target.closest("[data-dropdown]");
+    document.querySelectorAll(".dropdown.open").forEach((el) => {
+      if (!toggle || !el.contains(toggle)) el.classList.remove("open");
+    });
+    if (toggle) {
+      event.preventDefault();
+      toggle.closest(".dropdown").classList.toggle("open");
+    }
   });
 })(typeof window !== "undefined" ? window : globalThis);

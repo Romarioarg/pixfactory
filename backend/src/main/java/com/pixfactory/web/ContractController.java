@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/contracts")
+@RequestMapping({"/api/contracts", "/api/contratos"})
 public class ContractController {
     private final ContractService contractService;
 

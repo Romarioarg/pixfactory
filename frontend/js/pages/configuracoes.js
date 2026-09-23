@@ -4,6 +4,10 @@
   document.getElementById("companyName").value = s.companyName || "";
   document.getElementById("slogan").value = s.slogan || "";
   document.getElementById("defaultInterestRate").value = s.defaultInterestRate || 0;
+  document.getElementById("lateFeePercent").value = s.lateFeePercent || 0;
+  document.getElementById("moraPercentPerDay").value = s.moraPercentPerDay || 0;
+  document.getElementById("earlyPayoffDiscountPercent").value = s.earlyPayoffDiscountPercent || 0;
+  document.getElementById("graceDays").value = s.graceDays || 0;
   document.getElementById("emailNotifications").checked = !!s.emailNotifications;
   document.getElementById("paymentReminders").checked = !!s.paymentReminders;
 
@@ -13,6 +17,10 @@
       companyName: document.getElementById("companyName").value.trim(),
       slogan: document.getElementById("slogan").value.trim(),
       defaultInterestRate: Number(document.getElementById("defaultInterestRate").value || 0),
+      lateFeePercent: Number(document.getElementById("lateFeePercent").value || 0),
+      moraPercentPerDay: Number(document.getElementById("moraPercentPerDay").value || 0),
+      earlyPayoffDiscountPercent: Number(document.getElementById("earlyPayoffDiscountPercent").value || 0),
+      graceDays: Number(document.getElementById("graceDays").value || 0),
       emailNotifications: document.getElementById("emailNotifications").checked,
       paymentReminders: document.getElementById("paymentReminders").checked,
     });

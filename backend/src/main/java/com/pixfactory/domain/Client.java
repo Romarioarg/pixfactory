@@ -24,8 +24,14 @@ public class Client {
     private String status = "ativo";
     private String fotoUrl;
     private LocalDate criadoEm = LocalDate.now();
-    @Column(length = 4000)
+    @Column(columnDefinition = "TEXT")
     private String historicoJson = "[]";
+    @Column(columnDefinition = "TEXT")
+    private String indicadorJson = "{}";
+    @Column(columnDefinition = "TEXT")
+    private String referenciasJson = "[]";
+    @Column(columnDefinition = "TEXT")
+    private String observacoes;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -57,4 +63,10 @@ public class Client {
     public void setCriadoEm(LocalDate criadoEm) { this.criadoEm = criadoEm; }
     public String getHistoricoJson() { return historicoJson; }
     public void setHistoricoJson(String historicoJson) { this.historicoJson = historicoJson; }
+    public String getIndicadorJson() { return indicadorJson; }
+    public void setIndicadorJson(String indicadorJson) { this.indicadorJson = indicadorJson; }
+    public String getReferenciasJson() { return referenciasJson; }
+    public void setReferenciasJson(String referenciasJson) { this.referenciasJson = referenciasJson; }
+    public String getObservacoes() { return observacoes; }
+    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
 }

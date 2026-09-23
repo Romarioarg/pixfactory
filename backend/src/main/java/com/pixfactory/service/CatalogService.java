@@ -221,6 +221,11 @@ public class CatalogService {
         if (body.get("paymentReminders") != null) settings.setPaymentReminders(Boolean.parseBoolean(String.valueOf(body.get("paymentReminders"))));
         if (body.get("hideValues") != null) settings.setHideValues(Boolean.parseBoolean(String.valueOf(body.get("hideValues"))));
         if (body.get("theme") != null) settings.setTheme(String.valueOf(body.get("theme")));
+        if (body.get("lateFeePercent") != null) settings.setLateFeePercent(decimal(body.get("lateFeePercent")));
+        if (body.get("moraPercentPerDay") != null) settings.setMoraPercentPerDay(decimal(body.get("moraPercentPerDay")));
+        if (body.get("earlyPayoffDiscountPercent") != null) settings.setEarlyPayoffDiscountPercent(decimal(body.get("earlyPayoffDiscountPercent")));
+        if (body.get("graceDays") != null) settings.setGraceDays(Integer.parseInt(String.valueOf(body.get("graceDays"))));
+        if (body.get("cobrancaEscada") != null) settings.setCobrancaEscada(String.valueOf(body.get("cobrancaEscada")));
         return settingsMap(settingsRepository.save(settings));
     }
 
@@ -245,6 +250,11 @@ public class CatalogService {
         map.put("paymentReminders", settings.isPaymentReminders());
         map.put("theme", settings.getTheme());
         map.put("hideValues", settings.isHideValues());
+        map.put("lateFeePercent", settings.getLateFeePercent());
+        map.put("moraPercentPerDay", settings.getMoraPercentPerDay());
+        map.put("earlyPayoffDiscountPercent", settings.getEarlyPayoffDiscountPercent());
+        map.put("graceDays", settings.getGraceDays());
+        map.put("cobrancaEscada", settings.getCobrancaEscada());
         return map;
     }
 

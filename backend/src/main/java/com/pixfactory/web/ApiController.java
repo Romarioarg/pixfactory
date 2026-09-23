@@ -4,6 +4,8 @@ import com.pixfactory.domain.User;
 import com.pixfactory.mapper.DtoMapper;
 import com.pixfactory.repo.*;
 import com.pixfactory.service.CatalogService;
+import com.pixfactory.service.CashService;
+import com.pixfactory.service.ChargeService;
 import com.pixfactory.service.ClientService;
 import com.pixfactory.service.ContractService;
 import com.pixfactory.service.DashboardService;
@@ -22,6 +24,8 @@ public class ApiController {
     private final CatalogService catalogService;
     private final ClientService clientService;
     private final ContractService contractService;
+    private final ChargeService chargeService;
+    private final CashService cashService;
     private final DtoMapper mapper;
     private final LaunchRepository launchRepository;
     private final PayableRepository payableRepository;
@@ -36,6 +40,8 @@ public class ApiController {
             CatalogService catalogService,
             ClientService clientService,
             ContractService contractService,
+            ChargeService chargeService,
+            CashService cashService,
             DtoMapper mapper,
             LaunchRepository launchRepository,
             PayableRepository payableRepository,
@@ -49,6 +55,8 @@ public class ApiController {
         this.catalogService = catalogService;
         this.clientService = clientService;
         this.contractService = contractService;
+        this.chargeService = chargeService;
+        this.cashService = cashService;
         this.mapper = mapper;
         this.launchRepository = launchRepository;
         this.payableRepository = payableRepository;
@@ -65,6 +73,8 @@ public class ApiController {
         data.put("user", mapper.user(user));
         data.put("clients", clientService.findAll());
         data.put("contracts", contractService.findAll());
+        data.put("charges", chargeService.findAll());
+        data.put("cobrancas", data.get("charges"));
         data.put("launches", catalogService.launches());
         data.put("payables", catalogService.payables());
         data.put("receivables", catalogService.receivables());
@@ -79,6 +89,7 @@ public class ApiController {
         data.put("payments", contractService.payments());
         data.put("emails", catalogService.emails());
         data.put("metrics", dashboardService.metrics());
+        data.put("caixa", cashService.today());
         return data;
     }
 

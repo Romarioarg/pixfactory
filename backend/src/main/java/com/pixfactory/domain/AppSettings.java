@@ -16,6 +16,12 @@ public class AppSettings {
     private boolean paymentReminders = true;
     private String theme = "dark";
     private boolean hideValues;
+    private BigDecimal lateFeePercent = new BigDecimal("2.0");
+    private BigDecimal moraPercentPerDay = new BigDecimal("0.033");
+    private BigDecimal earlyPayoffDiscountPercent = new BigDecimal("5.0");
+    private Integer graceDays = 0;
+    @Column(length = 500)
+    private String cobrancaEscada = "antes,vencimento,1,7,30,60,90";
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,4 +41,14 @@ public class AppSettings {
     public void setTheme(String theme) { this.theme = theme; }
     public boolean isHideValues() { return hideValues; }
     public void setHideValues(boolean hideValues) { this.hideValues = hideValues; }
+    public BigDecimal getLateFeePercent() { return lateFeePercent; }
+    public void setLateFeePercent(BigDecimal lateFeePercent) { this.lateFeePercent = lateFeePercent; }
+    public BigDecimal getMoraPercentPerDay() { return moraPercentPerDay; }
+    public void setMoraPercentPerDay(BigDecimal moraPercentPerDay) { this.moraPercentPerDay = moraPercentPerDay; }
+    public BigDecimal getEarlyPayoffDiscountPercent() { return earlyPayoffDiscountPercent; }
+    public void setEarlyPayoffDiscountPercent(BigDecimal earlyPayoffDiscountPercent) { this.earlyPayoffDiscountPercent = earlyPayoffDiscountPercent; }
+    public Integer getGraceDays() { return graceDays; }
+    public void setGraceDays(Integer graceDays) { this.graceDays = graceDays; }
+    public String getCobrancaEscada() { return cobrancaEscada; }
+    public void setCobrancaEscada(String cobrancaEscada) { this.cobrancaEscada = cobrancaEscada; }
 }

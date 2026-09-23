@@ -61,12 +61,53 @@
       .replace(/"/g, "&quot;");
   };
 
+  PF.openWhatsApp = function openWhatsApp(phone, message) {
+    const d = PF.digits(phone);
+    if (!d) return false;
+    window.open("https://wa.me/55" + d + "?text=" + encodeURIComponent(message), "_blank");
+    return true;
+  };
+
+  PF.whatsappChargeMessage = function whatsappChargeMessage(opts) {
+    const o = opts || {};
+    const nome = o.nome || o.clienteNome || "cliente";
+    const valor = PF.formatMoney(o.valor);
+    const data = PF.formatDate(o.vencimento);
+    const today = PF.isoDate(0);
+    let msg = "Olá, " + nome + "! Tudo bem? Sua cobrança no valor de " + valor;
+    if (o.status === "atrasado" || (o.vencimento && o.vencimento < today)) {
+      msg += " venceu em " + data;
+    } else if (o.vencimento === today) {
+      msg += " vence hoje";
+    } else {
+      msg += " vence em " + data;
+    }
+    if (o.numero) msg += " (parcela " + o.numero + ")";
+    msg += ". PixFactory.";
+    return msg;
+  };
+
+  PF.whatsappReceiptMessage = function whatsappReceiptMessage(opts) {
+    const o = opts || {};
+    const nome = o.nome || o.clienteNome || "cliente";
+    return "Olá, " + nome + "! Segue o recibo operacional da parcela " + (o.numero || "") +
+      " no valor pago de " + PF.formatMoney(o.valorPago || o.valor) +
+      ". Recibo " + (o.reciboId || ("PF-" + (o.id || ""))) + ". PixFactory DEMO.";
+  };
+
   PF.statusLabel = function statusLabel(status) {
     const map = {
+      pago: "Pago",
+      parcial: "Parcial",
+      cancelado: "Cancelado",
+      renegociada: "Renegociada",
       ativo: "Em dia",
       atrasado: "Em atraso",
       pendente: "Pendente",
+      vencendo_hoje: "Vencendo hoje",
+      a_vencer: "A vencer",
       encerrado: "Quitado",
+      renegociado: "Renegociado",
       acordo: "Acordo",
       hold: "Em espera",
       falecimento: "Encerrado",
@@ -76,8 +117,8 @@
 
   PF.statusClass = function statusClass(status) {
     if (status === "atrasado") return "badge-danger";
-    if (status === "pendente" || status === "hold" || status === "acordo") return "badge-warn";
-    if (status === "encerrado" || status === "ativo") return "badge-ok";
+    if (status === "pendente" || status === "hold" || status === "acordo" || status === "parcial" || status === "renegociado") return "badge-warn";
+    if (status === "encerrado" || status === "ativo" || status === "pago") return "badge-ok";
     return "badge-muted";
   };
 })(typeof window !== "undefined" ? window : globalThis);

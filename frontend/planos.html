@@ -9,22 +9,54 @@
 </head>
 <body>
   <main class="main-content" id="main">
-    <header class="page-header"><h1>Planos</h1></header>
-    <p class="hint">A troca de plano é simulada neste navegador. Não há cobrança real.</p>
+    <header class="page-header">
+      <div>
+        <h1>Planos PixFactory</h1>
+        <p>Escolha o ritmo da operação. Troca simulada neste DEMO — sem cartão de verdade.</p>
+      </div>
+    </header>
+    <p class="hint" id="plan-current"></p>
     <section class="pricing">
-      <article class="card">
+      <article class="card price-card" data-plan-card="gratuito">
+        <p class="plan-tag">Começar</p>
         <h2>Gratuito</h2>
-        <p>Até 20 clientes e backup manual.</p>
+        <p class="plan-price">R$ 0<span>/mês</span></p>
+        <p class="hint">Para testar a operação com carteira pequena.</p>
+        <ul class="plan-list">
+          <li>Até 20 clientes</li>
+          <li>Agenda e cobrança WhatsApp</li>
+          <li>Só juros até quitar + parcela cheia</li>
+          <li>Caixa do dia e recibo</li>
+          <li>Backup manual</li>
+        </ul>
         <button type="button" data-plan="gratuito">Usar gratuito</button>
       </article>
-      <article class="card price-card featured">
+      <article class="card price-card featured" data-plan-card="pro">
+        <p class="plan-tag highlight">Mais escolhido</p>
         <h2>Pro</h2>
-        <p>Clientes ilimitados, relatórios e exportação.</p>
+        <p class="plan-price">R$ 79<span>/mês</span></p>
+        <p class="hint">Carteira no ritmo de quem vive de juros e cobrança.</p>
+        <ul class="plan-list">
+          <li>Clientes e contratos ilimitados</li>
+          <li>Busca global, follow-up e inadimplência</li>
+          <li>Multa, mora, estorno e quitação</li>
+          <li>Relatórios e exportação</li>
+          <li>Assistente operacional</li>
+        </ul>
         <button type="button" data-plan="pro">Assinar Pro</button>
       </article>
-      <article class="card">
+      <article class="card price-card" data-plan-card="premium">
+        <p class="plan-tag">Operação cheia</p>
         <h2>Premium</h2>
-        <p>Tudo do Pro + suporte prioritário.</p>
+        <p class="plan-price">R$ 149<span>/mês</span></p>
+        <p class="hint">Tudo do Pro, com prioridade quando a carteira pesa.</p>
+        <ul class="plan-list">
+          <li>Tudo do Pro</li>
+          <li>Suporte prioritário</li>
+          <li>Vários operadores (visão futura)</li>
+          <li>Régua D+1 / D+3 / D+7 (visão futura)</li>
+          <li>Conciliação Pix (visão futura)</li>
+        </ul>
         <button type="button" data-plan="premium">Assinar Premium</button>
       </article>
     </section>

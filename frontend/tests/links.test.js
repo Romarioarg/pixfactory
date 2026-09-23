@@ -24,7 +24,7 @@ const required = [
   "controle-de-gastos.html", "lancamentos.html", "limites-gastos.html",
   "controle-relatorios.html", "conexao-bancaria.html", "configuracoes.html",
   "perfil.html", "editar_perfil.html", "notificacoes.html", "planos.html",
-  "gerenciamento_usuarios.html", "novos-mes.html",
+  "gerenciamento_usuarios.html", "novos-mes.html", "inadimplencia.html", "cliente.html", "caixa.html", "recibo.html",
 ];
 required.forEach((file) => assert(existing.has(file), "page exists: " + file));
 

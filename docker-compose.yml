@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: pixfactory
       MYSQL_ROOT_PASSWORD: pixfactory-root
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - pixfactory_mysql:/var/lib/mysql
     healthcheck:

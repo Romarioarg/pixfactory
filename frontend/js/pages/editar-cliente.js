@@ -18,6 +18,18 @@
   set("rendaMensal", client.rendaMensal);
   set("banco", client.banco);
   set("classificacao", client.classificacao);
+  const ind = client.indicador || {};
+  set("indicador-nome", ind.nome);
+  set("indicador-telefone", ind.telefone || ind.whatsapp);
+  set("indicador-endereco", ind.endereco);
+  set("indicador-relacao", ind.relacao);
+  set("indicador-obs", ind.observacao);
+  const refs = client.referencias || [];
+  if (refs[0]) {
+    set("ref1-nome", refs[0].nome);
+    set("ref1-telefone", refs[0].telefone);
+    set("ref1-relacao", refs[0].relacao);
+  }
 
   document.getElementById("cpf").addEventListener("input", (e) => { e.target.value = PF.maskCpf(e.target.value); });
   document.getElementById("telefone").addEventListener("input", (e) => { e.target.value = PF.maskPhone(e.target.value); });
@@ -35,6 +47,17 @@
       rendaMensal: Number(document.getElementById("rendaMensal").value || 0),
       banco: document.getElementById("banco").value.trim(),
       classificacao: document.getElementById("classificacao").value,
+      indicador: {
+        nome: document.getElementById("indicador-nome").value.trim(),
+        telefone: document.getElementById("indicador-telefone").value.trim(),
+        whatsapp: document.getElementById("indicador-telefone").value.trim(),
+        endereco: document.getElementById("indicador-endereco").value.trim(),
+        relacao: document.getElementById("indicador-relacao").value.trim(),
+        observacao: document.getElementById("indicador-obs").value.trim(),
+      },
+      referencias: [
+        { nome: document.getElementById("ref1-nome").value.trim(), telefone: document.getElementById("ref1-telefone").value.trim(), relacao: document.getElementById("ref1-relacao").value.trim() },
+      ].filter((r) => r.nome),
     };
     const errors = PF.validate({
       nome: { value: payload.nome, checks: [PF.validators.required] },

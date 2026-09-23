@@ -14,17 +14,18 @@
       <a class="btn" href="novo_contrato.html">Novo contrato</a>
     </header>
     <div class="actions-row" id="filters">
-      <button type="button" data-filter="todos">Todos</button>
-      <button type="button" class="btn-ghost" data-filter="ativo">Ativos</button>
-      <button type="button" class="btn-ghost" data-filter="atrasado">Atrasados</button>
-      <button type="button" class="btn-ghost" data-filter="pendente">Pendentes</button>
-      <button type="button" class="btn-ghost" data-filter="encerrado">Encerrados</button>
+      <button type="button" class="filter-chip active" data-filter="todos">Todos</button>
+      <button type="button" class="filter-chip" data-filter="ativo">Ativos</button>
+      <button type="button" class="filter-chip" data-filter="pendente">Pendentes</button>
+      <button type="button" class="filter-chip" data-filter="atrasado">Atrasados</button>
+      <button type="button" class="filter-chip" data-filter="encerrado">Encerrados</button>
     </div>
     <input class="search-input" id="contract-search" type="search" placeholder="Buscar contrato ou cliente">
     <table>
       <thead><tr><th>Cliente</th><th>Tipo</th><th>Valor</th><th>Saldo</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody id="contracts-body"></tbody>
     </table>
+    <div class="pagination" id="pager"></div>
   </main>
   <div id="manage-modal" class="modal"><div class="modal-content"><button class="modal-close" type="button" data-close-modal="manage-modal" aria-label="Fechar">&times;</button><div id="manage-body"></div></div></div>
   <script src="js/format.js"></script>

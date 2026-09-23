@@ -9,7 +9,7 @@
 </head>
 <body>
   <main class="main-content" id="main">
-    <header class="page-header"><h1>Simulador financeiro</h1></header>
+      <p>Escolha o sistema. “Só juros até quitar o capital” é o caso de emprestar R$ 1.000 a 20% e receber R$ 200 por mês até a pessoa devolver os R$ 1.000.</p>
     <div class="grid grid-2">
       <section class="card">
         <div class="tabs" id="tabs">
@@ -22,8 +22,23 @@
           <div class="field"><label for="valor-emprestimo">Valor</label><input id="valor-emprestimo" type="number" value="1000" step="0.01" required></div>
           <div class="field"><label for="taxa-juros">Taxa mensal (%)</label><input id="taxa-juros" type="number" value="2.5" step="0.01" required></div>
           <div class="field"><label for="num-parcelas">Parcelas</label><input id="num-parcelas" type="number" value="12" min="1" required></div>
-          <div class="field"><label for="frequencia-pagamento">Frequência</label>
-            <select id="frequencia-pagamento"><option value="mensal">Mensal</option><option value="semanal">Semanal</option><option value="diario">Diário</option><option value="anual">Anual</option></select>
+          <div class="field"><label for="base-emprestimo">Base de cálculo</label>
+            <select id="base-emprestimo">
+              <option value="saldo">Sobre o saldo</option>
+              <option value="principal_original">Sobre o principal original</option>
+              <option value="valor_fixo">Valor fixo</option>
+            </select>
+          </div>
+          <div class="field"><label for="sistema-emprestimo">Sistema</label>
+            <select id="sistema-emprestimo">
+              <option value="price">Price / composto (parcela fixa)</option>
+              <option value="sac">SAC</option>
+              <option value="sacre">SACRE</option>
+              <option value="simples">Juros simples / parcela cheia</option>
+              <option value="so_juros">Só juros + balloon (americano)</option>
+              <option value="so_juros_aberto">Só juros até quitar o capital</option>
+              <option value="aluguel">Aluguel</option>
+            </select>
           </div>
           <button type="submit">Calcular</button>
         </form>

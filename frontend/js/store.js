@@ -18,7 +18,7 @@
       notifications: [],
       suggestions: [],
       appointments: [],
-      payments: [],
+      charges: [],
       emails: [],
       activity: [],
       settings: {
@@ -96,6 +96,7 @@
       cache = Object.assign(emptyCache(), data);
       cache.clients = (data.clients || []).map(normalize);
       cache.contracts = (data.contracts || []).map(normalize);
+      cache.charges = (data.charges || data.cobrancas || []).map(normalize);
       cache.launches = (data.launches || []).map(normalize);
       cache.payables = (data.payables || []).map(normalize);
       cache.receivables = (data.receivables || []).map(normalize);
@@ -122,6 +123,7 @@
     users: collection("users", "/api/users"),
     clients: collection("clients", "/api/clients"),
     contracts: collection("contracts", "/api/contracts"),
+    charges: collection("charges", "/api/cobrancas"),
     launches: collection("launches", "/api/launches"),
     payables: collection("payables", "/api/payables"),
     receivables: collection("receivables", "/api/receivables"),
@@ -162,6 +164,12 @@
     clientContracts(clientId) {
       return list("contracts").filter((c) => String(c.clienteId) === String(clientId));
     },
+    clientCharges(clientId) {
+      return list("charges").filter((c) => String(c.clienteId) === String(clientId));
+    },
+    overdueCharges() {
+      return list("charges").filter((c) => c.status === "atrasado" || (c.status === "parcial" && Number(c.saldo) > 0 && c.promessaStatus === "quebrada"));
+    },
     metrics() {
       return cache.metrics || {};
     },
@@ -200,6 +208,33 @@
       upsert("payments", payment);
       await this.hydrate();
       return payment;
+    },
+    async payCharge(id, valor, extra) {
+      const body = Object.assign({ valor: valor }, extra || {});
+      const updated = await PF.api.post("/api/cobrancas/" + id + "/pagamentos", body);
+      upsert("charges", updated);
+      await this.hydrate();
+      return updated;
+    },
+    async promiseCharge(id, data, valor, extra) {
+      const body = Object.assign({ data: data, valor: valor }, extra || {});
+      const updated = await PF.api.post("/api/cobrancas/" + id + "/promessa", body);
+      return upsert("charges", updated);
+    },
+    async contactCharge(id, canal, resultado, observacao, proximoContato) {
+      const payload = { canal: canal, resultado: resultado, observacao: observacao };
+      if (proximoContato) payload.proximoContato = proximoContato;
+      const updated = await PF.api.post("/api/cobrancas/" + id + "/contato", payload);
+      return upsert("charges", updated);
+    },
+    async reverseCharge(id, motivo) {
+      const updated = await PF.api.post("/api/cobrancas/" + id + "/estorno", { motivo: motivo || "Estorno operacional" });
+      upsert("charges", updated);
+      await this.hydrate();
+      return updated;
+    },
+    async chargeReceipt(id) {
+      return PF.api.get("/api/cobrancas/" + id + "/recibo");
     },
   };
 })(typeof window !== "undefined" ? window : globalThis);

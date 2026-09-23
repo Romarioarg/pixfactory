@@ -3,7 +3,10 @@
   let filter = "todos";
   const body = document.getElementById("contracts-body");
   const search = document.getElementById("contract-search");
+  const pager = document.getElementById("pager");
   let currentId = null;
+  let page = 1;
+  const PAGE_SIZE = 8;
 
   function clientName(id) {
     const c = PF.store.clients.get(id);
@@ -21,20 +24,52 @@
 
   function render() {
     const rows = list();
+    const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+    if (page > pages) page = pages;
+    const slice = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     if (!rows.length) {
       body.innerHTML = '<tr><td colspan="6">' + PF.ui.empty("Nenhum contrato encontrado.") + "</td></tr>";
+      pager.innerHTML = "";
       return;
     }
-    body.innerHTML = rows.map((c) =>
-      "<tr>" +
+    body.innerHTML = slice.map((c) => {
+      const cli = PF.store.clients.get(c.clienteId);
+      return "<tr>" +
       '<td data-label="Cliente">' + PF.escapeHtml(clientName(c.clienteId)) + "</td>" +
       '<td data-label="Tipo">' + PF.escapeHtml(c.tipo) + "</td>" +
       '<td data-label="Valor">' + PF.formatMoney(c.valorTotal) + "</td>" +
       '<td data-label="Saldo">' + PF.formatMoney(c.saldoDevedor) + "</td>" +
       '<td data-label="Status"><span class="badge ' + PF.statusClass(c.status) + '">' + PF.statusLabel(c.status) + "</span></td>" +
-      '<td data-label="Ações"><button type="button" data-open="' + c.id + '">Gerenciar</button></td>' +
-      "</tr>"
-    ).join("");
+      '<td data-label="Ações"><div class="actions-row">' +
+      '<button type="button" data-open="' + c.id + '">Ver</button>' +
+      (cli ? '<a class="btn-ghost" href="editar-cliente.html?id=' + encodeURIComponent(cli.id) + '">Editar</a>' : "") +
+      (cli && cli.telefone ? '<button type="button" class="btn-ghost" data-msg="' + c.id + '">Enviar Mensagem</button>' : "") +
+      "</div></td></tr>";
+    }).join("");
+    pager.innerHTML = '<button type="button" class="btn-ghost" id="prev-page"' + (page === 1 ? " disabled" : "") + ">Anterior</button>" +
+      "<span>Página " + page + " de " + pages + "</span>" +
+      '<button type="button" class="btn-ghost" id="next-page"' + (page === pages ? " disabled" : "") + ">Próxima</button>";
+  }
+
+  function isOpenInterest(c) {
+    const modo = String(c.modoPagamento || "").toLowerCase();
+    const sistema = String(c.sistemaAmortizacao || "").toLowerCase();
+    return modo.indexOf("rotativo") >= 0 || modo.indexOf("aberto") >= 0 || sistema.indexOf("aberto") >= 0;
+  }
+
+  function nextInterestAmount(c) {
+    const open = PF.store.charges.all().filter((ch) =>
+      String(ch.contratoId) === String(c.id) &&
+      ch.tipoParcela === "so_juros" &&
+      ch.status !== "pago" &&
+      ch.status !== "cancelado"
+    );
+    return open.length ? Number(open[0].valor || 0) : null;
+  }
+
+  function capitalRemaining(c) {
+    const charge = PF.store.charges.all().find((ch) => String(ch.contratoId) === String(c.id) && ch.tipoParcela === "principal");
+    return charge ? Number(charge.saldo || 0) : Number(c.valorTotal || 0);
   }
 
   function paymentBox(payment) {
@@ -62,6 +97,12 @@
       "<p>Total " + PF.formatMoney(c.valorTotal) + " · Pago " + PF.formatMoney(c.valorPago) + " · Saldo " + PF.formatMoney(c.saldoDevedor) + "</p>" +
       "<p>Parcelas " + c.parcelasPagas + "/" + c.parcelasTotais + " · Próximo: " + PF.formatDate(c.proximoPagamento) + "</p>" +
       "<p>Juros " + c.juros + "% · Multa " + PF.formatMoney(c.multa) + "</p>" +
+      "<p>" + PF.escapeHtml(c.sistemaAmortizacao || "price") + " · " + PF.escapeHtml(c.modoPagamento || "parcela_cheia") +
+      (isOpenInterest(c) ? " · <span class='badge badge-ok'>Cobrança até quitar</span>" : "") +
+      (c.originalContractId ? " · origem #" + c.originalContractId : "") + "</p>" +
+      (isOpenInterest(c) ? "<p>Capital em aberto " + PF.formatMoney(capitalRemaining(c)) +
+        (nextInterestAmount(c) != null ? " · juro do período " + PF.formatMoney(nextInterestAmount(c)) : "") +
+        "</p>" : "") +
       '<div class="actions-row">' +
       '<button type="button" data-act="pix">Pix Demo</button>' +
       '<button type="button" data-act="pagar">Registrar pagamento</button>' +
@@ -69,7 +110,15 @@
       '<button type="button" data-act="extra">Novo empréstimo</button>' +
       '<button type="button" data-act="bem">Pagamento com bem</button>' +
       '<button type="button" data-act="reneg">Renegociar</button>' +
+      '<button type="button" data-act="imprevisto">Imprevisto</button>' +
       '<button type="button" data-act="quitar">Quitar</button>' +
+      '<button type="button" data-act="quitar_antecipado">Quitar antecipado</button>' +
+      (isOpenInterest(c)
+        ? '<button type="button" data-act="gerar_juros">Gerar próximo juro</button>' +
+          '<button type="button" data-act="amortizar_capital">Amortizar capital</button>'
+        : "") +
+      '<button type="button" data-act="nova_operacao">Nova operação</button>' +
+      '<button type="button" data-act="refinanciar">Refinanciar</button>' +
       '<button type="button" data-act="acordo">Acordo</button>' +
       '<button type="button" data-act="transferir">Transferir</button>' +
       '<button type="button" data-act="hold">Colocar em espera</button>' +
@@ -85,6 +134,7 @@
   async function runAction(id, action, extra) {
     try {
       await PF.store.contractAction(id, action, extra || {});
+      await PF.store.hydrate();
       render();
       openManage(id);
       PF.ui.toast("Contrato atualizado.");
@@ -97,12 +147,25 @@
     const btn = e.target.closest("[data-filter]");
     if (!btn) return;
     filter = btn.getAttribute("data-filter");
+    document.querySelectorAll("#filters [data-filter]").forEach((el) => el.classList.toggle("active", el === btn));
+    page = 1;
     render();
   });
-  search.addEventListener("input", render);
+  search.addEventListener("input", () => { page = 1; render(); });
   body.addEventListener("click", (e) => {
     const open = e.target.closest("[data-open]");
+    const msg = e.target.closest("[data-msg]");
     if (open) openManage(open.getAttribute("data-open"));
+    if (msg) {
+      const c = PF.store.contracts.get(msg.getAttribute("data-msg"));
+      const cli = c ? PF.store.clients.get(c.clienteId) : null;
+      if (!cli) return;
+      PF.openWhatsApp(cli.telefone, "Olá, " + cli.nome + "! Tudo bem? Entrando em contato sobre o contrato no PixFactory. Saldo: " + PF.formatMoney(c.saldoDevedor) + ".");
+    }
+  });
+  pager.addEventListener("click", (e) => {
+    if (e.target.id === "prev-page") { page = Math.max(1, page - 1); render(); }
+    if (e.target.id === "next-page") { page += 1; render(); }
   });
 
   document.getElementById("manage-body").addEventListener("click", async (e) => {
@@ -163,11 +226,51 @@
     if (action === "reneg") {
       const juros = Number(prompt("Nova taxa de juros (%):", c.juros));
       if (juros == null) return;
-      return runAction(currentId, "reneg", { juros: juros });
+      const parcelas = Number(prompt("Novas parcelas:", c.parcelasTotais));
+      if (!parcelas) return;
+      const modo = prompt("Modo: parcela_cheia ou so_juros", c.modoPagamento || "parcela_cheia");
+      const justificativa = prompt("Justificativa da renegociação:", "Acordo com o cliente");
+      if (!justificativa) return;
+      return runAction(currentId, "reneg", { juros: juros, parcelasTotais: parcelas, modo: modo, sistema: c.sistemaAmortizacao || "price", justificativa: justificativa });
+    }
+    if (action === "imprevisto") {
+      const tipo = prompt("Tipo: pular_parcela, feriado, perda_renda, pix_falhou, cliente_ausente, reajuste_aluguel", "pular_parcela");
+      if (!tipo) return;
+      const observacao = prompt("Observação:", "") || "";
+      const extra = { tipo: tipo, observacao: observacao };
+      if (tipo === "pular_parcela" || tipo === "feriado") extra.dias = Number(prompt("Dias para adiar:", "7")) || 7;
+      if (tipo === "reajuste_aluguel") extra.valor = Number(prompt("Novo valor do aluguel:", c.valorTotal));
+      return runAction(currentId, "imprevisto", extra);
     }
     if (action === "quitar") {
-      if (!PF.ui.confirm("Quitar o saldo de " + PF.formatMoney(c.saldoDevedor) + "?")) return;
+      if (!PF.ui.confirm("Quitar o saldo de " + PF.formatMoney(c.saldoDevedor) + " sem desconto?")) return;
       return runAction(currentId, "quitar", {});
+    }
+    if (action === "quitar_antecipado") {
+      if (!PF.ui.confirm("Quitar antecipado o saldo de " + PF.formatMoney(c.saldoDevedor) + " com o desconto configurado?")) return;
+      return runAction(currentId, "quitar_antecipado", { desconto: true });
+    }
+    if (action === "gerar_juros") {
+      return runAction(currentId, "gerar_juros", {});
+    }
+    if (action === "amortizar_capital") {
+      const restante = capitalRemaining(c);
+      const valor = Number(prompt("Quanto do capital o cliente está devolvendo agora? Em aberto: " + PF.formatMoney(restante), ""));
+      if (!valor || valor <= 0) return;
+      return runAction(currentId, "amortizar_capital", { valor: valor });
+    }
+    if (action === "nova_operacao") {
+      const modo = prompt("1 = operação separada\n2 = agrupar no principal\n3 = refinanciar\n4 = quitar e criar nova", "1");
+      if (!modo) return;
+      const valor = Number(prompt("Valor do novo crédito:", "500"));
+      if (!valor) return;
+      const map = { "1": "separar", "2": "agrupar", "3": "refinanciar", "4": "quitar_e_novo" };
+      return runAction(currentId, "nova_operacao", { valor: valor, modoOperacao: map[modo] || "separar" });
+    }
+    if (action === "refinanciar") {
+      const valor = Number(prompt("Novo crédito (deve cobrir o saldo de " + PF.formatMoney(c.saldoDevedor) + "):", Number(c.saldoDevedor) + 500));
+      if (!valor) return;
+      return runAction(currentId, "refinanciar", { valor: valor });
     }
     if (action === "acordo") {
       const valor = Number(prompt("Valor do acordo:", c.saldoDevedor));

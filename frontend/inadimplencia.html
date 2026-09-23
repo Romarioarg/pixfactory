@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inadimplência | PixFactory</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="main-content" id="main">
+    <header class="page-header">
+      <h1>Inadimplência</h1>
+      <a class="btn-ghost" href="dashboard.html">Voltar</a>
+    </header>
+    <div class="actions-row" id="aging">
+      <button type="button" class="filter-chip active" data-aging="todos">Todos</button>
+      <button type="button" class="filter-chip" data-aging="sem_contato">Sem contato</button>
+      <button type="button" class="filter-chip" data-aging="promessa_hoje">Promessa hoje</button>
+      <button type="button" class="filter-chip" data-aging="quebrada">Promessa quebrada</button>
+      <button type="button" class="filter-chip" data-aging="1-7">1–7 dias</button>
+      <button type="button" class="filter-chip" data-aging="8-30">8–30 dias</button>
+      <button type="button" class="filter-chip" data-aging="31-60">31–60 dias</button>
+      <button type="button" class="filter-chip" data-aging="61-90">61–90 dias</button>
+      <button type="button" class="filter-chip" data-aging="90+">Acima de 90</button>
+    </div>
+    <div id="inad-summary" class="grid grid-3" style="margin-bottom:16px"></div>
+    <table>
+      <thead><tr><th>Cliente</th><th>Parcela</th><th>Valor em atraso</th><th>Dias</th><th>Último contato</th><th>Promessa</th><th>Ações</th></tr></thead>
+      <tbody id="inad-body"></tbody>
+    </table>
+  </main>
+  <script src="js/format.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/inadimplencia.js"></script>
+</body>
+</html>

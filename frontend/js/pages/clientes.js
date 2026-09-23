@@ -23,6 +23,7 @@
       "<p>" + PF.maskPhone(c.telefone) + " · " + PF.escapeHtml(c.email || "") + "</p>" +
       '<div class="actions-row" style="margin-top:10px">' +
       '<button type="button" data-detail="' + c.id + '">Ver detalhes</button>' +
+      '<a class="btn-ghost" href="cliente.html?id=' + encodeURIComponent(c.id) + '">Dossiê</a>' +
       '<button type="button" class="btn-ghost" data-wa="' + c.id + '">Cobrança</button>' +
       '<a class="btn btn-warn" href="editar-cliente.html?id=' + encodeURIComponent(c.id) + '">Editar</a>' +
       '<button type="button" class="btn-danger" data-del="' + c.id + '">Remover</button>' +
@@ -50,8 +51,8 @@
     if (wa) {
       const client = PF.store.clients.get(wa.getAttribute("data-wa"));
       if (!client || !client.telefone) return PF.ui.toast("Cliente sem telefone.", "error");
-      const msg = encodeURIComponent("Olá " + client.nome + ", lembrete de cobrança do PixFactory.");
-      window.open("https://wa.me/55" + PF.digits(client.telefone) + "?text=" + msg, "_blank");
+      const late = PF.store.clientCharges(client.id).find((x) => x.status === "atrasado") || PF.store.clientCharges(client.id)[0];
+      PF.openWhatsApp(client.telefone, late ? PF.whatsappChargeMessage(Object.assign({ nome: client.nome }, late)) : "Olá, " + client.nome + "! Tudo bem? Contato do PixFactory.");
     }
     if (detail) {
       const client = PF.store.clients.get(detail.getAttribute("data-detail"));

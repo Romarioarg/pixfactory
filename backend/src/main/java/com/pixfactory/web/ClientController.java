@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/clients")
+@RequestMapping({"/api/clients", "/api/clientes"})
 public class ClientController {
     private final ClientService clientService;
 
@@ -24,6 +24,11 @@ public class ClientController {
     @GetMapping("/{id}")
     public Map<String, Object> get(@PathVariable Long id) {
         return clientService.find(id);
+    }
+
+    @GetMapping("/{id}/dossie")
+    public Map<String, Object> dossier(@PathVariable Long id) {
+        return clientService.dossier(id);
     }
 
     @PostMapping

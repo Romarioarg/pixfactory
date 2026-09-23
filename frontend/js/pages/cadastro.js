@@ -28,6 +28,19 @@
       banco: document.getElementById("banco").value.trim(),
       classificacao: document.getElementById("classificacao").value,
       foto: document.getElementById("preview").getAttribute("src") || "assets/favicon.svg",
+      observacoes: "",
+      indicador: {
+        nome: document.getElementById("indicador-nome").value.trim(),
+        telefone: document.getElementById("indicador-telefone").value.trim(),
+        whatsapp: document.getElementById("indicador-telefone").value.trim(),
+        endereco: document.getElementById("indicador-endereco").value.trim(),
+        relacao: document.getElementById("indicador-relacao").value.trim(),
+        observacao: document.getElementById("indicador-obs").value.trim(),
+      },
+      referencias: [
+        { nome: document.getElementById("ref1-nome").value.trim(), telefone: document.getElementById("ref1-telefone").value.trim(), relacao: document.getElementById("ref1-relacao").value.trim() },
+        { nome: document.getElementById("ref2-nome").value.trim(), telefone: document.getElementById("ref2-telefone").value.trim(), relacao: document.getElementById("ref2-relacao").value.trim() },
+      ].filter((r) => r.nome),
     };
     const errors = PF.validate({
       nome: { value: payload.nome, checks: [PF.validators.required] },

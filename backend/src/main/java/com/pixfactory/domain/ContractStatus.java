@@ -8,6 +8,7 @@ public enum ContractStatus {
     ATRASADO("atrasado"),
     PENDENTE("pendente"),
     ENCERRADO("encerrado"),
+    RENEGOCIADO("renegociado"),
     ACORDO("acordo"),
     HOLD("hold"),
     FALECIMENTO("falecimento");

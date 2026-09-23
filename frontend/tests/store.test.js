@@ -35,6 +35,8 @@ assert(PF.validators.cpf("000.000.000-00") !== "", "invalid CPF");
 assert(PF.validators.password("Demo@123") === "", "valid password");
 assert(PF.validators.password("123") !== "", "weak password");
 assert(PF.statusLabel("atrasado") === "Em atraso", "status label");
+assert(PF.whatsappChargeMessage({ nome: "João", valor: 300, vencimento: "2026-08-20" }).includes("João"), "whatsapp message uses name");
+assert(PF.whatsappReceiptMessage({ nome: "João", valorPago: 300, numero: 2, reciboId: "PF-9" }).includes("PF-9"), "whatsapp receipt uses id");
 
 if (failed) {
   console.error("\n" + failed + " test(s) failed");

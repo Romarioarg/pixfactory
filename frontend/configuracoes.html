@@ -16,6 +16,10 @@
         <div class="field"><label for="companyName">Nome da empresa</label><input id="companyName"></div>
         <div class="field"><label for="slogan">Slogan</label><input id="slogan"></div>
         <div class="field"><label for="defaultInterestRate">Juros padrão (%)</label><input id="defaultInterestRate" type="number" step="0.01"></div>
+        <div class="field"><label for="lateFeePercent">Multa de atraso (%)</label><input id="lateFeePercent" type="number" step="0.01" min="0"></div>
+        <div class="field"><label for="moraPercentPerDay">Juros de mora ao dia (%)</label><input id="moraPercentPerDay" type="number" step="0.001" min="0"></div>
+        <div class="field"><label for="earlyPayoffDiscountPercent">Desconto quitação antecipada (%)</label><input id="earlyPayoffDiscountPercent" type="number" step="0.01" min="0"></div>
+        <div class="field"><label for="graceDays">Carência (dias)</label><input id="graceDays" type="number" min="0"></div>
         <label><input id="emailNotifications" type="checkbox"> Notificações por e-mail (preferência local)</label>
         <label><input id="paymentReminders" type="checkbox"> Lembretes de pagamento</label>
         <button type="submit">Salvar</button>
