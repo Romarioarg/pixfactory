@@ -1,193 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Portfólio de Romario Gomes — Full Stack Developer & QA Engineer." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfólio de Romario Gomes — Full Stack Developer e QA Engineer. Projeto em destaque: PixFactory.">
   <title>Romario Dev | Full Stack Developer & QA Engineer</title>
   <link rel="icon" href="frontend/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
-  <div class="grid-overlay"></div>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="glow glow-a" aria-hidden="true"></div>
+  <div class="glow glow-b" aria-hidden="true"></div>
 
-  <main class="page">
-    <header class="brand">
-      <div class="brand-mark">&lt;/&gt;</div>
-      <div>
-        <strong>ROMARIO <span>DEV</span></strong>
-        <small>Full Stack Developer | QA Engineer</small>
-      </div>
-    </header>
+  <header class="topbar">
+    <a class="logo" href="#topo">
+      <span class="logo-mark" aria-hidden="true">&lt;/&gt;</span>
+      <span>ROMARIO <em>DEV</em></span>
+    </a>
+    <p class="topbar-role">Full Stack Developer · QA Engineer</p>
+  </header>
 
-    <section class="hero">
+  <main id="conteudo">
+    <section class="hero" id="topo">
       <div class="hero-copy">
-        <div class="eyebrow"><span></span> SEMPRE EM EVOLUÇÃO</div>
-        <h1>Olá, eu sou<br><span>Romario Gomes</span></h1>
-        <h2>Full Stack Developer &amp; QA Engineer</h2>
+        <p class="kicker"><span></span> Sempre em evolução</p>
+        <h1>Olá, eu sou <span>Romario Gomes</span></h1>
+        <p class="role">Full Stack Developer &amp; QA Engineer</p>
         <p class="lead">
-          Estudante de Análise e Desenvolvimento de Sistemas, apaixonado por tecnologia,
-          qualidade de software e automação de testes. Atualmente atuo como QA Engineer,
-          buscando evoluir como desenvolvedor e construir soluções reais com tecnologia.
+          Estudante de Análise e Desenvolvimento de Sistemas. Atuo como QA Engineer
+          e sigo evoluindo em testes, automação, APIs e desenvolvimento de soluções reais.
         </p>
-
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#projeto">Ver meu projeto <span>→</span></a>
-          <a class="btn btn-secondary" href="https://github.com/Romarioarg" target="_blank" rel="noopener">Meu GitHub <span>↗</span></a>
+        <div class="actions">
+          <a class="btn btn-primary" href="#projeto">Ver meu projeto <span aria-hidden="true">→</span></a>
+          <a class="btn btn-ghost" href="https://github.com/Romarioarg" target="_blank" rel="noopener">Meu GitHub <span aria-hidden="true">↗</span></a>
         </div>
-
-        <div class="pillars">
-          <div><b>◉</b><span>Testar<br><small>com propósito</small></span></div>
-          <div><b>&lt;/&gt;</b><span>Desenvolver<br><small>com qualidade</small></span></div>
-          <div><b>⌁</b><span>Automatizar<br><small>com eficiência</small></span></div>
-          <div><b>↗</b><span>Evoluir<br><small>sempre</small></span></div>
-        </div>
+        <ul class="pillars">
+          <li><b>Testar</b><span>com propósito</span></li>
+          <li><b>Desenvolver</b><span>com qualidade</span></li>
+          <li><b>Automatizar</b><span>com eficiência</span></li>
+          <li><b>Evoluir</b><span>sempre</span></li>
+        </ul>
       </div>
 
       <div class="hero-visual">
-        <div class="quote quote-top">“Disciplina<br>Foco<br>Testes<br>Resultados”</div>
-        <div class="portrait-ring">
-          <img src="assets/romario-fullstack-developer.png" alt="Arte de Romario Gomes como Full Stack Developer" />
+        <p class="note note-a">Disciplina<br>Foco<br>Testes<br>Resultados</p>
+        <div class="ring">
+          <img src="assets/romario-fullstack-developer.png" alt="Romario Gomes, ilustração Full Stack Developer">
         </div>
-        <div class="neon-note">Better<br>Tests<br>A Brighter<br>Tomorrow</div>
+        <p class="note note-b">Better Tests<br>A Brighter<br>Tomorrow</p>
       </div>
     </section>
 
-    <section class="stats" aria-label="Resumo">
-      <article><span class="stat-icon">⌘</span><div><strong>+100</strong><small>Horas de estudo</small></div></article>
-      <article><span class="stat-icon">&lt;/&gt;</span><div><strong>3</strong><small>Projetos em andamento</small></div></article>
-      <article><span class="stat-icon">QA</span><div><strong>QA Engineer</strong><small>Experiência atual</small></div></article>
-      <article><span class="stat-icon">∞</span><div><strong>Sempre</strong><small>Em evolução</small></div></article>
+    <section class="summary" aria-label="Resumo">
+      <article><small>01</small><strong>Em evolução</strong><span>Percurso em andamento</span></article>
+      <article><small>02</small><strong>Projetos</strong><span>Prática aplicada</span></article>
+      <article><small>03</small><strong>QA Engineer</strong><span>Atuação atual</span></article>
+      <article><small>04</small><strong>Sempre</strong><span>Aprendizado contínuo</span></article>
     </section>
 
-    <section class="three-panels">
-      <article class="panel">
-        <div class="panel-title"><span>◉</span><h3>O que eu faço</h3></div>
+    <section class="bento" aria-label="Atuação, tecnologias e estudos">
+      <article class="card">
+        <h2><span aria-hidden="true">◉</span> O que eu faço</h2>
         <p>
           Atuo com testes manuais e automação, validação de APIs, qualidade de software
-          e desenvolvimento. Busco aplicar meus conhecimentos em projetos reais e
-          continuar evoluindo junto com a equipe.
+          e desenvolvimento. Busco aplicar esses conhecimentos em projetos reais e continuar evoluindo.
         </p>
       </article>
 
-      <article class="panel">
-        <div class="panel-title"><span>⌘</span><h3>Tecnologias</h3></div>
-        <div class="tech-grid">
-          <span>Java</span><span>Python</span><span>JavaScript</span><span>HTML5</span>
-          <span>CSS3</span><span>Spring Boot</span><span>MySQL</span><span>Docker</span>
-          <span>Git</span><span>GitHub</span><span>Playwright</span><span>Postman</span>
-        </div>
+      <article class="card card-tech">
+        <h2><span aria-hidden="true">{ }</span> Tecnologias</h2>
+        <p class="card-note">Estudadas e utilizadas em projetos e na rotina de qualidade.</p>
+        <ul class="chips">
+          <li>Java</li><li>Python</li><li>JavaScript</li><li>HTML5</li>
+          <li>CSS3</li><li>Spring Boot</li><li>MySQL</li><li>Docker</li>
+          <li>Git</li><li>GitHub</li><li>Playwright</li><li>Postman</li>
+        </ul>
       </article>
 
-      <article class="panel">
-        <div class="panel-title"><span>▣</span><h3>Em estudo</h3></div>
-        <ul class="study-list">
-          <li>Playwright (Automação)</li>
-          <li>ADVPL / TLPP (TOTVS Protheus)</li>
-          <li>Boas práticas de desenvolvimento</li>
-          <li>Arquitetura de sistemas</li>
-          <li>Integração de APIs</li>
-          <li>Estudo contínuo de novas tecnologias</li>
+      <article class="card">
+        <h2><span aria-hidden="true">▣</span> Em estudo</h2>
+        <ul class="study">
+          <li>Playwright</li>
+          <li>ADVPL / TLPP</li>
+          <li>Boas práticas</li>
+          <li>Arquitetura</li>
+          <li>APIs</li>
+          <li>Evolução contínua</li>
         </ul>
       </article>
     </section>
 
-    <section id="projeto" class="project-section">
-      <div class="section-kicker">▣ PROJETO EM DESTAQUE</div>
-      <div class="project-content">
-        <div class="project-copy">
-          <h2>PixFactory</h2>
-          <p class="project-subtitle">Plataforma Web de Gestão de Clientes</p>
-          <p>
-            Sistema completo com frontend, API, banco de dados e autenticação.
-            Projeto pessoal desenvolvido para aplicar na prática desenvolvimento web,
-            APIs, modelagem de dados, validação de funcionalidades e boas práticas.
-          </p>
-
-          <div class="tags">
-            <span>Java</span><span>Spring Boot</span><span>MySQL</span><span>Docker</span>
-            <span>JWT</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Swagger</span>
-          </div>
-
-          <div class="project-actions">
-            <a class="btn btn-primary" href="https://github.com/Romarioarg/pixfactory" target="_blank" rel="noopener">
-              Ver repositório no GitHub ↗
-            </a>
-            <a class="btn btn-secondary" href="https://github.com/Romarioarg/pixfactory#readme" target="_blank" rel="noopener">
-              Ler README →
-            </a>
-          </div>
+    <section class="project" id="projeto">
+      <div class="project-copy">
+        <p class="kicker"><span></span> Projeto em destaque</p>
+        <h2>PixFactory</h2>
+        <p class="project-sub">Plataforma Web de Gestão de Clientes</p>
+        <p>
+          Sistema completo com frontend, API, banco de dados e autenticação.
+          Projeto pessoal desenvolvido para aplicar na prática desenvolvimento web,
+          APIs, modelagem de dados, validação de funcionalidades e boas práticas.
+        </p>
+        <ul class="chips">
+          <li>Java</li><li>Spring Boot</li><li>MySQL</li><li>Docker</li>
+          <li>JWT</li><li>HTML</li><li>CSS</li><li>JavaScript</li><li>Swagger</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/Romarioarg/pixfactory" target="_blank" rel="noopener">Ver repositório no GitHub <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-ghost" href="https://github.com/Romarioarg/pixfactory#readme" target="_blank" rel="noopener">Ler README <span aria-hidden="true">→</span></a>
         </div>
+      </div>
 
-        <div class="project-art">
-          <div class="laptop">
-            <div class="screen">
-              <div class="screen-top"><b>PixFactory</b><span>●</span></div>
-              <div class="screen-body">
-                <aside></aside>
-                <div class="mini-dashboard">
-                  <div class="mini-cards"><i></i><i></i><i></i><i></i></div>
-                  <div class="mini-chart"></div>
-                  <div class="mini-chart small"></div>
-                </div>
-              </div>
+      <div class="stage" aria-hidden="true">
+        <div class="screen">
+          <div class="screen-top"><b>PixFactory</b><i></i></div>
+          <div class="screen-body">
+            <aside></aside>
+            <div>
+              <div class="kpis"><span></span><span></span><span></span><span></span></div>
+              <div class="chart"></div>
+              <div class="chart chart-sm"></div>
             </div>
-            <div class="keyboard"></div>
           </div>
         </div>
+        <div class="base"></div>
       </div>
     </section>
 
-    <section class="run-section">
-      <div class="section-kicker">▣ COMO EXECUTAR O PROJETO</div>
-      <h2>Quer ver o sistema funcionando?</h2>
-      <p class="run-intro">O PixFactory é executado localmente. Clone o repositório e siga o README para preparar o ambiente.</p>
-
-      <div class="steps">
-        <article><b>01</b><h3>Clone o repositório</h3><code>git clone<br>https://github.com/<wbr>Romarioarg/<wbr>pixfactory.git</code></article>
-        <article><b>02</b><h3>Entre na pasta</h3><code>cd pixfactory</code></article>
-        <article><b>03</b><h3>Execute o Docker</h3><code>docker compose up --build</code></article>
-        <article><b>04</b><h3>Acesse no navegador</h3><code>http://localhost:8080</code></article>
-        <article><b>05</b><h3>Use a conta demo</h3><code>demo@pixfactory.app / Demo@123</code></article>
-      </div>
-
-      <div class="notice">
-        <strong>Importante:</strong> esta página é a vitrine do projeto. O dashboard real do PixFactory
-        é executado localmente com o ambiente completo do repositório.
-      </div>
+    <section class="run" aria-labelledby="run-title">
+      <p class="kicker"><span></span> Como executar</p>
+      <h2 id="run-title">O sistema real roda na sua máquina</h2>
+      <p class="lead">Esta página apresenta o projeto. Para ver o dashboard, clone o repositório e suba o ambiente local.</p>
+      <ol class="steps">
+        <li><b>01</b><strong>Clone o repositório</strong><code>git clone<br>https://github.com/<wbr>Romarioarg/<wbr>pixfactory.git</code></li>
+        <li><b>02</b><strong>Entre na pasta</strong><code>cd pixfactory</code></li>
+        <li><b>03</b><strong>Suba o ambiente</strong><code>docker compose up<br>--build</code></li>
+        <li><b>04</b><strong>Abra no navegador</strong><code>http://localhost:8080</code></li>
+        <li><b>05</b><strong>Conta demo</strong><code>demo@pixfactory.app<br>Demo@123</code></li>
+      </ol>
+      <p class="notice">O dashboard verdadeiro não fica embutido aqui. Ele abre em <strong>localhost:8080</strong> depois do ambiente completo.</p>
     </section>
 
-    <section class="experience">
+    <section class="profile">
       <div>
-        <div class="section-kicker">▣ PERFIL</div>
+        <p class="kicker"><span></span> Perfil</p>
         <h2>Construindo conhecimento na prática.</h2>
         <p>
-          Estudante de ADS e QA Engineer, com contato diário com testes, APIs, banco de dados,
-          Git/GitHub, CI/CD e desenvolvimento. A proposta deste portfólio é mostrar a evolução
-          por meio de projetos reais e estudos aplicados.
+          Estudante de ADS e QA Engineer, em contato com testes, APIs, banco de dados,
+          Git/GitHub e desenvolvimento. O portfólio mostra essa evolução por projetos reais e estudo aplicado.
         </p>
       </div>
-      <div class="quote-card">“Em constante evolução,<br>sempre buscando aprender<br>e construir um futuro melhor<br>com tecnologia.”</div>
+      <blockquote>Em constante evolução, sempre buscando aprender e construir com tecnologia.</blockquote>
     </section>
-
-    <footer>
-      <div>
-        <strong>ROMARIO <span>DEV</span></strong>
-        <small>Full Stack Developer | QA Engineer</small>
-      </div>
-      <div class="footer-links">
-        <a href="mailto:arg.dev.java@gmail.com">✉ arg.dev.java@gmail.com</a>
-        <a href="https://www.linkedin.com/in/anderson-romario-gomes" target="_blank" rel="noopener">in LinkedIn</a>
-        <a href="https://github.com/Romarioarg" target="_blank" rel="noopener">◉ github.com/Romarioarg</a>
-      </div>
-      <div class="footer-mark">&lt;/&gt;</div>
-    </footer>
   </main>
+
+  <footer id="contato">
+    <div class="logo">
+      <span class="logo-mark" aria-hidden="true">&lt;/&gt;</span>
+      <span>ROMARIO <em>DEV</em><small>Full Stack Developer · QA Engineer</small></span>
+    </div>
+    <nav class="contacts" aria-label="Contato">
+      <a href="mailto:arg.dev.java@gmail.com">arg.dev.java@gmail.com</a>
+      <a href="https://www.linkedin.com/in/anderson-romario-gomes" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/Romarioarg" target="_blank" rel="noopener">github.com/Romarioarg</a>
+    </nav>
+  </footer>
 
   <script src="script.js"></script>
 </body>
